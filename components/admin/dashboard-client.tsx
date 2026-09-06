@@ -33,25 +33,25 @@ export default function AdminDashboardClient({
   // Status Warna Kendali Kapasitas (PRD §4.7)
   let statusTheme = {
     badge: 'Aman',
-    badgeClass: 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300',
-    cardBorder: 'border-emerald-500/30',
-    progressColor: 'bg-emerald-500',
+    badgeClass: 'bg-emerald-50 border-emerald-300 text-emerald-800',
+    cardBorder: 'border-emerald-400/80',
+    progressColor: 'bg-emerald-600',
     desc: 'Jumlah tamu terkonfirmasi masih dalam kapasitas aman venue.',
   };
 
   if (projected >= 240) {
     statusTheme = {
       badge: 'Kapasitas Kritis / Penuh',
-      badgeClass: 'bg-rose-950/70 border-rose-500/50 text-rose-300 animate-pulse',
-      cardBorder: 'border-rose-500/50',
-      progressColor: 'bg-rose-500',
+      badgeClass: 'bg-rose-100 border-rose-400 text-rose-900 animate-pulse',
+      cardBorder: 'border-rose-500',
+      progressColor: 'bg-rose-600',
       desc: 'PERINGATAN: Proyeksi kehadiran mendekati batas maksimal 250 katering!',
     };
   } else if (projected >= 200) {
     statusTheme = {
       badge: 'Waspada (Mendekati Batas)',
-      badgeClass: 'bg-amber-950/60 border-amber-500/50 text-amber-300',
-      cardBorder: 'border-amber-500/40',
+      badgeClass: 'bg-amber-100 border-amber-400 text-amber-900',
+      cardBorder: 'border-amber-400',
       progressColor: 'bg-amber-500',
       desc: 'Perhatian: Kuota katering tersisa kurang dari 50 kursi.',
     };
@@ -140,25 +140,25 @@ export default function AdminDashboardClient({
   };
 
   return (
-    <div className="min-h-screen bg-[#140F0C] pb-24 text-[#F4EDE4]">
+    <div className="min-h-screen bg-[#F9F5EE] pb-24 text-[#2C1E14]">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-40 border-b border-gold-bright/20 bg-[#1A120B]/95 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 border-b border-[#E5D8C5] bg-[#FDFBF7]/95 shadow-sm backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <div className="relative h-9 w-9 shrink-0">
+            <div className="relative h-10 w-10 shrink-0">
               <Image
                 src="/logo/monogram-gold.png"
                 alt="Logo Alwi & Septy"
                 fill
-                sizes="36px"
+                sizes="40px"
                 className="object-contain"
               />
             </div>
             <div>
-              <span className="font-display text-lg font-semibold tracking-wide text-gold-bright sm:text-xl">
+              <span className="font-display text-xl font-bold tracking-wide text-ink sm:text-2xl">
                 Wedding Alwi &amp; Septy
               </span>
-              <span className="hidden text-xs tracking-wider text-label-on-dark/60 sm:inline sm:ml-2">
+              <span className="hidden text-sm font-semibold tracking-wider text-ink-soft sm:inline sm:ml-2">
                 · Admin Panel
               </span>
             </div>
@@ -169,16 +169,16 @@ export default function AdminDashboardClient({
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden rounded-lg border border-gold-bright/30 px-3 py-1.5 text-xs font-medium text-gold-bright/90 transition hover:border-gold-bright hover:bg-gold-bright/10 sm:inline-flex"
+              className="hidden cursor-pointer rounded-xl border border-gold-deep/30 bg-[#FAF6F0] px-4 py-2 text-sm font-semibold text-gold-deep shadow-xs transition hover:bg-gold-deep hover:text-white sm:inline-flex"
             >
               Lihat Undangan Publik ↗
             </a>
-            <div className="hidden text-right text-xs text-label-on-dark/70 sm:block">
+            <div className="hidden text-right text-sm font-medium text-ink-soft sm:block">
               <span>{adminEmail}</span>
             </div>
             <button
               onClick={handleLogout}
-              className="rounded-lg border border-gold-bright/30 bg-[#251B15] px-3.5 py-1.5 text-xs font-semibold tracking-wide text-label-on-dark transition hover:border-rose-400/50 hover:bg-rose-950/30 hover:text-rose-200"
+              className="cursor-pointer rounded-xl border border-rose-300 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-800 transition hover:bg-rose-100 hover:text-rose-900"
             >
               Keluar
             </button>
@@ -186,21 +186,21 @@ export default function AdminDashboardClient({
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8 space-y-8">
         {/* Notifikasi Aksi */}
         {notice && (
           <div
             role="alert"
-            className={`mb-6 flex items-center justify-between rounded-xl border p-4 text-sm transition ${
+            className={`flex items-center justify-between rounded-xl border p-4 text-base font-medium shadow-sm transition ${
               notice.type === 'success'
-                ? 'border-emerald-500/40 bg-emerald-950/50 text-emerald-200'
-                : 'border-rose-500/40 bg-rose-950/50 text-rose-200'
+                ? 'border-emerald-300 bg-emerald-50 text-emerald-900'
+                : 'border-rose-300 bg-rose-50 text-rose-900'
             }`}
           >
             <span>{notice.text}</span>
             <button
               onClick={() => setNotice(null)}
-              className="ml-3 text-xs opacity-75 hover:opacity-100"
+              className="cursor-pointer ml-3 text-sm font-semibold opacity-75 hover:opacity-100"
             >
               ✕ Tutup
             </button>
@@ -210,34 +210,34 @@ export default function AdminDashboardClient({
         {/* ========================================================================= */}
         {/* 1. KARTU SOROTAN: PROYEKSI TOTAL HEADCOUNT & KENDALI KAPASITAS (PRD §4.7) */}
         {/* ========================================================================= */}
-        <section className={`mb-8 overflow-hidden rounded-2xl border ${statusTheme.cardBorder} bg-[#1E1815] p-6 shadow-xl`}>
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <section className={`overflow-hidden rounded-2xl border-2 ${statusTheme.cardBorder} bg-white p-6 sm:p-8 shadow-md`}>
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div>
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span className="text-xs font-semibold tracking-wider uppercase text-label-on-dark/70">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-sm font-bold tracking-wider uppercase text-ink-soft">
                   Kendali Kapasitas Katering (PRD §4.7)
                 </span>
                 <span
-                  className={`rounded-full border px-3 py-0.5 text-xs font-semibold ${statusTheme.badgeClass}`}
+                  className={`rounded-full border px-3.5 py-1 text-sm font-bold ${statusTheme.badgeClass}`}
                 >
                   {statusTheme.badge}
                 </span>
               </div>
-              <h2 className="mt-2 font-display text-2xl font-normal text-[#F4EDE4] sm:text-3xl">
+              <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">
                 Proyeksi Kehadiran:{' '}
-                <span className="font-semibold text-gold-bright">{projected}</span>
-                <span className="text-lg text-label-on-dark/60 font-normal"> / {capacity} Orang</span>
+                <span className="text-gold-deep">{projected}</span>
+                <span className="text-xl sm:text-2xl text-ink-soft font-normal"> / {capacity} Orang</span>
               </h2>
-              <p className="mt-1 text-xs text-label-on-dark/80">{statusTheme.desc}</p>
+              <p className="mt-2 text-base text-ink-soft">{statusTheme.desc}</p>
             </div>
 
-            <div className="flex flex-col items-start gap-1 rounded-xl border border-gold-bright/15 bg-[#140F0C]/80 px-4 py-3 md:items-end">
-              <span className="text-xs text-label-on-dark/60 uppercase tracking-wider">
+            <div className="flex flex-col items-start gap-1.5 rounded-2xl border border-[#E5D8C5] bg-[#FAF6F0] px-5 py-4 md:items-end">
+              <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-ink-soft">
                 Sisa Kuota Kursi
               </span>
               <span
-                className={`font-display text-2xl font-bold ${
-                  remaining <= 10 ? 'text-rose-400' : 'text-gold-bright'
+                className={`font-display text-3xl sm:text-4xl font-bold ${
+                  remaining <= 10 ? 'text-rose-600' : 'text-gold-deep'
                 }`}
               >
                 {remaining > 0 ? `${remaining} Kursi` : 'Penuh / Lewat Kuota'}
@@ -246,96 +246,96 @@ export default function AdminDashboardClient({
           </div>
 
           {/* Progress Bar Visual */}
-          <div className="mt-5">
-            <div className="h-3 w-full overflow-hidden rounded-full bg-[#120D0A] p-0.5 border border-gold-bright/20">
+          <div className="mt-6">
+            <div className="h-4 w-full overflow-hidden rounded-full bg-[#EAE0D3] p-0.5 border border-[#D5C6B1]">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${statusTheme.progressColor}`}
                 style={{ width: `${percentFilled}%` }}
               />
             </div>
-            <div className="mt-2 flex justify-between text-xs text-label-on-dark/60">
-              <span>0</span>
-              <span>Kapasitas Maksimal Venue: 250</span>
+            <div className="mt-2.5 flex justify-between text-sm font-medium text-ink-soft">
+              <span>0 Orang</span>
+              <span>Kapasitas Maksimal Venue: 250 Orang</span>
             </div>
           </div>
 
           {/* Rincian Rumus Proyeksi */}
-          <div className="mt-4 rounded-lg border border-gold-bright/10 bg-[#16100D] p-3 text-xs text-label-on-dark/80">
-            <span className="font-semibold text-gold-bright">Rumus Proyeksi: </span>
-            {initialStats.attendingCount} Tamu Hadir + {initialStats.totalPlusOne} Pendamping + 50 Keluarga Inti &amp; Panitia = <strong className="text-gold-bright">{projected} Orang</strong>.
+          <div className="mt-5 rounded-xl border border-[#E5D8C5] bg-[#FAF6F0] p-4 text-sm sm:text-base text-ink leading-relaxed">
+            <span className="font-bold text-gold-deep">Rumus Proyeksi: </span>
+            {initialStats.attendingCount} Tamu Hadir + {initialStats.totalPlusOne} Pendamping + 50 Keluarga Inti &amp; Panitia = <strong className="font-bold text-gold-deep">{projected} Orang</strong>.
           </div>
         </section>
 
         {/* ========================================================================= */}
         {/* 2. GRID METRIK RINGKASAN: TAMU, PEMBUKAAN, & RSVP (PRD §4.7) */}
         {/* ========================================================================= */}
-        <section className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {/* Total Tamu */}
-          <div className="rounded-xl border border-gold-bright/20 bg-[#1E1815] p-5 shadow-sm">
-            <span className="text-xs font-medium tracking-wider uppercase text-label-on-dark/70">
+          <div className="rounded-2xl border border-[#E5D8C5] bg-white p-6 shadow-sm">
+            <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-ink-soft">
               Total Tamu Terdaftar
             </span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-display text-3xl font-semibold text-[#F4EDE4]">
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-display text-4xl sm:text-5xl font-bold text-ink">
                 {initialStats.totalGuests}
               </span>
-              <span className="text-xs text-label-on-dark/60">Undangan</span>
+              <span className="text-sm font-medium text-ink-soft">Undangan</span>
             </div>
-            <p className="mt-2 text-[11px] text-label-on-dark/60">
-              Kapasitas daftar target: 150 tamu
+            <p className="mt-3 text-sm text-ink-soft">
+              Target daftar: 150 undangan
             </p>
           </div>
 
           {/* Status Buka Undangan */}
-          <div className="rounded-xl border border-gold-bright/20 bg-[#1E1815] p-5 shadow-sm">
-            <span className="text-xs font-medium tracking-wider uppercase text-label-on-dark/70">
+          <div className="rounded-2xl border border-[#E5D8C5] bg-white p-6 shadow-sm">
+            <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-ink-soft">
               Sudah Buka Undangan
             </span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-display text-3xl font-semibold text-gold-bright">
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-display text-4xl sm:text-5xl font-bold text-gold-deep">
                 {initialStats.openedCount}
               </span>
-              <span className="text-xs text-label-on-dark/60">
+              <span className="text-sm font-medium text-ink-soft">
                 ({initialStats.totalGuests > 0 ? Math.round((initialStats.openedCount / initialStats.totalGuests) * 100) : 0}%)
               </span>
             </div>
-            <p className="mt-2 text-[11px] text-label-on-dark/60">
-              {initialStats.unopenedCount} tamu belum membuka layar sampul
+            <p className="mt-3 text-sm text-ink-soft">
+              {initialStats.unopenedCount} tamu belum membuka sampul
             </p>
           </div>
 
           {/* Konfirmasi Hadir */}
-          <div className="rounded-xl border border-gold-bright/20 bg-[#1E1815] p-5 shadow-sm">
-            <span className="text-xs font-medium tracking-wider uppercase text-emerald-400/90">
+          <div className="rounded-2xl border border-[#E5D8C5] bg-white p-6 shadow-sm">
+            <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-emerald-700">
               RSVP Hadir
             </span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-display text-3xl font-semibold text-emerald-400">
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-display text-4xl sm:text-5xl font-bold text-emerald-700">
                 {initialStats.attendingCount}
               </span>
-              <span className="text-xs text-label-on-dark/60">
+              <span className="text-sm font-medium text-ink-soft">
                 +{initialStats.totalPlusOne} pendamping
               </span>
             </div>
-            <p className="mt-2 text-[11px] text-label-on-dark/60">
+            <p className="mt-3 text-sm text-ink-soft">
               Total {initialStats.attendingCount + initialStats.totalPlusOne} orang hadir
             </p>
           </div>
 
           {/* Belum Respons & Tidak Hadir */}
-          <div className="rounded-xl border border-gold-bright/20 bg-[#1E1815] p-5 shadow-sm">
-            <span className="text-xs font-medium tracking-wider uppercase text-amber-400/90">
+          <div className="rounded-2xl border border-[#E5D8C5] bg-white p-6 shadow-sm">
+            <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-amber-700">
               Belum Konfirmasi
             </span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-display text-3xl font-semibold text-amber-400">
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-display text-4xl sm:text-5xl font-bold text-amber-700">
                 {initialStats.pendingCount}
               </span>
-              <span className="text-xs text-label-on-dark/60">
+              <span className="text-sm font-medium text-ink-soft">
                 · {initialStats.notAttendingCount} absen
               </span>
             </div>
-            <p className="mt-2 text-[11px] text-label-on-dark/60">
+            <p className="mt-3 text-sm text-ink-soft">
               Bot WhatsApp Preview: {initialStats.totalBotVisits || 0} kunjungan
             </p>
           </div>
@@ -344,24 +344,24 @@ export default function AdminDashboardClient({
         {/* ========================================================================= */}
         {/* 3. MODUL MANAJEMEN TAMU (PREVIEW SESI 2) */}
         {/* ========================================================================= */}
-        <section className="mb-10 rounded-2xl border border-gold-bright/20 bg-[#1E1815]/60 p-6">
+        <section className="rounded-2xl border border-[#E5D8C5] bg-white p-6 sm:p-8 shadow-sm">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>
               <div className="flex items-center gap-2">
-                <span className="rounded bg-gold-deep/30 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-gold-bright uppercase">
+                <span className="rounded-lg bg-[#FAF6F0] border border-gold-deep/30 px-3 py-1 text-xs font-bold tracking-wider text-gold-deep uppercase">
                   Tahap Pengerjaan Berikutnya (Sesi 2)
                 </span>
               </div>
-              <h3 className="mt-1 font-display text-xl font-normal text-[#F4EDE4]">
+              <h3 className="mt-2 font-display text-2xl font-bold text-ink">
                 Manajemen Tamu &amp; Generator WhatsApp (PRD §4.7)
               </h3>
-              <p className="mt-1 text-xs text-label-on-dark/70">
+              <p className="mt-1 text-sm sm:text-base text-ink-soft">
                 Tabel 150 tamu lengkap, filter reminder tamu belum konfirmasi, generator pesan WhatsApp personal, tambah/edit tamu, impor CSV, dan ekspor data katering/tata kursi.
               </p>
             </div>
             <button
               disabled
-              className="cursor-not-allowed rounded-lg border border-gold-bright/30 bg-[#18120E] px-4 py-2 text-xs font-medium text-label-on-dark/50"
+              className="cursor-not-allowed rounded-xl border border-[#D5C6B1] bg-[#F2EDE4] px-5 py-2.5 text-sm font-semibold text-ink-soft/60"
             >
               Segera Aktif di Sesi 2
             </button>
@@ -371,45 +371,45 @@ export default function AdminDashboardClient({
         {/* ========================================================================= */}
         {/* 4. MODUL MODERASI BUKU TAMU (PRD §4.4 & §4.7) */}
         {/* ========================================================================= */}
-        <section className="rounded-2xl border border-gold-bright/20 bg-[#1E1815] p-6 shadow-xl">
-          <div className="flex flex-col justify-between gap-4 border-b border-gold-bright/15 pb-5 sm:flex-row sm:items-center">
+        <section className="rounded-2xl border border-[#E5D8C5] bg-white p-6 sm:p-8 shadow-md">
+          <div className="flex flex-col justify-between gap-4 border-b border-[#E5D8C5] pb-6 sm:flex-row sm:items-center">
             <div>
-              <h3 className="font-display text-2xl font-normal text-gold-bright">
+              <h3 className="font-display text-2xl sm:text-3xl font-bold text-ink">
                 Moderasi Buku Tamu
               </h3>
-              <p className="mt-1 text-xs text-label-on-dark/70">
+              <p className="mt-1.5 text-sm sm:text-base text-ink-soft">
                 Penyembunyian ucapan berlaku secara real-time dan langsung hilang dari tampilan publik tamu dalam ~12 detik tanpa muat ulang.
               </p>
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5">
               <button
                 onClick={() => setModerationFilter('all')}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold transition shadow-xs ${
                   moderationFilter === 'all'
-                    ? 'border border-gold-bright bg-gold-deep text-white'
-                    : 'border border-gold-bright/20 bg-[#140F0C] text-label-on-dark/70 hover:text-white'
+                    ? 'bg-gold-deep text-white shadow-md'
+                    : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
                 }`}
               >
                 Semua ({messages.length})
               </button>
               <button
                 onClick={() => setModerationFilter('visible')}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold transition shadow-xs ${
                   moderationFilter === 'visible'
-                    ? 'border border-emerald-500 bg-emerald-950 text-emerald-300'
-                    : 'border border-gold-bright/20 bg-[#140F0C] text-label-on-dark/70 hover:text-white'
+                    ? 'bg-emerald-700 text-white shadow-md'
+                    : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
                 }`}
               >
                 Tampil ({visibleMessagesCount})
               </button>
               <button
                 onClick={() => setModerationFilter('hidden')}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold transition shadow-xs ${
                   moderationFilter === 'hidden'
-                    ? 'border border-rose-500 bg-rose-950 text-rose-300'
-                    : 'border border-gold-bright/20 bg-[#140F0C] text-label-on-dark/70 hover:text-white'
+                    ? 'bg-rose-700 text-white shadow-md'
+                    : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
                 }`}
               >
                 Disembunyikan ({hiddenMessagesCount})
@@ -418,68 +418,68 @@ export default function AdminDashboardClient({
           </div>
 
           {/* Bar Pencarian */}
-          <div className="mt-4 mb-6">
+          <div className="mt-6 mb-6">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari pengirim atau isi ucapan..."
-              className="w-full rounded-lg border border-gold-bright/25 bg-[#140F0C] px-4 py-2.5 text-xs text-[#F4EDE4] placeholder-label-on-dark/50 transition focus:border-gold-bright focus:outline-none focus:ring-1 focus:ring-gold-bright"
+              className="w-full rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] px-4 py-3 text-base text-ink placeholder-[#9C8B7B] transition focus:border-gold-deep focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-deep/20"
             />
           </div>
 
           {/* Daftar Ucapan */}
           {filteredMessages.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-gold-bright/20 py-12 text-center text-xs text-label-on-dark/60">
+            <div className="rounded-2xl border border-dashed border-[#D5C6B1] py-14 text-center text-sm sm:text-base text-ink-soft">
               {messages.length === 0
                 ? 'Belum ada ucapan yang masuk di Buku Tamu.'
                 : 'Tidak ada ucapan yang sesuai dengan filter atau pencarian.'}
             </div>
           ) : (
-            <div className="space-y-3.5">
+            <div className="space-y-4">
               {filteredMessages.map((msg) => {
                 const isProcessing = pendingMessageId === msg.id;
 
                 return (
                   <div
                     key={msg.id}
-                    className={`flex flex-col justify-between gap-3 rounded-xl border p-4 transition md:flex-row md:items-center ${
+                    className={`flex flex-col justify-between gap-4 rounded-2xl border p-5 sm:p-6 transition md:flex-row md:items-center ${
                       msg.isHidden
-                        ? 'border-rose-950/60 bg-[#160E0E]/80 opacity-75'
-                        : 'border-gold-bright/20 bg-[#16100D]'
+                        ? 'border-rose-200 bg-rose-50/50 opacity-80'
+                        : 'border-[#E5D8C5] bg-[#FAF6F0]'
                     }`}
                   >
-                    <div className="space-y-1.5 min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-display text-base font-semibold text-gold-bright break-words">
+                    <div className="space-y-2 min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <span className="font-display text-lg sm:text-xl font-bold text-ink break-words">
                           {msg.guestName}
                         </span>
-                        <span className="text-[11px] text-label-on-dark/50">
+                        <span className="text-xs sm:text-sm font-medium text-ink-soft">
                           {formatDateTime(msg.createdAt)}
                         </span>
                         {msg.isHidden ? (
-                          <span className="rounded-full border border-rose-500/40 bg-rose-950/60 px-2 py-0.5 text-[10px] font-medium text-rose-300">
+                          <span className="rounded-full border border-rose-300 bg-rose-100 px-3 py-0.5 text-xs font-bold text-rose-800">
                             Disembunyikan
                           </span>
                         ) : (
-                          <span className="rounded-full border border-emerald-500/40 bg-emerald-950/60 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
+                          <span className="rounded-full border border-emerald-300 bg-emerald-100 px-3 py-0.5 text-xs font-bold text-emerald-800">
                             Tampil Publik
                           </span>
                         )}
                       </div>
-                      <p className="text-xs leading-relaxed text-[#EDE5DA] break-words">
+                      <p className="text-base sm:text-lg leading-relaxed text-[#2C1E14] break-words">
                         {msg.message}
                       </p>
                     </div>
 
-                    <div className="shrink-0 pt-2 sm:pt-0">
+                    <div className="shrink-0 pt-2 md:pt-0">
                       <button
                         onClick={() => handleToggleVisibility(msg.id, msg.isHidden)}
                         disabled={isProcessing}
-                        className={`w-full sm:w-auto rounded-lg px-3.5 py-1.5 text-xs font-semibold tracking-wider uppercase transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                        className={`w-full sm:w-auto cursor-pointer rounded-xl px-5 py-2.5 text-sm sm:text-base font-bold tracking-wider uppercase transition shadow-xs disabled:cursor-not-allowed disabled:opacity-50 ${
                           msg.isHidden
-                            ? 'border border-emerald-500/50 bg-emerald-950/50 text-emerald-200 hover:bg-emerald-900/60'
-                            : 'border border-rose-500/40 bg-rose-950/40 text-rose-200 hover:bg-rose-900/50'
+                            ? 'border border-emerald-400 bg-emerald-600 text-white hover:bg-emerald-700'
+                            : 'border border-rose-300 bg-rose-100 text-rose-900 hover:bg-rose-200'
                         }`}
                       >
                         {isProcessing ? (

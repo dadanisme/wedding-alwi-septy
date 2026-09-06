@@ -12,35 +12,35 @@ export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAdminAction, initialState);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-[#F9F5EE]">
       <div className="w-full max-w-md space-y-8">
         {/* Header Kartu */}
         <div className="text-center">
-          <div className="relative mx-auto h-20 w-20 drop-shadow-md">
+          <div className="relative mx-auto h-24 w-24 drop-shadow-sm">
             <Image
               src="/logo/monogram-gold.png"
               alt="Monogram Alwi & Septy"
               fill
-              sizes="80px"
+              sizes="96px"
               className="object-contain"
               priority
             />
           </div>
-          <h1 className="mt-4 font-display text-3xl font-normal tracking-wide text-gold-bright sm:text-4xl">
+          <h1 className="mt-4 font-display text-4xl font-normal tracking-wide text-ink sm:text-5xl">
             Admin Panel
           </h1>
-          <p className="mt-2 text-sm tracking-widest uppercase text-label-on-dark/70">
+          <p className="mt-2 text-sm sm:text-base font-medium tracking-widest uppercase text-ink-soft">
             Alwi &amp; Septy · 10 Oktober 2026
           </p>
         </div>
 
         {/* Formulir Card */}
-        <div className="rounded-2xl border border-gold-bright/25 bg-[#1E1815]/90 p-8 shadow-2xl backdrop-blur-md">
+        <div className="rounded-2xl border border-[#E3D4C1] bg-white p-8 sm:p-10 shadow-xl">
           <form action={formAction} className="space-y-6">
             {state?.error && (
               <div
                 role="alert"
-                className="rounded-lg border border-rose-500/40 bg-rose-950/40 p-3.5 text-center text-sm text-rose-200"
+                className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-center text-sm sm:text-base font-medium text-rose-800"
               >
                 {state.error}
               </div>
@@ -49,11 +49,11 @@ export default function LoginForm() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-xs font-medium tracking-wider uppercase text-label-on-dark/80"
+                className="block text-sm sm:text-base font-semibold tracking-wider uppercase text-ink"
               >
                 Email Admin
               </label>
-              <div className="mt-1.5">
+              <div className="mt-2">
                 <input
                   id="email"
                   name="email"
@@ -62,7 +62,7 @@ export default function LoginForm() {
                   required
                   placeholder="admin@wedding.alwi.septy"
                   disabled={isPending}
-                  className="block w-full rounded-lg border border-gold-bright/30 bg-[#120D0A] px-4 py-3 text-sm text-[#F4EDE4] placeholder-[#8A7A6E] transition focus:border-gold-bright focus:outline-none focus:ring-1 focus:ring-gold-bright disabled:opacity-50"
+                  className="block w-full rounded-xl border border-[#D4C3AC] bg-[#FDFBF7] px-4 py-3.5 text-base text-ink placeholder-[#9C8B7B] transition focus:border-gold-deep focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-deep/20 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -70,11 +70,11 @@ export default function LoginForm() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-xs font-medium tracking-wider uppercase text-label-on-dark/80"
+                className="block text-sm sm:text-base font-semibold tracking-wider uppercase text-ink"
               >
                 Kata Sandi
               </label>
-              <div className="mt-1.5">
+              <div className="mt-2">
                 <input
                   id="password"
                   name="password"
@@ -83,7 +83,7 @@ export default function LoginForm() {
                   required
                   placeholder="••••••••"
                   disabled={isPending}
-                  className="block w-full rounded-lg border border-gold-bright/30 bg-[#120D0A] px-4 py-3 text-sm text-[#F4EDE4] placeholder-[#8A7A6E] transition focus:border-gold-bright focus:outline-none focus:ring-1 focus:ring-gold-bright disabled:opacity-50"
+                  className="block w-full rounded-xl border border-[#D4C3AC] bg-[#FDFBF7] px-4 py-3.5 text-base text-ink placeholder-[#9C8B7B] transition focus:border-gold-deep focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-deep/20 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -92,12 +92,12 @@ export default function LoginForm() {
               <button
                 type="submit"
                 disabled={isPending}
-                className="group relative flex w-full justify-center rounded-lg border border-gold-bright bg-gradient-to-r from-gold-deep via-gold-bright to-gold-deep py-3 text-sm font-semibold tracking-wider text-[#1A120B] uppercase shadow-lg transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-gold-bright focus:ring-offset-2 focus:ring-offset-[#1E1815] disabled:cursor-not-allowed disabled:opacity-60"
+                className="group relative flex w-full cursor-pointer justify-center rounded-xl bg-gold-deep py-3.5 text-base font-semibold tracking-wider text-white uppercase shadow-md transition hover:bg-[#72571B] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold-deep focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isPending ? (
                   <span className="flex items-center gap-2">
                     <svg
-                      className="h-4 w-4 animate-spin text-[#1A120B]"
+                      className="h-5 w-5 animate-spin text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -125,12 +125,12 @@ export default function LoginForm() {
             </div>
           </form>
 
-          <div className="mt-6 border-t border-gold-bright/15 pt-5 text-center">
+          <div className="mt-8 border-t border-[#EAE0D3] pt-6 text-center">
             <a
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-gold-bright/80 transition hover:text-gold-bright hover:underline"
+              className="inline-block cursor-pointer text-sm sm:text-base font-medium text-gold-deep transition hover:text-[#644D18] hover:underline"
             >
               ← Buka Halaman Undangan Publik
             </a>
