@@ -421,9 +421,24 @@ Memberikan penutup visual yang hangat, elegan, dan megah dengan bingkai gelap es
 **Alasan:**
 Memungkinkan pengerjaan seksi terus bergerak maju tanpa menunggu foto solo, sembari memastikan struktur visual, ritme spasi, dan hierarki tipografi sudah terpasang sempurna dan cocok dengan mockup approved.
 
+---
+
+## Seksi 5 Love Story: Linimasa 4 Momen Sementara, Tata Letak Zig-Zag Desktop, dan Integrasi Posisi
+
+**Keputusan:**
+1. **Implementasi dengan Linimasa 4 Momen Sementara:** Berdasarkan arahan pengguna untuk mengerjakan seksi yang terkunci dengan catatan konten dapat berubah, Seksi Love Story (Seksi 5, PRD §4.2 item 5) diimplementasikan menggunakan 4 momen linimasa dari rancangan mockup yang disetujui (`docs/mockup/Undangan Alwi & Septy.html`): 2019 (Awal Perkenalan), 2021 (Menjalin Komitmen), 2025 (Lamaran), dan 2026 (Menuju Halal).
+2. **Tata Letak Responsif:**
+   - **Ponsel:** Daftar vertikal padat (`padding: 52px 30px 56px`, `gap: 26px`) dengan thumbnail foto berasio 1:1 (`78×78px`) di sebelah kiri berbingkai emas `border-gold-bright/80`, serta tahun (*Crimson Pro* 10px emas), judul (*Cormorant Garamond* 20px), dan narasi ringkas (*Crimson Pro* 14px) di sisi kanan. Ornamen sulur `#sulur` dipasang di kiri atas (112×112px, opasitas 0.4).
+   - **Desktop:** Linimasa vertikal di tengah dengan garis gradien emas dan penanda belah ketupat/diamond (`h-[9px] w-[9px] rotate-45 bg-gold-deep`). Menggunakan pola berselang-seling zig-zag (`grid-cols-[1fr_96px_1fr]`): baris genap teks di kiri rata kanan dan thumbnail foto 4:3 (`230px`) di kanan rata kiri; baris ganjil thumbnail foto di kiri rata kanan dan teks di kanan rata kiri. Ornamen sulur dipasang di sudut kiri atas dan sudut kanan bawah dengan rotasi 180° (180×180px, opasitas 0.34).
+3. **Penyempurnaan Posisi Seksi pada Halaman:** Komponen `<LoveStory />` disisipkan di antara `<Mempelai />` dan `<Galeri />` pada `components/invitation-experience.tsx`. Hal ini mengembalikan urutan seksi menjadi 100% lengkap dan persis sesuai urutan PRD §4.2 item 1 sampai 11.
+4. **Sentralisasi Konten & Catatan:** Seluruh data 4 momen (dengan teks ringkas untuk ponsel dan narasi lengkap untuk desktop) disimpan di `lib/event-config.ts` (`loveStoryConfig`). Disertai catatan penjelas ("* Linimasa dan narasi cerita bersifat sementara dan dapat disesuaikan kembali.") serta dukungan slot foto jika nanti foto kenangan/dokumentasi dari klien dimasukkan. Tipografi didaftarkan sebagai token `@utility` baru di `app/globals.css` (`text-story-*`, `bg-story-placeholder(-lg)`).
+
+**Alasan:**
+Menjaga konsistensi alur visual undangan digital, memenuhi wireframe mockup yang telah disetujui klien, dan mempermudah penggantian naskah/foto di kemudian hari tanpa perlu mengubah struktur layout komponen.
+
 **Ditolak:**
-1. Memotong paksa foto prewedding berdua untuk solo shot tanpa persetujuan klien (dapat merusak resolusi dan komposisi asli foto).
-2. Memakai foto dummy acak dari luar yang tidak senada dengan gaya prewedding asli.
+1. Mengubah struktur linimasa menjadi format carousel horizontal (mockup approved menggunakan alur vertikal yang serasi dengan ritme scroll halaman undangan).
+2. Menghilangkan seksi Love Story dari alur halaman (PRD §4.2 secara eksplisit mensyaratkan Love Story di antara Mempelai dan Galeri).
 
 
 

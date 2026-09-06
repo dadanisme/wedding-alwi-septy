@@ -268,3 +268,65 @@ export const closingConfig = {
   monogramAlt: `Monogram ${couple.groom.nickname} & ${couple.bride.nickname}`,
 } as const;
 
+/**
+ * Konfigurasi dan data seksi Love Story (Seksi 5, PRD §4.2 item 5).
+ * Ditranskrip persis dari mockup yang diapprove (Undangan Alwi & Septy.html).
+ */
+export interface LoveStoryMoment {
+  year: string;
+  title: string;
+  mobileDescription: string;
+  desktopDescription: string;
+  photo?: string | null;
+  placeholderText?: string;
+  placeholderDesktopText?: string;
+}
+
+export const loveStoryConfig = {
+  sectionLabel: "Love Story",
+  temporaryNote:
+    "* Linimasa dan narasi cerita bersifat sementara dan dapat disesuaikan kembali.",
+  moments: [
+    {
+      year: "2019",
+      title: "Awal Perkenalan",
+      mobileDescription: "Dipertemukan lewat kegiatan kampus di Bandung.",
+      desktopDescription:
+        "Dipertemukan lewat kegiatan kampus di Bandung, dari obrolan yang awalnya tidak diniatkan serius.",
+      photo: null,
+      placeholderText: "2019 · 1:1",
+      placeholderDesktopText: "2019 · 4:3",
+    },
+    {
+      year: "2021",
+      title: "Menjalin Komitmen",
+      mobileDescription: "Sepakat menempuh jalan yang sama, sabar dan perlahan.",
+      desktopDescription:
+        "Sepakat menempuh jalan yang sama, dijalani perlahan dan dengan sabar.",
+      photo: null,
+      placeholderText: "2021 · 1:1",
+      placeholderDesktopText: "2021 · 4:3",
+    },
+    {
+      year: "2025",
+      title: "Lamaran",
+      mobileDescription: "Kedua keluarga bertemu dan menetapkan tanggal.",
+      desktopDescription:
+        "Kedua keluarga bertemu di Bandung dan menetapkan tanggal.",
+      photo: null,
+      placeholderText: "2025 · 1:1",
+      placeholderDesktopText: "2025 · 4:3",
+    },
+    {
+      year: "2026",
+      title: "Menuju Halal",
+      mobileDescription: "10 Oktober 2026, di Bandung.",
+      desktopDescription: "10 Oktober 2026, di hadapan keluarga dan sahabat.",
+      photo: null,
+      placeholderText: "2026 · 1:1",
+      placeholderDesktopText: "2026 · 4:3",
+    },
+  ] as readonly LoveStoryMoment[],
+} as const;
+
+
