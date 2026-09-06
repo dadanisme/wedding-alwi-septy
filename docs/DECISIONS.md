@@ -341,3 +341,21 @@ Menopang tiga fungsi utama gerbang sampul sesuai PRD §4.2 (momen pembukaan pers
 3. Ikon musik berbentuk piringan hitam tanpa indikator status yang jelas (kurang ramah bagi tamu kerabat orang tua dibandingkan ikon speaker standar).
 4. `scrollIntoView({ behavior: 'smooth' })` bawaan browser — durasinya terlalu singkat (~300ms) sehingga transisi terasa instan/tersentak alih-alih lembut dan elegan.
 
+---
+
+## Seksi RSVP: Formulir Konfirmasi Kehadiran, Pendamping Terbuka, dan Umpan Balik
+
+**Keputusan:**
+1. **Pilihan Kehadiran & Pendamping:** Radio buttons dengan kartu klik penuh (`accent-gold-deep`, border emas ganda, latar `bg-white/50`). Opsi "Membawa Pendamping?" dan input "Nama Pendamping" ditampilkan kondisional hanya jika tamu memilih "Ya, saya akan hadir".
+2. **Ketiadaan Pembatas Plus-One:** Sesuai PRD §2.4 dan keputusan terkunci sebelumnya, formulir tidak menyertakan batasan kuota, counter, atau sakelar penolak. Semua tamu yang hadir bebas memilih membawa pendamping.
+3. **Umpan Balik & Fleksibilitas Perubahan:** Setelah form disubmit, formulir berganti menjadi kartu konfirmasi berornamen emas dengan ucapan apresiasi dinamis ("Kami menantikan kehadiran Anda" / "Terima kasih atas doa restunya") serta tombol "Ubah Konfirmasi" sehingga tamu dapat memperbarui jawabannya kapan saja (PRD §4.3).
+4. **Pesan Batas Anjuran:** Keterangan waktu di bawah judul seksi beradaptasi secara otomatis terhadap tanggal `2026-09-26` (`suggestedDeadline`). Menampilkan permohonan sebelum batas waktu, dan berubah menjadi permohonan segera jika tanggal telah terlewat tanpa memblokir pengiriman formulir.
+
+**Alasan:**
+Menyediakan pengalaman konfirmasi yang ramah, sopan, dan minim hambatan bagi tamu segala usia, sekaligus memenuhi spesifikasi visual mockup dan ketentuan bisnis di PRD §4.3.
+
+**Ditolak:**
+1. Memblokir pengiriman formulir setelah batas 26 September (bertentangan dengan PRD §4.3: formulir tetap terbuka sampai hari-H).
+2. Input dropdown select untuk kehadiran/pendamping (radio kartu lebih mudah disentuh di layar ponsel tanpa membuka native picker).
+
+
