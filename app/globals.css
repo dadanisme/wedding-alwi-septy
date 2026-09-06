@@ -433,3 +433,76 @@ body {
   line-height: 1.8;
 }
 
+/*
+ * Seksi Buku Tamu — ditranskrip persis dari mockup yang disetujui
+ * (Undangan Alwi & Septy.html, seksi 9).
+ */
+@utility text-buku-input {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.3;
+}
+@utility text-buku-input-lg {
+  font-size: 17px;
+}
+
+@utility text-buku-textarea {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+}
+@utility text-buku-textarea-lg {
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+@utility text-buku-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+@utility text-buku-btn-lg {
+  font-size: 11px;
+  letter-spacing: 0.36em;
+}
+
+@utility text-buku-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+}
+@utility text-buku-name-lg {
+  font-size: 21px;
+}
+
+@utility text-buku-when {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+@utility text-buku-when-lg {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+}
+
+@utility text-buku-msg {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.75;
+}
+@utility text-buku-msg-lg {
+  font-size: 17px;
+  line-height: 1.8;
+}
+

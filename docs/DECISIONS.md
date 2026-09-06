@@ -358,4 +358,22 @@ Menyediakan pengalaman konfirmasi yang ramah, sopan, dan minim hambatan bagi tam
 1. Memblokir pengiriman formulir setelah batas 26 September (bertentangan dengan PRD §4.3: formulir tetap terbuka sampai hari-H).
 2. Input dropdown select untuk kehadiran/pendamping (radio kartu lebih mudah disentuh di layar ponsel tanpa membuka native picker).
 
+---
+
+## Seksi Buku Tamu: Formulir Ucapan & Doa, Atribusi Nama Tamu, dan Ornamen Sudut
+
+**Keputusan:**
+1. **Atribusi & Fleksibilitas Nama:** Sesuai konfirmasi pengguna pada sesi ini, field input nama ("Nama Anda") disediakan dengan nilai bawaan yang otomatis terisi dari prop nama tamu (`guestName`), namun tetap dapat diedit/disesuaikan jika tamu ingin mencantumkan sapaan tertentu atau menyertakan nama keluarga.
+2. **Formulir & Validasi:** Menggunakan border bawah emas tipis untuk input nama, textarea semi-transparan (`bg-white/50`) dengan batas maksimal 500 karakter (`maxMessageLength`), serta tombol "Kirim Ucapan" berbingkai emas dengan efek hover elegan.
+3. **Daftar Ucapan & Penanda Waktu:** Menampilkan nama pengirim dengan font Cormorant Garamond (`text-buku-name`), penanda waktu relatif kapital berspasi lebar dengan font Crimson Pro (`text-buku-when`), serta teks doa dengan Crimson Pro (`text-buku-msg`). Tiap entri dipisahkan oleh garis emas halus ganda (`border-gold-bright/40`).
+4. **State Lokal & Data Awal:** Menampilkan 3 ucapan awal yang ditranskrip persis dari mockup (`guestBookInitialEntries` di `lib/event-config.ts`), dan ucapan baru langsung dimasukkan secara instan ke urutan teratas ("Baru saja") di state lokal sebelum integrasi basis data Firestore di seksi terpisah (PRD §4.4: "Moderasi: Tidak ada — ucapan langsung tampil").
+5. **Ornamen & Latar:** Menggunakan latar krem hangat sekunder `#F2E8D8` (`bg-cream-secondary`) dengan pemisah garis atas emas `border-t border-gold-bright/35`, ornamen sulur tunggal di kiri bawah pada ponsel (`110x110`, opacity 0.4, scaleY(-1)), serta sepasang sulur di kiri dan kanan bawah pada desktop (`170x170`, opacity 0.34).
+
+**Alasan:**
+Menyelaraskan ketentuan PRD §4.4 dengan desain mockup visual yang telah disetujui klien, sekaligus memberi kebebasan tamu untuk memperjelas nama mereka tanpa kehilangan kemudahan atribusi otomatis.
+
+**Ditolak:**
+1. Mengunci nama tamu secara kaku (read-only) tanpa opsi penyesuaian (ditolak via konfirmasi user agar tamu bebas menyertakan sapaan akrab atau pasangan/keluarga).
+2. Membiarkan input nama kosong tanpa default (memaksa tamu mengetik ulang nama yang sebenarnya sudah diketahui dari link personal).
+
 

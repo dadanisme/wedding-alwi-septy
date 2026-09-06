@@ -9,6 +9,7 @@ import { Pembuka } from "@/components/sections/pembuka";
 import { Galeri } from "@/components/sections/galeri";
 import { Acara } from "@/components/sections/acara";
 import { Rsvp } from "@/components/sections/rsvp";
+import { BukuTamu } from "@/components/sections/buku-tamu";
 
 interface InvitationExperienceProps {
   guestName?: string;
@@ -160,6 +161,7 @@ export function InvitationExperience({
         <Galeri />
         <Acara />
         <Rsvp />
+        <BukuTamu guestName={guestName} />
       </main>
 
       <MusicPlayer

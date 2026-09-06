@@ -185,3 +185,41 @@ export const galleryPhotos = [
     orientation: "landscape",
   },
 ] as const;
+
+/**
+ * Konfigurasi dan data awal seksi Buku Tamu (PRD §4.4).
+ * Ditranskrip dari data mockup yang diapprove (docs/mockup/Undangan Alwi & Septy.html, seksi 9).
+ */
+export interface GuestBookEntry {
+  id?: string;
+  name: string;
+  when: string;
+  msg: string;
+}
+
+export const guestBookInitialEntries: readonly GuestBookEntry[] = [
+  {
+    name: "Rizky & Nadia",
+    when: "2 hari lalu",
+    msg: "Barakallahu lakuma wa baraka alaikuma. Sampai jumpa di Bandung, Alwi!",
+  },
+  {
+    name: "Keluarga Hernawati",
+    when: "4 hari lalu",
+    msg: "Semoga menjadi keluarga yang sakinah, mawaddah, warahmah. Kami sekeluarga insyaAllah hadir.",
+  },
+  {
+    name: "Teh Yuli",
+    when: "1 minggu lalu",
+    msg: "Selamat Septy. Doa terbaik untuk kalian berdua dan kedua keluarga.",
+  },
+] as const;
+
+export const guestBookConfig = {
+  title: "Buku Tamu",
+  namePlaceholder: "Nama Anda",
+  messagePlaceholder: "Tulis ucapan & doa",
+  submitButtonLabel: "Kirim Ucapan",
+  maxMessageLength: 500,
+  maxEntriesPerGuest: 3,
+} as const;
