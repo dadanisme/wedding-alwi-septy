@@ -372,8 +372,8 @@ export default function AdminDashboardClient({
         {/* 4. MODUL MODERASI BUKU TAMU (PRD §4.4 & §4.7) */}
         {/* ========================================================================= */}
         <section className="rounded-2xl border border-[#E5D8C5] bg-white p-6 sm:p-8 shadow-md">
-          <div className="flex flex-col justify-between gap-4 border-b border-[#E5D8C5] pb-6 sm:flex-row sm:items-center">
-            <div>
+          <div className="flex flex-col gap-4 border-b border-[#E5D8C5] pb-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
               <h3 className="font-display text-2xl sm:text-3xl font-bold text-ink">
                 Moderasi Buku Tamu
               </h3>
@@ -382,11 +382,11 @@ export default function AdminDashboardClient({
               </p>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex flex-wrap gap-2.5">
+            {/* Filter Tabs — 1 baris sejajar rapi tanpa bertumpuk */}
+            <div className="flex flex-nowrap shrink-0 items-center gap-2.5 overflow-x-auto pb-1 sm:pb-0 whitespace-nowrap">
               <button
                 onClick={() => setModerationFilter('all')}
-                className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold transition shadow-xs ${
+                className={`cursor-pointer shrink-0 rounded-xl px-4 py-2 text-sm sm:text-base font-bold transition shadow-xs whitespace-nowrap ${
                   moderationFilter === 'all'
                     ? 'bg-gold-deep text-white shadow-md'
                     : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
@@ -396,7 +396,7 @@ export default function AdminDashboardClient({
               </button>
               <button
                 onClick={() => setModerationFilter('visible')}
-                className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold transition shadow-xs ${
+                className={`cursor-pointer shrink-0 rounded-xl px-4 py-2 text-sm sm:text-base font-bold transition shadow-xs whitespace-nowrap ${
                   moderationFilter === 'visible'
                     ? 'bg-emerald-700 text-white shadow-md'
                     : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
@@ -406,7 +406,7 @@ export default function AdminDashboardClient({
               </button>
               <button
                 onClick={() => setModerationFilter('hidden')}
-                className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold transition shadow-xs ${
+                className={`cursor-pointer shrink-0 rounded-xl px-4 py-2 text-sm sm:text-base font-bold transition shadow-xs whitespace-nowrap ${
                   moderationFilter === 'hidden'
                     ? 'bg-rose-700 text-white shadow-md'
                     : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
