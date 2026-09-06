@@ -582,3 +582,49 @@ body {
   letter-spacing: 0.34em;
 }
 
+/*
+ * Seksi Penutup — ditranskrip persis dari mockup yang disetujui
+ * (Undangan Alwi & Septy.html, seksi 11).
+ */
+@utility text-penutup-msg {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.85;
+}
+@utility text-penutup-msg-lg {
+  font-size: 18px;
+  line-height: 1.95;
+}
+
+@utility text-penutup-wassalam {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  text-indent: 0.42em;
+}
+@utility text-penutup-wassalam-lg {
+  font-size: 10px;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+}
+
+@utility text-penutup-family {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.6;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-indent: 0.24em;
+}
+@utility text-penutup-family-lg {
+  font-size: 14px;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+}
+
+

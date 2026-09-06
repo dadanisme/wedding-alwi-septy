@@ -390,4 +390,23 @@ Menyediakan fasilitas praktis bagi tamu yang berhalangan hadir atau ingin member
 1. Fitur pencatatan amplop digital atau konfirmasi transfer (ditolak di PRD §4.8 & §10 karena membebani jadwal dan menambah gesekan bagi tamu).
 2. Tampilan nomor rekening yang mencolok atau bernada menuntut (ditolak di PRD §4.8).
 
+---
+
+## Seksi Penutup: Ucapan Terima Kasih, Doa Restu, Monogram Berapit Spray, dan Nama Keluarga
+
+**Keputusan:**
+1. **Penyajian & Geometri Mockup:** Seksi Penutup (Seksi 11, PRD §4.2 item 11) ditranskrip persis dari rancangan mockup yang disetujui (`docs/mockup/Undangan Alwi & Septy.html`). Menggunakan latar gelap cokelat espresso `#1A120B` (`bg-espresso`) dengan padding `pt-[60px] pb-[66px] px-8` (ponsel) dan `lg:pt-24 lg:pb-[104px] lg:px-10` (desktop).
+2. **Sistem Ornamen Sulur:** Pada ponsel, menggunakan 2 ornamen sulur diagonal (`#sulur` 120×120px, opacity 0.45 di kiri atas dan kanan bawah dengan rotasi 180°). Pada desktop, menggunakan 4 ornamen simetris di tiap sudut: kiri atas & kanan atas (180×180px, opacity 0.45) serta kiri bawah & kanan bawah (150×150px, opacity 0.35), menciptakan bingkai botani yang seimbang.
+3. **Monogram & Aksen Daun (Spray):** Menampilkan monogram resmi Alwi & Septy varian putih transparan (`monogram.white`, `/logo/monogram-white.png`) dengan tinggi 49px pada ponsel dan 87px pada desktop, diapit sepasang aksen daun SVG `#spray` (56×28px pada ponsel, 110×54px pada desktop, opacity 0.9).
+4. **Sentralisasi Konten:** Kalimat ucapan rasa bahagia & doa restu, salam penutup, serta nama kedua keluarga mempelai (`Kel. Dadang Sukandi · Kel. Uun Syukur`) disimpan terpusat di `lib/event-config.ts` (`closingConfig`), memanfaatkan nama ayah dari `couple.groom.father` dan `couple.bride.father` untuk menjaga *single source of truth*.
+5. **Pemetaan Warna & Tipografi:** Teks ucapan dan nama keluarga menggunakan token `--color-label-on-dark` (`#E8DCC4`, rasio kontras 13.7:1 AAA terhadap `#1A120B`), sedangkan salam Wassalamu'alaikum memakai `--color-tertiary-on-dark` (`#C6B79B`, rasio kontras 8.4:1 AAA). Tipografi didaftarkan sebagai token `@utility` baru di `app/globals.css` (`text-penutup-msg(-lg)`, `text-penutup-wassalam(-lg)`, dan `text-penutup-family(-lg)`).
+
+**Alasan:**
+Memberikan penutup visual yang hangat, elegan, dan megah dengan bingkai gelap espresso yang mengimbangi layar Sampul di awal halaman, sesuai kaidah desain yang disepakati (aksen gelap proporsional).
+
+**Ditolak:**
+1. Menambahkan wave divider sebelum Penutup (mockup approved secara eksplisit menggunakan transisi warna lurus dan bersih dari seksi Hadiah ke seksi Penutup).
+2. Menggunakan warna putih mentah `#FFFFFF` atau teks emas untuk isi pesan (melanggar aturan WCAG AA dan kesepakatan palet warna terkunci).
+
+
 

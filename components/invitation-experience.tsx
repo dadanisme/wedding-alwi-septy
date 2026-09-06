@@ -11,6 +11,7 @@ import { Acara } from "@/components/sections/acara";
 import { Rsvp } from "@/components/sections/rsvp";
 import { BukuTamu } from "@/components/sections/buku-tamu";
 import { Hadiah } from "@/components/sections/hadiah";
+import { Penutup } from "@/components/sections/penutup";
 
 interface InvitationExperienceProps {
   guestName?: string;
@@ -164,6 +165,7 @@ export function InvitationExperience({
         <Rsvp />
         <BukuTamu guestName={guestName} />
         <Hadiah />
+        <Penutup />
       </main>
 
       <MusicPlayer

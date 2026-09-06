@@ -235,3 +235,16 @@ export const guestBookConfig = {
   maxMessageLength: 500,
   maxEntriesPerGuest: 3,
 } as const;
+
+/**
+ * Konten seksi Penutup (Seksi 11, PRD §4.2 item 11).
+ * Ditranskrip persis dari mockup yang diapprove (Undangan Alwi & Septy.html).
+ */
+export const closingConfig = {
+  message:
+    "Merupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kedua mempelai.",
+  wassalam: "Wassalamu'alaikum Warahmatullahi Wabarakatuh",
+  familySignature: `Kel. ${couple.groom.father} \u00A0·\u00A0 Kel. ${couple.bride.father}`,
+  monogramAlt: `Monogram ${couple.groom.nickname} & ${couple.bride.nickname}`,
+} as const;
+
