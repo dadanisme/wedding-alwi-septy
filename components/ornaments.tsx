@@ -100,17 +100,24 @@ export function OrnamentDefs() {
           <circle cx="130" cy="13" r="1.6" fill="#8A6A22" />
         </symbol>
 
+        <path
+          id="waveLine"
+          d="M0 64 C 190 6 330 104 520 74 C 700 46 800 6 980 40 C 1140 70 1290 106 1440 58"
+        />
+
         <symbol id="wave" viewBox="0 0 1440 120" preserveAspectRatio="none">
           <path
             d="M0 120 L0 64 C 190 6 330 104 520 74 C 700 46 800 6 980 40 C 1140 70 1290 106 1440 58 L1440 120 Z"
             fill="#F7EFE1"
           />
-          <path
-            d="M0 64 C 190 6 330 104 520 74 C 700 46 800 6 980 40 C 1140 70 1290 106 1440 58"
+          <use href="#waveLine" fill="none" stroke="#C9A227" strokeWidth="1.6" opacity="0.55" />
+          <use
+            href="#waveLine"
             fill="none"
             stroke="#C9A227"
-            strokeWidth="1.6"
+            strokeWidth="2"
             opacity="0.55"
+            transform="translate(0 9)"
           />
         </symbol>
 

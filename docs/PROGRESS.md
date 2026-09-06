@@ -30,6 +30,7 @@ Firebase/Firestore/Auth dan lapisan akses data **belum** dikerjakan — masih di
 - **Foto prewedding asli dari klien** (21 foto, `public/photos/`) — di-resize & dikompresi (lihat `docs/DECISIONS.md`), dikategorikan `modern-01..12.jpg` / `adat-sunda-01..09.jpg`. Semua foto berdua, tidak ada solo shot.
 - **Berkas config konten acara** (`lib/event-config.ts`) — data mempelai, jadwal, venue, rekening (dari PRD §2), monogram, dan referensi foto sampul.
 - **Seksi Sampul** (`components/sections/sampul.tsx`, dirender di `/`) — ponsel: 1 foto potret modern full-bleed; desktop: 2 panel potret (modern + adat Sunda). Guest name masih contoh statis ("Bapak/Ibu Budi Santoso") — sistem link/token tamu belum ada. Tombol "Buka Undangan" belum fungsional (reveal konten + trigger musik menyusul). Diverifikasi visual di 390×844 & 1280×900 lewat Chrome DevTools MCP — cocok dengan mockup, tidak ada console error.
+- **Pembatas Wavy di bawah Sampul diperkaya** — symbol `wave` di `components/ornaments.tsx` sekarang punya 2 garis emas paralel (path `#waveLine` dipakai 2× lewat `<use>`, ketebalan & offset beda) alih-alih 1 garis tunggal, supaya transisi ke seksi Ayat tidak terlihat seperti dipotong polos. Diverifikasi di 390px & 1280px, lolos code review. **Referensi klien untuk transisi ini sebenarnya lebih kaya** (sulur pojok foto yang menjuntai melewati wave, flourish kecil, motif damask) — bagian flourish & motif damask itu milik latar seksi Ayat (belum dikerjakan), jadi sengaja tidak dikerjakan sekarang; klien memilih cukup garis ganda dulu.
 
 ## Berikutnya
 
