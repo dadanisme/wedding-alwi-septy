@@ -1,19 +1,62 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, useTransition } from "react";
 import { rsvpConfig } from "@/lib/event-config";
+import { submitRsvpAction } from "@/app/actions/rsvp";
+import type { RsvpAttendance, RsvpEntry } from "@/types/database";
 
-type AttendanceOption = "attending" | "not_attending";
+interface RsvpProps {
+  /**
+   * Slug lengkap dari URL tamu ("nama-slug-token"). Bila kosong, seksi berjalan
+   * dalam mode pratinjau (rute "/" tanpa tamu): formulir tetap dapat dicoba,
+   * tetapi tidak ada penulisan ke basis data.
+   */
+  fullSlug?: string;
+  /** Jawaban RSVP tersimpan, bila tamu sudah pernah mengisi (PRD §4.3). */
+  initialRsvp?: RsvpEntry | null;
+}
 
-export function Rsvp() {
-  const [attendance, setAttendance] = useState<AttendanceOption>("attending");
-  const [hasPlusOne, setHasPlusOne] = useState(false);
-  const [plusOneName, setPlusOneName] = useState("");
-  const [note, setNote] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
+/**
+ * Merangkai ringkasan jawaban tersimpan untuk kartu konfirmasi tamu yang kembali,
+ * mis. "Hadir · bersama 1 pendamping (Rina)".
+ */
+function buildSummary(rsvp: RsvpEntry): string {
+  if (rsvp.attendance !== "attending") {
+    return rsvpConfig.summaryNotAttending;
+  }
+
+  const companion = rsvp.plusOne
+    ? `${rsvpConfig.summaryWithPlusOne}${
+        rsvp.plusOneName ? ` (${rsvp.plusOneName})` : ""
+      }`
+    : rsvpConfig.summaryWithoutPlusOne;
+
+  return `${rsvpConfig.summaryAttending} · ${companion}`;
+}
+
+export function Rsvp({ fullSlug, initialRsvp = null }: RsvpProps) {
+  const [attendance, setAttendance] = useState<RsvpAttendance>(
+    initialRsvp?.attendance ?? "attending"
+  );
+  const [hasPlusOne, setHasPlusOne] = useState(initialRsvp?.plusOne ?? false);
+  const [plusOneName, setPlusOneName] = useState(initialRsvp?.plusOneName ?? "");
+  const [note, setNote] = useState(initialRsvp?.notes ?? "");
+
+  // Jawaban yang sudah tersimpan. Selama ini terisi dan tamu tidak sedang
+  // menyunting, kartu konfirmasi yang ditampilkan — bukan formulirnya.
+  const [savedRsvp, setSavedRsvp] = useState<RsvpEntry | null>(initialRsvp);
+  const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const plusOneNameId = useId();
   const noteId = useId();
+  const errorId = useId();
+
+  const showForm = savedRsvp === null || isEditing;
+
+  // Tanpa fullSlug tidak ada tamu untuk disimpani, jadi pengiriman dimatikan.
+  const isPreview = !fullSlug;
 
   // Hitung apakah tanggal anjuran RSVP sudah lewat
   const isPastDeadline =
@@ -24,8 +67,70 @@ export function Rsvp() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Di tahap ini (sebelum koneksi basis data Firestore), form mengelola state lokal
-    setIsSubmitted(true);
+    if (isPending) return;
+
+    setError(null);
+
+    // Mode pratinjau ("/" tanpa data tamu). Tombol kirim sudah dinonaktifkan,
+    // ini penjaga terakhir: jangan pernah menampilkan kartu "tersimpan" untuk
+    // jawaban yang tidak pernah ditulis ke mana pun.
+    if (!fullSlug) return;
+
+    const trimmedPlusOneName = plusOneName.trim();
+    const trimmedNote = note.trim();
+    const isAttending = attendance === "attending";
+    const willBringPlusOne = isAttending && hasPlusOne;
+
+    if (willBringPlusOne && !trimmedPlusOneName) {
+      setError(rsvpConfig.errorPlusOneNameRequired);
+      return;
+    }
+
+    startTransition(async () => {
+      // Wajib ditangkap di sini. Server Action punya try/catch sendiri, tetapi
+      // kegagalan transport (tamu kehilangan sinyal di tengah kirim) menolak
+      // promise-nya sebelum kode server sempat jalan. Rejeksi yang lolos dari
+      // startTransition diperlakukan React sebagai galat render dan MENGGANTI
+      // seluruh halaman undangan dengan layar galat — bukan hanya seksi ini.
+      try {
+        const result = await submitRsvpAction({
+          fullSlug,
+          attendance,
+          plusOne: willBringPlusOne,
+          plusOneName: trimmedPlusOneName,
+          notes: trimmedNote,
+        });
+
+        if (!result.success) {
+          setError(result.error);
+          return;
+        }
+
+        setSavedRsvp(result.rsvp);
+        setIsEditing(false);
+      } catch (err) {
+        console.warn("Gagal mengirim RSVP:", err);
+        setError(rsvpConfig.errorGeneric);
+      }
+    });
+  };
+
+  const handleEdit = () => {
+    setError(null);
+    setIsEditing(true);
+  };
+
+  // Jalan pulang dari mode ubah. Tanpa ini, tamu yang menekan "Ubah Konfirmasi"
+  // sekadar untuk melihat jawabannya terjebak di formulir sampai ia mengirim
+  // ulang atau memuat ulang halaman.
+  const handleCancel = () => {
+    if (!savedRsvp) return;
+    setAttendance(savedRsvp.attendance);
+    setHasPlusOne(savedRsvp.plusOne);
+    setPlusOneName(savedRsvp.plusOneName ?? "");
+    setNote(savedRsvp.notes ?? "");
+    setError(null);
+    setIsEditing(false);
   };
 
   return (
@@ -77,7 +182,7 @@ export function Rsvp() {
           </p>
         </div>
 
-        {!isSubmitted ? (
+        {showForm ? (
           /* Formulir RSVP */
           <form
             onSubmit={handleSubmit}
@@ -195,6 +300,7 @@ export function Rsvp() {
                   onChange={(e) => setPlusOneName(e.target.value)}
                   placeholder="Nama pendamping Anda"
                   required={hasPlusOne}
+                  maxLength={rsvpConfig.maxPlusOneNameLength}
                   className="border-b border-gold-bright/75 bg-transparent p-[11px_2px] text-rsvp-input text-ink outline-none transition-colors placeholder:text-ink-soft/40 focus:border-gold-deep lg:p-[12px_2px] lg:text-rsvp-input-lg"
                 />
               </label>
@@ -206,27 +312,62 @@ export function Rsvp() {
               className="flex flex-col gap-[8px] lg:gap-[9px]"
             >
               <span className="text-rsvp-legend lg:text-rsvp-legend-lg text-ink-soft">
-                Catatan Singkat
+                {rsvpConfig.notesLabel}
               </span>
               <textarea
                 id={noteId}
                 rows={3}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Doa atau pesan untuk kami"
+                placeholder={rsvpConfig.notesPlaceholder}
+                maxLength={rsvpConfig.maxNotesLength}
                 className="border border-gold-bright/65 bg-white/50 p-[12px] text-rsvp-input text-ink outline-none transition-colors resize-y placeholder:text-ink-soft/40 focus:border-gold-deep lg:p-[14px] lg:text-rsvp-input-lg"
               />
             </label>
 
-            {/* Tombol Kirim */}
-            <button
-              type="submit"
-              className="mt-[4px] cursor-pointer border border-gold-deep bg-gold-deep p-[16px] text-rsvp-btn tracking-[0.32em] text-on-photo uppercase indent-[0.32em] transition-colors duration-300 hover:bg-[#6e5419] lg:self-center lg:p-[17px_44px] lg:text-rsvp-btn-lg lg:tracking-[0.36em] lg:indent-[0.36em]"
-            >
-              Kirim Konfirmasi
-            </button>
+            {/* Pesan galat — memakai aksen emas, bukan warna galat baru di luar palet */}
+            {error && (
+              <p
+                id={errorId}
+                role="alert"
+                className="text-rsvp-desc lg:text-rsvp-desc-lg border border-gold-deep bg-white/70 p-[12px_14px] text-center text-ink text-pretty lg:p-[14px_16px]"
+              >
+                {error}
+              </p>
+            )}
+
+            {/* Tombol Kirim, dan Batal bila tamu sedang mengubah jawaban tersimpan */}
+            <div className="mt-[4px] flex flex-col gap-[10px] lg:flex-row lg:items-center lg:justify-center lg:gap-[14px]">
+              <button
+                type="submit"
+                disabled={isPending || isPreview}
+                aria-busy={isPending}
+                aria-describedby={error ? errorId : undefined}
+                className="cursor-pointer border border-gold-deep bg-gold-deep p-[16px] text-rsvp-btn tracking-[0.32em] text-on-photo uppercase indent-[0.32em] transition-colors duration-300 hover:bg-[#6e5419] disabled:cursor-not-allowed disabled:opacity-55 lg:p-[17px_44px] lg:text-rsvp-btn-lg lg:tracking-[0.36em] lg:indent-[0.36em]"
+              >
+                {isPending ? rsvpConfig.submittingLabel : rsvpConfig.submitLabel}
+              </button>
+
+              {savedRsvp && (
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  disabled={isPending}
+                  className="cursor-pointer border border-gold-deep/60 bg-transparent p-[14px] text-rsvp-btn tracking-[0.28em] text-ink-soft uppercase indent-[0.28em] transition-colors duration-300 hover:border-gold-deep hover:bg-gold-deep hover:text-on-photo disabled:cursor-not-allowed disabled:opacity-55 lg:p-[15px_30px]"
+                >
+                  {rsvpConfig.cancelButtonLabel}
+                </button>
+              )}
+            </div>
+
+            {/* Hanya terlihat di "/" — tamu sungguhan selalu punya link pribadi */}
+            {isPreview && (
+              <p className="text-rsvp-thanks-sub lg:text-rsvp-thanks-sub-lg text-center text-ink-soft text-pretty">
+                {rsvpConfig.previewNotice}
+              </p>
+            )}
           </form>
-        ) : (
+        ) : savedRsvp ? (
           /* Kartu Konfirmasi / Umpan Balik Sukses */
           <div className="flex w-full flex-col items-center gap-[10px] border border-gold-bright/70 bg-white/55 p-[26px_22px] text-center lg:max-w-[560px] lg:gap-[14px] lg:p-[38px_32px]">
             <svg
@@ -239,19 +380,33 @@ export function Rsvp() {
               {rsvpConfig.successTitle}
             </p>
             <p className="text-rsvp-thanks-sub lg:text-rsvp-thanks-sub-lg text-ink-soft">
-              {attendance === "attending"
+              {savedRsvp.attendance === "attending"
                 ? rsvpConfig.successAttending
                 : rsvpConfig.successNotAttending}
             </p>
+
+            {/* Ringkasan jawaban tersimpan, supaya tamu yang kembali langsung
+                tahu apa yang tercatat tanpa perlu membuka formulirnya. */}
+            <div className="mt-[4px] flex w-full flex-col gap-[5px] border border-gold-bright/55 bg-cream/70 p-[12px_14px] lg:mt-[6px] lg:gap-[6px] lg:p-[14px_18px]">
+              <p className="text-rsvp-summary lg:text-rsvp-summary-lg text-ink text-pretty">
+                {buildSummary(savedRsvp)}
+              </p>
+              {savedRsvp.notes ? (
+                <p className="text-rsvp-summary lg:text-rsvp-summary-lg text-ink-soft text-pretty">
+                  {rsvpConfig.summaryNotesPrefix}: {savedRsvp.notes}
+                </p>
+              ) : null}
+            </div>
+
             <button
               type="button"
-              onClick={() => setIsSubmitted(false)}
+              onClick={handleEdit}
               className="mt-[10px] cursor-pointer border border-gold-deep/60 bg-transparent px-[22px] py-[10px] text-rsvp-btn tracking-[0.28em] text-ink-soft uppercase indent-[0.28em] transition-colors duration-300 hover:border-gold-deep hover:bg-gold-deep hover:text-on-photo"
             >
               {rsvpConfig.editButtonLabel}
             </button>
           </div>
-        )}
+        ) : null}
       </div>
     </section>
   );

@@ -58,6 +58,36 @@ export const rsvpConfig = {
   successAttending: "Kami menantikan kehadiran Anda.",
   successNotAttending: "Terima kasih atas konfirmasi dan doa restunya.",
   editButtonLabel: "Ubah Konfirmasi",
+
+  // Label kolom catatan. Sesuai PRD §4.3, kolom ini untuk keperluan praktis
+  // (alergi makanan, kebutuhan khusus) — doa dan pesan punya seksi Buku Tamu sendiri.
+  notesLabel: "Catatan Singkat",
+  notesPlaceholder: "Alergi makanan atau kebutuhan khusus",
+
+  // Ringkasan jawaban tersimpan pada kartu konfirmasi bagi tamu yang kembali (PRD §4.3).
+  summaryAttending: "Hadir",
+  summaryNotAttending: "Belum bisa hadir",
+  summaryWithPlusOne: "bersama 1 pendamping",
+  summaryWithoutPlusOne: "tanpa pendamping",
+  summaryNotesPrefix: "Catatan",
+
+  submitLabel: "Kirim Konfirmasi",
+  submittingLabel: "Mengirim",
+  cancelButtonLabel: "Batal",
+  // Hanya tampil di rute "/" yang tidak punya data tamu. Tamu sungguhan selalu
+  // datang lewat link pribadi, jadi mereka tidak pernah melihat teks ini.
+  previewNotice:
+    "Mode pratinjau. Konfirmasi hanya dapat dikirim dari link undangan pribadi Anda.",
+  errorGeneric:
+    "Konfirmasi belum tersimpan. Mohon periksa koneksi Anda lalu coba lagi.",
+  errorPlusOneNameRequired: "Mohon isi nama pendamping Anda.",
+  // Angka pada dua pesan di bawah harus sama dengan batas di bawahnya.
+  errorPlusOneNameTooLong: "Nama pendamping maksimal 80 karakter.",
+  errorNotesTooLong: "Catatan maksimal 500 karakter.",
+
+  // Batas panjang input, ditegakkan di server (bukan hanya di klien).
+  maxPlusOneNameLength: 80,
+  maxNotesLength: 500,
 } as const;
 
 

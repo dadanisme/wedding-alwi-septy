@@ -434,6 +434,27 @@ body {
 }
 
 /*
+ * Ringkasan jawaban RSVP tersimpan pada kartu konfirmasi tamu yang kembali.
+ * Tidak ada di mockup — ditambahkan atas keputusan user 6 Sep 2026
+ * (lihat docs/DECISIONS.md). Sengaja dibuat lebih rapat dan bertracking
+ * ringan agar terbaca sebagai data tercatat, bukan sebagai prosa.
+ */
+@utility text-rsvp-summary {
+  font-family: var(--font-body);
+  /* Crimson Pro hanya dimuat pada bobot 300/400/600 (app/layout.tsx).
+     Bobot 500 akan disintesis browser, jadi pakai 400 — sudah cukup
+     terbeda dari prosa 300 di sekitarnya, dibantu tracking di bawah. */
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+}
+@utility text-rsvp-summary-lg {
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/*
  * Seksi Buku Tamu — ditranskrip persis dari mockup yang disetujui
  * (Undangan Alwi & Septy.html, seksi 9).
  */

@@ -17,6 +17,7 @@ import { Penutup } from "@/components/sections/penutup";
 
 import { trackGuestOpenAction } from "@/app/actions/tracking";
 import { getClientDeviceId } from "@/lib/device";
+import type { RsvpEntry, RsvpStatus } from "@/types/database";
 
 export interface GuestInfo {
   id: string;
@@ -24,9 +25,8 @@ export interface GuestInfo {
   salutation: string;
   displayName: string;
   fullSlug: string;
-  rsvpStatus?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rsvp?: any;
+  rsvpStatus?: RsvpStatus;
+  rsvp?: RsvpEntry | null;
 }
 
 interface InvitationExperienceProps {
@@ -192,7 +192,7 @@ export function InvitationExperience({
         <LoveStory />
         <Galeri />
         <Acara />
-        <Rsvp />
+        <Rsvp fullSlug={guest?.fullSlug} initialRsvp={guest?.rsvp ?? null} />
         <BukuTamu guestName={effectiveGuestName} />
         <Hadiah />
         <Penutup />

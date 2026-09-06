@@ -487,3 +487,54 @@ Memenuhi requirement fungsional PRD §4.1, §4.5, dan §4.6 secara presisi denga
 2. Mengharuskan PIN atau login tamu (ditolak di PRD §4.1 karena friksi UX).
 
 
+
+---
+
+## Integrasi RSVP ke Firestore: Kredensial `fullSlug`, Validasi Server, dan Ringkasan Jawaban
+
+**Keputusan:**
+
+1. **Tamu diidentifikasi lewat `fullSlug`, bukan Firestore document ID.** Server Action `submitRsvpAction` (`app/actions/rsvp.ts`) menerima `fullSlug` dari URL undangan, lalu meresolusinya sendiri ke dokumen tamu. Ini berbeda dari `trackGuestOpenAction` yang sudah ada dan memakai `guestId`.
+   Alasannya: model keamanan produk ini adalah **kepemilikan link** (PRD §4.1 — link boleh diteruskan, PIN ditolak). Token pada URL memang kredensial yang sah untuk menulis atas nama tamu; document ID hanyalah pengenal internal yang kebetulan terekspos ke klien. Kalau document ID cukup untuk menulis RSVP, maka bocornya ID dari sumber lain (log, dashboard, bug) langsung berarti kemampuan memalsukan jawaban. `trackGuestOpenAction` sengaja tidak diubah di sesi ini — ia hanya menaikkan penghitung, bukan menulis data yang dikirim tamu.
+
+2. **Seluruh validasi ditegakkan di server, bukan hanya di formulir.** Server Action adalah endpoint HTTP publik: payload apa pun bisa dikirim tanpa melewati React. Yang divalidasi: bentuk tipe tiap field (bukan-string/objek/null ditolak atau dibuang), `attendance` harus salah satu dari dua nilai sah, nama pendamping wajib bila membawa pendamping, batas panjang nama pendamping (80) dan catatan (500). `lib/db/rsvp.ts` memotong ulang panjangnya sebagai pertahanan lapis kedua bila kelak dipanggil dari admin panel atau skrip seeding.
+   Diuji dengan 14 payload adversarial yang dikirim langsung ke action tanpa melewati form — semuanya berperilaku sesuai harapan.
+
+3. **Aturan pendamping dinormalisasi di server, bukan dipercayakan ke klien.** Bila `attendance` bukan `attending`, `plusOne` dipaksa `false` dan nama pendamping dibuang, berapa pun yang dikirim klien. Ini **bukan** pembatas kuota — tidak ada penghitung, kuota, atau keadaan "penuh" di mana pun (PRD §2.4). Yang ditegakkan hanya konsistensi logis: tidak mungkin membawa pendamping ke acara yang tidak dihadiri.
+
+4. **`submittedAt` menandai pengiriman pertama dan tidak pernah bergeser; `updatedAt` yang bergerak.** Setiap pengiriman — pertama maupun perubahan — menambah satu dokumen baru ke subkoleksi `rsvpHistory` yang tidak pernah ditimpa, disertai penanda `isFirstSubmission` (PRD §7.2 "riwayat perubahan").
+
+5. **Kartu konfirmasi menampilkan ringkasan jawaban tersimpan** ("Hadir · bersama 1 pendamping (Nama)" beserta catatan bila ada), bukan hanya teks terima kasih generik. Diputuskan user 6 Sep 2026 setelah ditawari dua opsi. Ini penambahan visual pada seksi yang sudah lolos verifikasi, jadi disengaja dan dicatat. Utility tipografi baru `text-rsvp-summary(-lg)` ditambahkan di `app/globals.css` — sengaja lebih rapat dan bertracking ringan supaya terbaca sebagai data tercatat, bukan sebagai prosa.
+
+6. **Placeholder kolom catatan diubah dari "Doa atau pesan untuk kami" menjadi "Alergi makanan atau kebutuhan khusus".** Diputuskan user 6 Sep 2026. PRD §4.3 menyebut kolom ini untuk hal seperti alergi makanan, sementara doa dan pesan sudah punya seksi Buku Tamu sendiri. Copy lama membuat tamu menulis doa di dua tempat dan informasi katering tidak pernah terkumpul. **Perubahan copy ini menyimpang dari mockup yang diapprove mempelai** — perlu dikonfirmasi ulang ke mereka.
+
+7. **Pesan galat memakai aksen emas, bukan warna galat baru.** Palet yang dikunci dari mockup tidak punya warna merah/galat, dan menambah satu berarti memperkenalkan warna di luar sistem hanya untuk kasus tepi. Notice galat memakai `border-gold-deep` + `bg-white/70` + `text-ink` — semuanya token yang sudah ada.
+
+8. **Rejeksi promise di dalam `startTransition` wajib ditangkap.** Ditemukan lewat pengujian jaringan mati: Server Action punya `try/catch` sendiri, tetapi kegagalan transport menolak promise-nya sebelum kode server sempat jalan. Rejeksi yang lolos dari `startTransition` diperlakukan React sebagai galat render dan **mengganti seluruh halaman undangan** dengan layar "This page couldn't load" — bukan hanya menggagalkan seksi RSVP. Untuk tamu di jaringan 4G yang tidak stabil, ini kegagalan yang mahal. Diperbaiki dengan `try/catch` di dalam transition; setelah perbaikan, halaman tetap utuh, isian form terjaga, dan kirim ulang berhasil begitu sinyal kembali.
+
+**Alasan:**
+Memenuhi PRD §4.3 (kehadiran, pendamping tanpa kuota, nama pendamping untuk tata kursi, catatan, jawaban dapat diubah kapan saja lewat link yang sama) dan §7.2 (riwayat perubahan), sambil menjaga ketentuan `CLAUDE.md` bahwa seluruh input divalidasi di server dan seluruh konten acara terpusat di berkas config.
+
+9. **Penyimpanan dijalankan dalam satu transaksi Firestore** (`db.runTransaction`), bukan dua penulisan berurutan. Ditemukan oleh review adversarial dan `/code-review` secara terpisah, keduanya sepakat. Dua alasan, keduanya nyata karena link boleh diteruskan sehingga dua perangkat bisa mengirim bersamaan:
+   - **Atomik.** Kalau pembaruan dokumen tamu dan penulisan riwayat terpisah dan hanya yang kedua gagal, jawaban tamu **sudah** tersimpan tetapi tamu diberi tahu "Konfirmasi belum tersimpan" — kebalikan dari kenyataan. Tamu mengirim ulang, dan karena `submittedAt` sudah ada, riwayat pengiriman pertamanya hilang permanen (`isFirstSubmission: false` pada satu-satunya baris riwayat).
+   - **Serialisasi baca-tulis.** Tanpa transaksi, dua pengiriman bersamaan sama-sama membaca dokumen kosong dan sama-sama menandai dirinya pengiriman pertama.
+   ID dokumen riwayat sengaja dibuat **sebelum** transaksi supaya percobaan ulang akibat contention mendarat di dokumen yang sama, bukan menghasilkan baris riwayat ganda. Diuji live: dua pengiriman bersamaan menghasilkan tepat 2 baris riwayat dengan tepat 1 bertanda pengiriman pertama.
+
+10. **"Pertama" ditentukan oleh ada-tidaknya map `rsvp`, bukan oleh field `submittedAt` di dalamnya.** Dokumen hasil impor atau seeding bisa punya map `rsvp` tanpa `submittedAt`; kalau itu dianggap pengiriman pertama, waktu respons asli tamu tertimpa diam-diam.
+
+11. **Pengiriman dimatikan di rute `/` (tanpa data tamu).** Diputuskan user 6 Sep 2026. Sebelumnya rute pratinjau menampilkan kartu "Terima kasih atas konfirmasinya" lengkap padahal tidak ada yang ditulis ke mana pun — ditandai oleh 3 dari 5 lensa review. Skenario nyatanya: link yang terpotong saat diteruskan lewat WhatsApp, atau tamu yang mengetik domain telanjang, lalu mengira dirinya sudah terhitung. Sekarang tombol kirim dinonaktifkan dan ada keterangan "Mode pratinjau" yang hanya muncul di rute itu. Konsekuensinya: meninjau tampilan kartu konfirmasi kini butuh link tamu uji, tidak bisa lewat `/` saja.
+
+12. **Tombol "Batal" pada mode ubah.** Diputuskan user 6 Sep 2026. Tanpa itu, tamu yang menekan "Ubah Konfirmasi" sekadar untuk melihat jawabannya terjebak di formulir sampai ia mengirim ulang atau memuat ulang halaman. Tombol hanya muncul bila tamu memang sudah punya jawaban tersimpan, sehingga tampilan bagi tamu baru tidak berubah sama sekali (diverifikasi ulang di 390px dan 1280px).
+
+13. **`text-rsvp-summary` memakai `font-weight: 400`, bukan 500.** Crimson Pro hanya dimuat pada bobot 300/400/600 (`app/layout.tsx`); bobot 500 akan disintesis browser. Pembedaan dari prosa 300 di sekitarnya dibawa oleh bobot 400 plus tracking, bukan oleh bobot yang tidak tersedia.
+
+**Ditolak:**
+1. Memakai `guestId` sebagai kredensial tulis RSVP (lihat butir 1).
+2. Menambah warna merah/galat ke palet hanya untuk notice kegagalan (lihat butir 7).
+3. Menambah `revalidatePath` setelah simpan — halaman `/[guestSlug]` sudah dirender dinamis (memakai `headers()`), jadi tidak ada cache yang perlu dibatalkan.
+4. Membiarkan kolom catatan bermaksud ganda sebagai doa sekaligus alergi (lihat butir 6).
+5. Membedakan pesan galat "link tidak dikenali" dari galat koneksi. Pesan spesifik akan lebih menolong, tetapi membocorkan apakah sebuah link pernah ada — hal yang justru dijaga oleh halaman 404 generik (PRD §4.1). Dibiarkan generik; dicatat di sini agar tidak dilaporkan ulang sebagai temuan.
+
+**Diketahui, sengaja tidak dikerjakan sesi ini:**
+- Peralihan teks batas anjuran dihitung dari tanggal **UTC**, sehingga berganti pukul 07.00 WIB pada 27 September, bukan tengah malam. Kode ini sudah ada sebelum sesi ini dan hanya memengaruhi kalimat anjuran, bukan kemampuan mengirim formulir (tidak ada deadline keras — PRD §4.3).
+- `rsvpHistory` tumbuh tanpa batas: pengiriman ulang yang isinya sama tetap menambah dokumen baru. Untuk 150 tamu, volumenya tidak bermasalah, dan pemangkasan justru bertentangan dengan tujuan jejak audit.
