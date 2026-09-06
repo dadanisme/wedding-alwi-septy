@@ -11,7 +11,7 @@ import { openingGreeting, openingPhotos } from "@/lib/event-config";
  */
 export function Pembuka() {
   return (
-    <section className="relative min-h-[620px] overflow-hidden bg-espresso lg:min-h-[660px]">
+    <section className="relative flex min-h-[620px] flex-col justify-end overflow-hidden bg-espresso lg:min-h-[660px]">
       <div className="absolute inset-0 lg:hidden">
         <Image
           src={openingPhotos.portrait}
@@ -64,7 +64,7 @@ export function Pembuka() {
         <use href="#sulur" />
       </svg>
 
-      <div className="relative flex h-full flex-col items-center justify-end gap-4 px-8 pb-[84px] lg:gap-5 lg:px-10 lg:pb-32">
+      <div className="relative flex flex-col items-center gap-4 px-8 pb-[84px] lg:gap-5 lg:px-10 lg:pb-32">
         <span className="text-label-small lg:text-label-small-lg text-label-on-dark indent-[0.44em] lg:indent-[0.5em]">
           {openingGreeting.bismillah}
         </span>
