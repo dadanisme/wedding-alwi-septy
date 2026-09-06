@@ -298,12 +298,27 @@ Percobaan pertama pakai `object-top` (0%) — ini menghilangkan potongan kepala,
 
 ---
 
-## Ornamen botani emas transisi wave berbasis AI
+## Ornamen botani emas transisi wave berbasis AI (Dicabut — Kembali ke SVG Original)
 
-**Keputusan:** transisi wave di bawah foto Sampul diperkaya dengan aset ornamen bunga & sulur botani foil emas (`public/ornaments/gold-floral-spray.webp`), yang di-generate via AI langsung dari acuan visual gambar referensi klien, dikonversi ke WebP transparan (alpha channel). Di mobile (390px), ukuran diperbesar (`w-[128px]` kanan, `w-[110px]` kiri) dengan orientasi mekar mengarah ke dalam foto.
+**Keputusan:** eksperimen penambahan aset raster ornamen bunga & sulur botani foil emas (`public/ornaments/gold-floral-spray.webp`) pada pembatas wave Sampul dicabut atas permintaan pengguna ("revert aja deh si asset nya, pake original"). Seluruh aset raster di `public/ornaments/` dihapus, dan tampilan pembatas wave dikembalikan 100% ke implementasi SVG original ganda (`#wave` di `components/ornaments.tsx`).
 
-**Alasan:** mockup awal hanya memiliki pembatas garis wave geometris ganda polos karena keterbatasan alat saat itu dalam menggambar detail botani organik. Gambar referensi asli klien secara eksplisit menampilkan bunga mekar 5 kelopak dan dedaunan emas di atas garis lengkung wave. Aset raster WebP transparan berkualitas tinggi mempertahankan nuansa foil emas yang luwes dan mewah tanpa membebani performa (<101 KB).
+**Alasan pencabutan:** mempertahankan konsistensi sistem ornamen SVG inline original yang sudah disetujui tanpa menambah layer aset gambar raster eksternal.
+
+---
+
+## Seksi Detail Acara: Satu Venue, Peta Tersemat, dan Integrasi Kalender Ganda
+
+**Keputusan:**
+1. **Satu Venue:** Akad dan Resepsi disajikan dalam satu seksi tanpa menduplikasi alamat dan peta, sesuai PRD §4.2. Di ponsel disajikan dalam grid waktu 2 kolom (Akad & Resepsi) diikuti blok Lokasi; di desktop disajikan dalam susunan 3 kolom sejajar (Akad | Resepsi | Lokasi).
+2. **Peta Tersemat:** Iframe Google Maps interaktif disematkan langsung untuk Steikhaus Bandung dengan `loading="lazy"`. Wadah peta diberi latar garis diagonal arsitektural `#2A1F15` dan border emas halus `border-[rgba(201,162,39,0.45)]` sebagai fallback estetis saat loading.
+3. **Integrasi Kalender Universal:** Tombol "Simpan ke Kalender" menyediakan menu popover dengan 2 opsi: tautan langsung ke Google Calendar URL (pre-filled untuk tamu Android/PC) dan berkas `.ics` (iCalendar standard via dynamic Blob download untuk Apple Calendar di iPhone/macOS atau Outlook).
+4. **Warna & Kontras Gelap:** Seluruh seksi menggunakan latar `#1A120B` (`bg-espresso`), teks `#E8DCC4`, `#F6EFE6`, `#C6B79B`, serta garis emas ganda gradien. Emas tidak pernah dipakai untuk teks isi.
+
+**Alasan:**
+Memberikan kejelasan waktu dan navigasi lokasi tanpa redundansi bagi tamu undangan. Penanganan kalender ganda (Google Cal + .ics) menghilangkan hambatan teknis bagi tamu dengan berbagai platform perangkat.
 
 **Ditolak:**
-1. Menggambar manual dengan SVG sederhana (terlalu kaku dan datar, tidak bisa meniru tekstur foil emas dan kedalaman botani referensi).
-2. Membiarkan pembatas wave polos tanpa ornamen bunga (tidak sesuai dengan acuan referensi yang disukai klien).
+1. Mengulang alamat/peta terpisah untuk Akad dan Resepsi (membingungkan tamu dan memboroskan ruang vertikal).
+2. Menggunakan hanya link Google Calendar tanpa file `.ics` (menyulitkan pengguna iOS/Apple Calendar yang tidak memasang Google Calendar).
+3. Hanya tombol tautan tanpa peta embed langsung (kurang informatif sebelum tamu memutuskan membuka aplikasi navigasi luar).
+

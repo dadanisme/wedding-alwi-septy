@@ -1,3 +1,4 @@
+import { Acara } from "@/components/sections/acara";
 import { Ayat } from "@/components/sections/ayat";
 import { Galeri } from "@/components/sections/galeri";
 import { Pembuka } from "@/components/sections/pembuka";
@@ -29,6 +30,7 @@ export default function Home() {
         <Ayat />
         <Pembuka />
         <Galeri />
+        <Acara />
       </main>
     </>
   );

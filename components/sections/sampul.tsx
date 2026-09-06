@@ -54,32 +54,6 @@ export function Sampul({
         <use href="#wave" width="1440" height="120" />
       </svg>
 
-      {/* Ornamen bunga & sulur emas di atas garis pembatas wave */}
-      <div
-        className="pointer-events-none absolute bottom-[14px] right-[-8px] z-[5] w-[128px] -scale-x-100 opacity-95 lg:bottom-[30px] lg:right-[4px] lg:w-[200px]"
-        aria-hidden="true"
-      >
-        <Image
-          src="/ornaments/gold-floral-spray.webp"
-          alt=""
-          width={605}
-          height={752}
-          className="h-auto w-full"
-        />
-      </div>
-      <div
-        className="pointer-events-none absolute bottom-[10px] left-[-6px] z-[5] w-[110px] opacity-90 lg:bottom-[24px] lg:left-[2px] lg:w-[170px]"
-        aria-hidden="true"
-      >
-        <Image
-          src="/ornaments/gold-floral-spray.webp"
-          alt=""
-          width={605}
-          height={752}
-          className="h-auto w-full"
-        />
-      </div>
-
       <svg
         className="absolute top-0 left-0 h-[132px] w-[132px] opacity-85 lg:h-[196px] lg:w-[196px]"
         aria-hidden="true"
