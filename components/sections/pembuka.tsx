@@ -18,7 +18,7 @@ export function Pembuka() {
           alt="Alwi & Septy — busana adat Sunda"
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-top"
         />
       </div>
       <div className="absolute inset-0 hidden lg:block">
@@ -27,7 +27,7 @@ export function Pembuka() {
           alt="Alwi & Septy — busana adat Sunda"
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-top"
         />
       </div>
 
