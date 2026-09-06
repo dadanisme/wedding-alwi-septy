@@ -1,19 +1,31 @@
 # PROGRESS
 
-Diperbarui: 7 September 2026 (sesi Admin Panel Bagian 2: Manajemen Tamu, Generator WhatsApp, Impor CSV & Ekspor)
+Diperbarui: 7 September 2026 (sesi Pembuatan Dynamic OpenGraph Image 1200×630 untuk Pratinjau WhatsApp & Media Sosial)
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Penyempurnaan UI Admin Panel (Ikon SVG vektor murni pengganti emoji, perbaikan styling dropdown chevron & lebar modal form tamu, serta tab segmented pemisah Manajemen Tamu dan Buku Tamu) selesai 100% dan diverifikasi visual via Chrome DevTools MCP & unit integration tests.
+Implementasi Dynamic OpenGraph Banner 1200×630 piksel (PRD §4.6) untuk rute umum `/` dan rute personal `/[guestSlug]` telah selesai 100% dan lolos build & lint.
 
 Fokus berikutnya:
-1. Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) sesuai PRD §4.6.
+1. Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) setelah deploy / tunnel.
 2. Konfirmasi ke mempelai terkait placeholder catatan RSVP.
 3. Persiapan input daftar 150 tamu resmi saat data final dari klien diserahkan.
 
 ## Selesai
+
+- **Sistem Dynamic OpenGraph Banner 1200×630 piksel (PRD §4.6)** (7 Sep 2026):
+  - **Banner Standar 1200×630 Lanskap**: Memperbaiki masalah tampilan thumbnail vertikal dan thumbnail kotak kecil WhatsApp dengan menghasilkan kartu OpenGraph presisi 1200 × 630 piksel (rasio standar 1.91:1) menggunakan `next/og` (`ImageResponse`).
+  - **Foto Adat Sunda Terpilih (`og-base.jpg`)**: Memotong dan mengoptimalkan foto lanskap adat Sunda Alwi & Septy (`adat-sunda-04.jpg`) ke resolusi 1200 × 630 piksel. Framing pasangan dan mahkota Siger Sunda tetap terjaga utuh dan elegan di bagian tengah atas.
+  - **Overlay Teks Personal & Tipografi Eksklusif (`lib/og-helper.tsx`)**:
+    - Tipografi Cormorant Garamond SemiBold resmi (`public/fonts/CormorantGaramond-SemiBold.ttf`) yang dibundel lokal untuk performa kilat tanpa dependensi eksternal saat runtime.
+    - Monogram resmi emas A&S (`public/logo/monogram-gold.png`) dan badge tanggal acara `10 · 10 · 2026`.
+    - Untuk rute personal `/[guestSlug]` (`app/[guestSlug]/opengraph-image.tsx`): Overlay *"Kepada Yth. {Sapaan} {Nama Tamu}"* tebal, kontras tajam di atas gradien espresso, terbaca jelas bahkan pada ukuran thumbnail kecil di daftar chat WhatsApp.
+    - Untuk rute umum `/` (`app/opengraph-image.tsx`): Overlay *"The Wedding of Alwi & Septy"* dengan detail tanggal dan lokasi venue.
+  - **Metadata & Twitter Cards**: Dikonfigurasi di `app/layout.tsx` (dengan `metadataBase` otomatis mendeteksi environment URL) dan `app/[guestSlug]/page.tsx`, menghasilkan format kartu `summary_large_image` yang konsisten.
+  - **Verifikasi**: `bun test` 15/15 lulus 100%, `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, dan verifikasi curl format gambar menghasilkan `PNG image data, 1200 x 630, RGBA`.
+
 
 - **Penyempurnaan UI Admin Panel — Ikon Vektor SVG, Dropdown Select Styling, Segmented Tabs, & Tooltips** (7 Sep 2026):
   - **Sistem Ikon Vektor Native (`components/admin/admin-icons.tsx`)**: Menggantikan seluruh emoji di admin panel dengan ikon SVG vektor konsisten (stroke 2px, fill currentColor, ukuran serasi): `IconUsers`, `IconUserPlus`, `IconUpload`, `IconDownload`, `IconWhatsApp`, `IconLink`, `IconEdit`, `IconTrash`, `IconCopy`, `IconCheck`, `IconSearch`, `IconX`, `IconChevronDown`, `IconMessageSquare`, `IconClock`, `IconAlertTriangle`, `IconFileText`, `IconMail`. Bebas dependensi pustaka ikon eksternal.
