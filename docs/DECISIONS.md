@@ -169,3 +169,36 @@ Pengendaliannya bersifat pengamatan. RSVP masuk bertahap selama enam minggu, jad
 **Alasan:** permintaan langsung klien/pengembang. Vercel mendeteksi package manager otomatis dari lockfile yang ada di root, jadi kehadiran `bun.lock` sudah cukup — tidak perlu perubahan konfigurasi build di Vercel.
 
 **Dampak:** `README.md` masih mencantumkan npm/yarn/pnpm sebagai opsi (boilerplate `create-next-app`, belum dirapikan — di luar scope sesi ini). Script di `package.json` tidak berubah, hanya package manager yang menjalankannya.
+
+---
+
+## Foto prewedding: intake, kompresi, dan pemilihan foto sampul
+
+**Keputusan:** 21 foto dari klien (`drive-download-20260906T061840Z-1-001`) disalin ke `public/photos/`, di-resize ke maksimal 2000px sisi terpanjang dan dikompresi JPEG kualitas 78 (pakai `sips`, bukan dependency baru), lalu diberi nama deskriptif per gaya: `modern-01..12.jpg` (busana modern, latar kebun bunga) dan `adat-sunda-01..09.jpg` (busana adat Sunda, latar rumah kayu). Total turun dari ~90MB jadi ~11MB.
+
+**Alasan:** PRD §5 mengharuskan "optimasi agresif" untuk foto prewedding. `next/image` mengoptimasi ukuran akhir per-viewport saat runtime, jadi source di `public/` hanya perlu cukup besar untuk retina desktop (~1680px efektif), bukan resolusi kamera asli (4242×2828–8MB/foto).
+
+**Pemilihan foto sampul:** `modern-01.jpg` (potret, komposisi bersih, ruang kosong di atas kepala untuk scrim teks) dan `adat-sunda-02.jpg` (potret formal simetris, latar tidak ramai) — dipilih dari hasil tinjau visual seluruh 21 foto, cocok dengan spek mockup (Sampul ponsel: 1 foto potret modern full-bleed; Sampul desktop: dua panel potret 4:5, kiri modern/kanan adat Sunda). Referensi disimpan di `lib/event-config.ts` (`coverPhotos`), bukan di-hardcode di komponen.
+
+**Konsekuensi untuk seksi lain:** seksi Mempelai butuh foto **solo** (pria sendiri, wanita sendiri) — tidak ada di antara 21 foto ini (semua foto berdua). Seksi Love Story butuh naskah + tahun momen yang juga belum ada (lihat PRD §11 poin 3–4, masih terbuka). Kedua seksi ini tetap terkunci; lihat `docs/PROGRESS.md`.
+
+---
+
+## Implementasi Sampul: pemetaan warna & token yang belum lengkap
+
+**Keputusan:** saat porting seksi Sampul dari mockup, ditemukan dua kesenjangan kecil di design system yang dikunci sebelumnya (palet 11 warna + skala tipografi):
+
+1. Mockup Sampul memakai beberapa varian near-white ad hoc untuk teks di atas foto (`#F1E7D6`, `#EFE4D2`) yang tidak persis sama dengan token manapun. Diputuskan untuk memetakan semuanya ke 2 token yang sudah ada: `--color-on-photo` untuk teks utama (judul, nama tamu, teks tombol) dan `--color-label-on-dark` untuk label kecil (`The Wedding Of`, tanggal, `Kepada Yth.`, subteks italic) — bukan menambah token warna baru, supaya palet 11 warna yang sudah dikunci tetap utuh.
+2. Subteks italic ("Mohon berkenan hadir & memberi doa restu") tidak punya padanan di skala tipografi yang sudah ditranskrip. Ditambahkan utility baru `text-caption-italic`/`-lg` di `app/globals.css` (13px/17px, italic, 300) — nilai ditranskrip langsung dari mockup, bukan ditebak, mengikuti pola `@utility` yang sudah ada.
+
+**Alasan:** kedua kesenjangan ini murni celah transkripsi sesi sebelumnya (elemen yang belum sempat masuk tabel skala), bukan perubahan atas keputusan yang sudah dikunci — jadi ditambal langsung alih-alih memblokir implementasi seksi.
+
+---
+
+## Spacing struktural: nilai piksel langsung, bukan token baru
+
+**Keputusan:** padding, gap, ukuran ornamen, dan letter-spacing di komponen seksi (mis. `components/sections/sampul.tsx`) memakai nilai arbitrary Tailwind (`pt-[52px]`, `gap-[14px]`, `tracking-[0.34em]`, dst.) yang ditranskrip langsung dari geometri mockup per breakpoint, bukan lewat token spacing baru.
+
+**Alasan:** design system yang dikunci sebelumnya eksplisit hanya mencakup palet warna dan skala tipografi (lihat "Design system dikunci lewat token CSS" di atas) — spacing sengaja tidak masuk cakupan itu. Ini konsisten dengan keputusan "dua breakpoint tetap, bukan `clamp()` fluida": tiap seksi punya geometri piksel sendiri sesuai mockup, jadi token spacing generik justru bisa menyembunyikan bahwa dua seksi kebetulan mirip padahal didesain independen.
+
+**Batasan:** kalau sebuah nilai (padding, gap, ukuran ikon, dll.) ternyata dipakai identik di ≥2 seksi setelah beberapa seksi diimplementasikan, nilai itu harus diangkat jadi utility bersama di `app/globals.css` saat itu — bukan didiamkan sebagai duplikasi. Warna dan skala tipografi tetap wajib pakai token yang sudah ada, tanpa pengecualian.

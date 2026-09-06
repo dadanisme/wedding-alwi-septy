@@ -109,3 +109,53 @@ body {
 @utility max-w-reading-lg {
   max-width: 620px;
 }
+
+/*
+ * Sub-judul kecil bergaya italic (mis. "Mohon berkenan hadir & memberi doa
+ * restu" di Sampul) — ditemukan saat implementasi seksi Sampul, bukan di
+ * tabel skala awal. Nilai ditranskrip langsung dari mockup (seksi Sampul
+ * ponsel/desktop), bukan ditebak.
+ */
+@utility text-caption-italic {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 13px;
+  line-height: 1.5;
+}
+@utility text-caption-italic-lg {
+  font-size: 17px;
+}
+
+/*
+ * Scrim gelap di atas foto sampul supaya teks & tombol tetap terbaca.
+ * Ditranskrip dari mockup (seksi Sampul ponsel/desktop). Pakai color-mix()
+ * dengan token --color-espresso, bukan hex mentah, supaya tetap terikat
+ * ke palet meskipun gradasinya spesifik untuk seksi ini.
+ */
+@utility bg-cover-scrim {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-espresso) 62%, transparent) 0%,
+    color-mix(in srgb, var(--color-espresso) 14%, transparent) 26%,
+    color-mix(in srgb, var(--color-espresso) 42%, transparent) 54%,
+    color-mix(in srgb, var(--color-espresso) 88%, transparent) 100%
+  );
+}
+@utility bg-cover-scrim-radial {
+  background: radial-gradient(
+    58% 46% at 50% 52%,
+    color-mix(in srgb, var(--color-espresso) 72%, transparent) 0%,
+    color-mix(in srgb, var(--color-espresso) 34%, transparent) 60%,
+    color-mix(in srgb, var(--color-espresso) 12%, transparent) 100%
+  );
+}
+@utility bg-cover-scrim-linear {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-espresso) 50%, transparent) 0%,
+    transparent 24%,
+    transparent 52%,
+    color-mix(in srgb, var(--color-espresso) 86%, transparent) 100%
+  );
+}

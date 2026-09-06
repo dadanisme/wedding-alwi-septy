@@ -6,7 +6,11 @@ Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.
 
 ## Sedang Dikerjakan
 
-Route `/styleguide` sudah ada dan gate desain (lihat `CLAUDE.md` bagian Catatan) sudah **tutup** — design system dikunci dari mockup yang diapprove. Implementasi seksi (Sampul, Ayat, Pembuka, dst.) boleh dimulai sesi berikutnya, satu seksi per sesi, tapi sebagian besar seksi masih menunggu foto prewedding asli (lihat Terkunci).
+Seksi **Sampul** sudah diimplementasikan (`components/sections/sampul.tsx`, dirender di `/`) dan lolos code review. **Belum diverifikasi manusia di ponsel asli** — jangan tandai selesai sepenuhnya sampai itu terjadi (lihat CLAUDE.md § Protokol Sesi).
+
+Foto prewedding asli dari klien sudah masuk (`public/photos/`, 21 foto) — lihat "Selesai". Ini membuka blocker Sampul & Galeri, tapi **Mempelai** dan **Love Story** masih terkunci (lihat Terkunci) karena kebutuhannya beda: Mempelai butuh foto solo (semua 21 foto yang ada berdua), Love Story butuh naskah.
+
+Berkas config konten acara sudah ada (`lib/event-config.ts`, baru mencakup data mempelai/jadwal/venue/rekening/foto sampul — akan bertambah seiring seksi lain diimplementasikan).
 
 Firebase/Firestore/Auth dan lapisan akses data **belum** dikerjakan — masih di daftar "Berikutnya".
 
@@ -23,27 +27,31 @@ Firebase/Firestore/Auth dan lapisan akses data **belum** dikerjakan — masih di
 - Design system dikunci: palet (11 warna + rasio kontras), font (Cormorant Garamond + Crimson Pro via `next/font/google`), skala tipografi (kelas `text-*`/`text-*-lg` di `app/globals.css`) — semua ditranskrip dari blok "Catatan Desain" di mockup, bukan ditebak ulang.
 - Sistem ornamen SVG diporting ke `components/ornaments.tsx` (sulur, spray, orn, wave, damaskPat, ico-cal/rings/pin) — dipasang sekali di root layout lewat `<OrnamentDefs />`.
 - Route `/styleguide` — menampilkan palet, skala tipografi (termasuk uji nama bergelar 390px), ornamen, dan 3 varian logo.
+- **Foto prewedding asli dari klien** (21 foto, `public/photos/`) — di-resize & dikompresi (lihat `docs/DECISIONS.md`), dikategorikan `modern-01..12.jpg` / `adat-sunda-01..09.jpg`. Semua foto berdua, tidak ada solo shot.
+- **Berkas config konten acara** (`lib/event-config.ts`) — data mempelai, jadwal, venue, rekening (dari PRD §2), monogram, dan referensi foto sampul.
+- **Seksi Sampul** (`components/sections/sampul.tsx`, dirender di `/`) — ponsel: 1 foto potret modern full-bleed; desktop: 2 panel potret (modern + adat Sunda). Guest name masih contoh statis ("Bapak/Ibu Budi Santoso") — sistem link/token tamu belum ada. Tombol "Buka Undangan" belum fungsional (reveal konten + trigger musik menyusul). Diverifikasi visual di 390×844 & 1280×900 lewat Chrome DevTools MCP — cocok dengan mockup, tidak ada console error.
 
 ## Berikutnya
 
+- **Verifikasi manusia**: buka `/` di ponsel asli, bandingkan dengan mockup (lihat CLAUDE.md § Protokol Sesi)
 - Setup project Firebase — Firestore dan Auth
-- Berkas config konten acara
 - Lapisan akses data
-- Implementasi seksi satu per satu (menunggu foto untuk sebagian besar — lihat Terkunci)
+- Implementasi seksi berikutnya satu per satu — kandidat siap: **Galeri** (foto sudah ada, tidak ada blocker konten). Ayat/Pembuka/Detail Acara/RSVP/Buku Tamu/Hadiah/Penutup belum dicek blocker-nya secara spesifik.
 
 ## Terkunci
 
 | Item | Menunggu |
 |---|---|
-| Implementasi seksi (Sampul, Pembuka, Mempelai, Love Story, Galeri) | Foto prewedding asli — klien bilang sudah ada (6 Sep), tapi belum ditemukan berkasnya (dicek di Downloads, belum ada) |
+| Seksi Mempelai | Foto **solo** pria & wanita — 21 foto yang ada semuanya foto berdua |
+| Seksi Love Story | Naskah + tahun tiap momen (PRD §11 poin 3) |
 | Akurasi proyeksi total di dashboard | Jumlah pasti keluarga inti dan panitia |
 
 ## Menunggu dari Klien
 
-1. **Foto prewedding** (minimal 2: satu modern, satu adat Sunda, potret) — paling mendesak, sudah dua kali jadi penyebab masalah. Klien bilang sudah ada (6 Sep) tapi berkasnya belum ditemukan.
+1. ~~Foto prewedding~~ — **sudah masuk** (6 Sep), 21 foto di `public/photos/`. Tapi semuanya foto berdua — kalau seksi Mempelai butuh foto solo per orang, itu perlu diminta terpisah.
 2. ~~Foto berorientasi lanskap untuk sampul desktop~~ — tidak lagi relevan. Mockup yang diapprove memakai 2 foto **potret** (4:5) berdampingan untuk sampul desktop, foto yang sama dengan versi ponsel.
 3. Jumlah pasti keluarga inti dan panitia — dibutuhkan sebelum 3 Oktober 2026 (lihat Tanggal Penting)
-4. Naskah love story
+4. Naskah love story (termasuk berapa momen & tahunnya)
 5. Dress code
 6. Pilihan musik latar
 7. Handle Instagram
