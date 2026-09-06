@@ -201,8 +201,8 @@ export function Galeri() {
               fill
               sizes={
                 photo.span === 2
-                  ? "(min-width: 1024px) 50vw, 100vw"
-                  : "(min-width: 1024px) 25vw, 50vw"
+                  ? "(min-width: 1440px) 720px, (min-width: 1024px) 50vw, 100vw"
+                  : "(min-width: 1440px) 360px, (min-width: 1024px) 25vw, 50vw"
               }
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />

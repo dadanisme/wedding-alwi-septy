@@ -48,7 +48,8 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 export default function StyleguidePage() {
   return (
-    <main className="mx-auto flex max-w-[900px] flex-col gap-16 px-6 py-16 lg:px-12">
+    <div className="min-h-screen bg-cream">
+      <main className="mx-auto flex max-w-[900px] flex-col gap-16 px-6 py-16 lg:px-12">
       <header className="flex flex-col gap-3 border-b border-gold-bright/30 pb-8">
         <span className="text-label-small text-gold-deep">Design System</span>
         <h1 className="text-full-name lg:text-full-name-lg text-ink">Undangan Alwi &amp; Septy</h1>
@@ -158,5 +159,6 @@ export default function StyleguidePage() {
         </div>
       </section>
     </main>
+    </div>
   );
 }

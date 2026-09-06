@@ -281,3 +281,18 @@ Percobaan pertama pakai `object-top` (0%) — ini menghilangkan potongan kepala,
 1. **`sizes` salah untuk tile span-2.** `<Image>` grid dulu pakai `sizes` yang sama untuk semua tile (`25vw` desktop / `50vw` ponsel) padahal tile lanskap (span-2, mayoritas dari 21 foto) dirender selebar `50vw` desktop / `100vw` ponsel — dua kali lebih lebar dari yang diminta ke Next.js, jadi browser mengambil source gambar yang terlalu kecil lalu di-upscale CSS (blur/pecah). Fix: `sizes` sekarang bercabang berdasar `photo.span`.
 2. **Fokus lightbox ke-reset di setiap navigasi, bukan cuma saat buka.** `useEffect` yang memindah fokus ke tombol Tutup memakai `[activeIndex]` sebagai dependency, jadi berjalan ulang setiap next/prev — pengguna keyboard yang Tab ke tombol "Foto berikutnya" lalu tekan Enter berulang kali akan didorong fokusnya balik ke Tutup setiap langkah, sehingga Enter kedua menutup lightbox alih-alih lanjut ke foto berikutnya. Fix: dependency diganti ke `isOpen` (boolean `activeIndex !== null`), supaya efek cuma jalan saat transisi buka/tutup, bukan tiap pergantian indeks.
 3. **Heuristik promosi run-ganjil (lihat entri gap grid di atas) cuma terbukti benar untuk 21 foto saat ini** — kalau `galleryPhotos` diedit nanti dan menghasilkan rangkaian lanskap yang panjangnya ganjil, itu bisa memunculkan gap serupa yang tidak ditangani heuristik ini. Daripada menggeneralisasi algoritmanya (risiko kompleksitas tanpa jaminan menutup semua kasus), ditambahkan `assertNoGridGaps()` — simulasi penempatan grid yang `throw` saat modul dimuat kalau susunan tile manapun (2 kolom atau 4 kolom) ternyata menyisakan gap. Build akan gagal keras kalau ini terjadi, bukan diam-diam menampilkan bug visual yang sama seperti yang baru ditemukan sesi ini.
+
+---
+
+## Container system terpusat (max-w: 1440px) dan perlakuan ultrawide
+
+**Keputusan:** seluruh halaman undangan dibatasi lebar maksimum 1440px (`max-w-page`) di tengah layar (`mx-auto`) untuk viewport ultrawide (>1440px). Area luar (gutter) di ultrawide memakai warna matte linen hangat (`--color-matte: #e4ded2`, berasal dari acuan warna latar bundler mockup yang disetujui) dipadukan dengan tekstur motif damask botani melati yang diulang rapi (`public/patterns/botanical-damask.jpg`) dan elevasi multi-layer shadow (`shadow-page`).
+
+**Alasan:** pada layar ultrawide (1920px, 2560px, 3440px), layout tanpa batas lebar menyebabkan foto prewedding ter-crop menjadi sangat pipih/ekstrem, ornamen sudut (sulur) terpisah ribuan piksel dari konten teks, dan grid galeri menjadi raksasa. Batas 1440px dipilih karena pas dengan lebar viewBox aset SVG wave (`viewBox="0 0 1440 120"`) dan resolusi desktop referensi. Gutter hitam/espresso ditolak karena terlalu kontras/gelap terhadap mayoritas halaman yang bernuansa krem gading; border garis fisik 1px juga ditolak karena memunculkan garis putih/terang yang mengganggu.
+
+**Ditolak:**
+1. Membiarkan halaman meluas penuh 100vw di ultrawide (membuat rasio foto dan grid rusak).
+2. Latar gutter hitam pekat/espresso (terlalu gelap dan jarring saat melihat seksi terang).
+3. Border garis vertikal di tepi container (terlihat seperti garis putih/artifak yang mengganggu).
+4. Warna gutter terlalu gelap seperti `#cbbca2` (dites dan ditolak pengguna karena terlalu gelap).
+

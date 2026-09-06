@@ -18,6 +18,7 @@
   --color-on-photo: #fdfaf4;
   --color-gold-deep: #8a6a22;
   --color-gold-bright: #c9a227;
+  --color-matte: #e4ded2;
 }
 
 @theme inline {
@@ -26,8 +27,27 @@
 }
 
 body {
-  background: var(--color-cream);
+  background: var(--color-matte);
   color: var(--color-ink);
+}
+
+/*
+ * Kontainer halaman — batas maksimum lebar layout (1440px, pas dengan
+ * lebar viewBox aset wave). Di atas 1440px (layar ultrawide), kontainer
+ * terpusat (mx-auto) dengan gutter luar bermotif linen/damask.
+ */
+@utility max-w-page {
+  max-width: 1440px;
+}
+
+/*
+ * Elevasi bayangan halaman di layar ultrawide — multi-layer warm shadow
+ * yang memberi kesan undangan fisik terangkat ("di atas") latar matte.
+ */
+@utility shadow-page {
+  box-shadow:
+    0 0 55px rgba(40, 26, 14, 0.28),
+    0 0 20px rgba(40, 26, 14, 0.18);
 }
 
 /*

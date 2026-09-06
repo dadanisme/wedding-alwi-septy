@@ -27,7 +27,7 @@ export function Pembuka() {
           src={openingPhotos.landscape}
           alt="Alwi & Septy — busana adat Sunda"
           fill
-          sizes="100vw"
+          sizes="(min-width: 1440px) 1440px, 100vw"
           className="object-cover object-[center_20%]"
         />
         <div className="absolute inset-0 bg-pembuka-scrim-lg" />
