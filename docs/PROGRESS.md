@@ -1,22 +1,49 @@
 # PROGRESS
 
-Diperbarui: 7 September 2026 (sesi Admin Panel Bagian 1: Auth, Dashboard & Moderasi)
+Diperbarui: 7 September 2026 (sesi Admin Panel Bagian 2: Manajemen Tamu, Generator WhatsApp, Impor CSV & Ekspor)
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Admin Panel Bagian 1 (Autentikasi Firebase Auth, Proteksi Sesi Server, Dashboard Kapasitas 250 & RSVP, serta Antarmuka Moderasi Buku Tamu) selesai 100% dan diverifikasi live via browser automation Chrome DevTools MCP & unit integration tests.
+Admin Panel Bagian 2 (Manajemen Tamu Lengkap: Tabel tamu, filter reminder Belum Respons, Generator WhatsApp PRD Lampiran B, Tambah/Edit/Hapus satuan, Impor CSV massal, dan Ekspor CSV Katering) selesai 100% dan diverifikasi live via browser automation Chrome DevTools MCP & unit integration tests.
 
-Fokus berikutnya: **Admin Panel Bagian 2 (Manajemen Tamu Lengkap)**:
-1. Tabel 150 tamu: nama, grup, status buka, kehadiran, pendamping, deteksi perangkat unik.
-2. Filter tamu "Belum Respons" dengan tombol salin pesan reminder WhatsApp.
-3. Generator link personal dan pesan WhatsApp otomatis (sesuai PRD Lampiran B).
-4. Tambah / edit tamu satu per satu.
-5. Impor CSV dengan validasi format sebelum simpan ke Firestore.
-6. Ekspor data lengkap (CSV) untuk kebutuhan katering dan tata kursi.
+Fokus berikutnya:
+1. Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) sesuai PRD §4.6.
+2. Konfirmasi ke mempelai terkait placeholder catatan RSVP.
+3. Persiapan input daftar 150 tamu resmi saat data final dari klien diserahkan.
 
 ## Selesai
+
+- **Admin Panel Bagian 2 — Manajemen Tamu Lengkap, Generator WhatsApp, Impor CSV & Ekspor** (7 Sep 2026):
+  - **Tabel Tamu Responsif**: Menampilkan daftar tamu lengkap dengan nama, sapaan, kategori grup, status buka (frekuensi & waktu buka), deteksi penerusan link via hash perangkat unik (`uniqueDevices > 1`), status RSVP (Hadir + pendamping, Tidak Hadir, Belum Respons), serta catatan/kebutuhan khusus.
+  - **Filter & Pencarian Instan**:
+    - Tab filter status: *Semua*, *Belum Respons* (disorot khusus dengan alert reminder batas anjuran 26 September 2026), *Hadir*, *Tidak Hadir*, *Sudah Buka*, dan *Belum Buka*.
+    - Filter kategori grup dinamis dan pencarian teks instan (nama/sapaan/catatan/pendamping).
+    - Paginasi adaptif (25, 50, 100, atau Tampilkan Semua).
+  - **Generator Tautan & Pesan WhatsApp (PRD §4.7 & Lampiran B)** (`components/admin/whatsapp-modal.tsx`):
+    - Template 1: *Undangan Resmi* sesuai persis format PRD Lampiran B dengan parameter `{sapaan}`, `{nama}`, dan tautan personal `{link_undangan}`.
+    - Template 2: *Pengingat / Reminder RSVP* santun menyebutkan batas anjuran 26 September 2026 demi kelancaran persiapan katering Steikhaus Bandung.
+    - Tombol salin link personal, salin pesan lengkap ke clipboard, dan tombol langsung kirim via WhatsApp (`https://api.whatsapp.com/send?text=...`).
+  - **Pengelolaan Tamu Satuan (CRUD)** (`components/admin/guest-form-modal.tsx`, `components/admin/delete-guest-modal.tsx`, `app/actions/guests.ts`, `lib/db/guests.ts`):
+    - Tambah tamu baru dengan auto-slug dan token acak 8-karakter hex unik.
+    - Edit data tamu (nama, sapaan, kategori) dengan opsi proteksi pembaharuan slug agar link yang sudah disebar tidak rusak.
+    - Hapus tamu dengan modal konfirmasi protektif yang memperingatkan jika tamu telah membuka link atau mengisi RSVP.
+  - **Impor CSV Massal dengan Validasi (PRD §4.7 & Lampiran A)** (`components/admin/import-csv-modal.tsx`, `lib/guest-utils.ts`):
+    - Mendukung unggah berkas `.csv` atau tempel teks CSV langsung.
+    - Auto-detect pemisah koma (`,`) dan titik koma (`;`) untuk kompatibilitas Microsoft Excel Indonesia.
+    - Validasi live format sebelum simpan: menghitung jumlah valid vs baris bermasalah, menampilkan rincian galat, serta tabel pratinjau calon tamu sebelum komit batch ke Firestore (dalam chunk aman 400 dokumen).
+  - **Ekspor Data Lengkap CSV untuk Katering & Tata Kursi (PRD §4.7)** (`lib/guest-utils.ts`):
+    - Menghasilkan berkas CSV berformat UTF-8 BOM (`\uFEFF`) sehingga langsung rapi dibuka di Microsoft Excel Mac/Windows tanpa karakter rusak.
+    - Kolom lengkap: `No, Nama Tamu, Sapaan, Kategori Grup, Status Buka, Frekuensi Buka, Jumlah Perangkat, Status RSVP, Estimasi Kursi (1/2/0), Bawa Pendamping, Nama Pendamping, Catatan/Alergi, Link Undangan Personal, Waktu RSVP, Waktu Pertama Buka`.
+  - **Sinkronisasi Real-Time Dashboard**:
+    - Penambahan, pengeditan, penghapusan, atau impor tamu langsung memperbarui kartu kendali kapasitas 250, bilah kemajuan, dan metrik ringkasan secara instan di klien.
+  - **Verifikasi Menyeluruh**:
+    - Unit integration test suite (14 pengujian lulus 100% di `tests/guest-management.test.ts`).
+    - Uji otomasi browser live via Chrome DevTools MCP: penambahan tamu manual, uji generator pesan WhatsApp & reminder, impor batch 4 tamu via CSV, pencarian real-time, pengeditan tamu dengan gelar, penghapusan tamu dengan dialog konfirmasi, dan uji responsif di mobile 390×844 & desktop 1280×900.
+    - Data uji Firestore dibersihkan kembali hingga bersih.
+    - Lolos `bun run lint` dan `bun run build` bersih tanpa peringatan.
+
 
 - **Admin Panel Bagian 1 — Autentikasi Firebase Auth, Dashboard Kapasitas 250, & Moderasi Buku Tamu** (7 Sep 2026):
   - **Autentikasi Server-Side Firebase Auth**: Login email & kata sandi admin via Google Identity Toolkit REST API dan Firebase Admin SDK session cookie 5 hari terenkripsi di HTTP-only cookie `__session` (`lib/auth.ts`, `app/actions/auth.ts`). Sepenuhnya server-side tanpa menambah client SDK baru.
@@ -107,7 +134,7 @@ Fokus berikutnya: **Admin Panel Bagian 2 (Manajemen Tamu Lengkap)**:
 
 ## Berikutnya
 
-- Admin panel: login auth & pemantauan dashboard real-time (tabel tamu, generator link WhatsApp, filter belum respons, ekspor) + antarmuka moderasi Buku Tamu
+- Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) sesuai PRD §4.6
 - Konfirmasi ke mempelai: perubahan placeholder catatan RSVP dari "Doa atau pesan untuk kami" menjadi "Alergi makanan atau kebutuhan khusus"
 - Ganti aset yang perlu diganti (disebut user 6 Sep, daftar spesifiknya belum diberikan)
 

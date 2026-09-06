@@ -127,6 +127,32 @@ export interface CreateGuestInput {
   token?: string;
 }
 
+export interface UpdateGuestInput {
+  name?: string;
+  salutation?: string;
+  guestGroup?: string;
+  updateSlug?: boolean;
+}
+
+export interface BatchImportGuestItem {
+  name: string;
+  salutation?: string;
+  guestGroup?: string;
+}
+
+/**
+ * Menghasilkan slug URL yang bersih dan aman dari karakter non-alfanumerik/aksen.
+ */
+export function generateGuestSlug(name: string): string {
+  const normalized = name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return normalized || 'tamu';
+}
+
 /**
  * Membuat data tamu baru dengan token acak 8 karakter (PRD §4.1).
  */
@@ -134,12 +160,7 @@ export async function createGuest(input: CreateGuestInput): Promise<Guest> {
   const db = getAdminDb();
 
   // Generate slug dari nama jika tidak diberikan
-  const slug =
-    input.slug ||
-    input.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+  const slug = input.slug || generateGuestSlug(input.name);
 
   // Generate token acak minimal 8 karakter
   const token = input.token || crypto.randomBytes(4).toString('hex'); // 8 hex characters
@@ -180,6 +201,128 @@ export async function createGuest(input: CreateGuestInput): Promise<Guest> {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
+}
+
+/**
+ * Memperbarui data tamu yang sudah ada.
+ */
+export async function updateGuest(
+  guestId: string,
+  input: UpdateGuestInput
+): Promise<Guest | null> {
+  const db = getAdminDb();
+  const docRef = db.collection(COLLECTION_NAME).doc(guestId);
+  const doc = await docRef.get();
+
+  if (!doc.exists) return null;
+  const currentData = doc.data()!;
+
+  const updates: Record<string, unknown> = {
+    updatedAt: FieldValue.serverTimestamp(),
+  };
+
+  if (input.name !== undefined && input.name.trim()) {
+    const trimmedName = input.name.trim();
+    updates.name = trimmedName;
+
+    // Jika belum pernah dibuka dan belum ada kunjungan, aman untuk memperbarui slug & fullSlug
+    const isUnopened = !currentData.openedAt && (currentData.openCount || 0) === 0;
+    if (input.updateSlug ?? isUnopened) {
+      const newSlug = generateGuestSlug(trimmedName);
+      updates.slug = newSlug;
+      updates.fullSlug = `${newSlug}-${currentData.token}`;
+    }
+  }
+
+  if (input.salutation !== undefined) {
+    updates.salutation = input.salutation.trim() || 'Bapak/Ibu';
+  }
+
+  if (input.guestGroup !== undefined) {
+    updates.guestGroup = input.guestGroup.trim() || 'tamu_undangan';
+  }
+
+  await docRef.update(updates);
+  const updatedDoc = await docRef.get();
+  return mapGuestDoc(updatedDoc.id, updatedDoc.data()!);
+}
+
+/**
+ * Menghapus tamu dari basis data.
+ */
+export async function deleteGuest(guestId: string): Promise<boolean> {
+  const db = getAdminDb();
+  const docRef = db.collection(COLLECTION_NAME).doc(guestId);
+  const doc = await docRef.get();
+  if (!doc.exists) return false;
+
+  await docRef.delete();
+  return true;
+}
+
+/**
+ * Impor tamu secara massal dalam batch write Firestore (PRD §4.7 & Lampiran A).
+ */
+export async function batchImportGuests(
+  items: BatchImportGuestItem[]
+): Promise<{ count: number; guests: Guest[] }> {
+  const db = getAdminDb();
+  const results: Guest[] = [];
+
+  const CHUNK_SIZE = 400;
+  for (let i = 0; i < items.length; i += CHUNK_SIZE) {
+    const chunk = items.slice(i, i + CHUNK_SIZE);
+    const batch = db.batch();
+
+    for (const item of chunk) {
+      const trimmedName = item.name.trim();
+      if (!trimmedName) continue;
+
+      const slug = generateGuestSlug(trimmedName);
+      const token = crypto.randomBytes(4).toString('hex');
+      const fullSlug = `${slug}-${token}`;
+      const docRef = db.collection(COLLECTION_NAME).doc();
+
+      const newGuestData = {
+        slug,
+        token,
+        fullSlug,
+        name: trimmedName,
+        salutation: item.salutation?.trim() || 'Bapak/Ibu',
+        guestGroup: item.guestGroup?.trim() || 'tamu_undangan',
+        plusOneAllowed: true,
+        openedAt: null,
+        lastOpenedAt: null,
+        openCount: 0,
+        uniqueDevices: [],
+        autoVisitCount: 0,
+        rsvpStatus: 'pending',
+        rsvp: null,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      batch.set(docRef, newGuestData);
+
+      results.push({
+        id: docRef.id,
+        ...newGuestData,
+        openedAt: null,
+        lastOpenedAt: null,
+        openCount: 0,
+        uniqueDevices: [],
+        autoVisitCount: 0,
+        rsvpStatus: 'pending',
+        rsvp: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
+    await batch.commit();
+  }
+
+  return { count: results.length, guests: results };
 }
 
 /**

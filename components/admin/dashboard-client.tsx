@@ -1,22 +1,28 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
+import React, { useState, useMemo, useTransition } from 'react';
 import Image from 'next/image';
-import type { GuestSummaryStats, GuestMessage } from '../../types/database';
+import { useRouter } from 'next/navigation';
+import type { GuestSummaryStats, GuestMessage, Guest } from '../../types/database';
 import { logoutAdminAction } from '../../app/actions/auth';
 import { toggleMessageVisibilityAction } from '../../app/actions/moderation';
+import GuestManagement from './guest-management';
 
 interface Props {
   initialStats: GuestSummaryStats;
   initialMessages: GuestMessage[];
+  initialGuests?: Guest[];
   adminEmail: string;
 }
 
 export default function AdminDashboardClient({
   initialStats,
   initialMessages,
+  initialGuests = [],
   adminEmail,
 }: Props) {
+  const router = useRouter();
+  const [guests, setGuests] = useState<Guest[]>(initialGuests);
   const [messages, setMessages] = useState<GuestMessage[]>(initialMessages);
   const [moderationFilter, setModerationFilter] = useState<'all' | 'visible' | 'hidden'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,9 +30,48 @@ export default function AdminDashboardClient({
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [, startTransition] = useTransition();
 
+  // Proyeksi headcount & metrik dihitung langsung dari data guests terbaru
+  const stats = useMemo(() => {
+    let openedCount = 0;
+    let attendingCount = 0;
+    let notAttendingCount = 0;
+    let pendingCount = 0;
+    let totalPlusOne = 0;
+    let totalBotVisits = 0;
+
+    for (const guest of guests) {
+      if (guest.openedAt || guest.openCount > 0) openedCount++;
+      if (guest.autoVisitCount) totalBotVisits += guest.autoVisitCount;
+      if (guest.rsvpStatus === 'attending') {
+        attendingCount++;
+        if (guest.rsvp?.plusOne) totalPlusOne++;
+      } else if (guest.rsvpStatus === 'not_attending') {
+        notAttendingCount++;
+      } else {
+        pendingCount++;
+      }
+    }
+
+    const KELUARGA_INTI_PANITIA = 50; // PRD §2.4
+    const projectedHeadcount = attendingCount + totalPlusOne + KELUARGA_INTI_PANITIA;
+
+    return {
+      totalGuests: guests.length,
+      openedCount,
+      unopenedCount: Math.max(0, guests.length - openedCount),
+      attendingCount,
+      notAttendingCount,
+      pendingCount,
+      totalPlusOne,
+      totalBotVisits,
+      projectedHeadcount,
+      maxCapacity: initialStats.maxCapacity || 250,
+    };
+  }, [guests, initialStats.maxCapacity]);
+
   // Perhitungan Proyeksi Headcount & Kapasitas (PRD §2.4 & §4.7)
-  const capacity = initialStats.maxCapacity || 250;
-  const projected = initialStats.projectedHeadcount;
+  const capacity = stats.maxCapacity || 250;
+  const projected = stats.projectedHeadcount;
   const remaining = capacity - projected;
   const percentFilled = Math.min(100, Math.round((projected / capacity) * 100));
 
@@ -262,7 +307,7 @@ export default function AdminDashboardClient({
           {/* Rincian Rumus Proyeksi */}
           <div className="mt-5 rounded-xl border border-[#E5D8C5] bg-[#FAF6F0] p-4 text-sm sm:text-base text-ink leading-relaxed">
             <span className="font-bold text-gold-deep">Rumus Proyeksi: </span>
-            {initialStats.attendingCount} Tamu Hadir + {initialStats.totalPlusOne} Pendamping + 50 Keluarga Inti &amp; Panitia = <strong className="font-bold text-gold-deep">{projected} Orang</strong>.
+            {stats.attendingCount} Tamu Hadir + {stats.totalPlusOne} Pendamping + 50 Keluarga Inti &amp; Panitia = <strong className="font-bold text-gold-deep">{projected} Orang</strong>.
           </div>
         </section>
 
@@ -277,7 +322,7 @@ export default function AdminDashboardClient({
             </span>
             <div className="mt-3 flex items-baseline gap-2">
               <span className="font-display text-4xl sm:text-5xl font-bold text-ink">
-                {initialStats.totalGuests}
+                {stats.totalGuests}
               </span>
               <span className="text-sm font-medium text-ink-soft">Undangan</span>
             </div>
@@ -293,14 +338,14 @@ export default function AdminDashboardClient({
             </span>
             <div className="mt-3 flex items-baseline gap-2">
               <span className="font-display text-4xl sm:text-5xl font-bold text-gold-deep">
-                {initialStats.openedCount}
+                {stats.openedCount}
               </span>
               <span className="text-sm font-medium text-ink-soft">
-                ({initialStats.totalGuests > 0 ? Math.round((initialStats.openedCount / initialStats.totalGuests) * 100) : 0}%)
+                ({stats.totalGuests > 0 ? Math.round((stats.openedCount / stats.totalGuests) * 100) : 0}%)
               </span>
             </div>
             <p className="mt-3 text-sm text-ink-soft">
-              {initialStats.unopenedCount} tamu belum membuka sampul
+              {stats.unopenedCount} tamu belum membuka sampul
             </p>
           </div>
 
@@ -311,14 +356,14 @@ export default function AdminDashboardClient({
             </span>
             <div className="mt-3 flex items-baseline gap-2">
               <span className="font-display text-4xl sm:text-5xl font-bold text-emerald-700">
-                {initialStats.attendingCount}
+                {stats.attendingCount}
               </span>
               <span className="text-sm font-medium text-ink-soft">
-                +{initialStats.totalPlusOne} pendamping
+                +{stats.totalPlusOne} pendamping
               </span>
             </div>
             <p className="mt-3 text-sm text-ink-soft">
-              Total {initialStats.attendingCount + initialStats.totalPlusOne} orang hadir
+              Total {stats.attendingCount + stats.totalPlusOne} orang hadir
             </p>
           </div>
 
@@ -329,44 +374,36 @@ export default function AdminDashboardClient({
             </span>
             <div className="mt-3 flex items-baseline gap-2">
               <span className="font-display text-4xl sm:text-5xl font-bold text-amber-700">
-                {initialStats.pendingCount}
+                {stats.pendingCount}
               </span>
               <span className="text-sm font-medium text-ink-soft">
-                · {initialStats.notAttendingCount} absen
+                · {stats.notAttendingCount} absen
               </span>
             </div>
             <p className="mt-3 text-sm text-ink-soft">
-              Bot WhatsApp Preview: {initialStats.totalBotVisits || 0} kunjungan
+              Bot WhatsApp Preview: {stats.totalBotVisits || 0} kunjungan
             </p>
           </div>
         </section>
 
         {/* ========================================================================= */}
-        {/* 3. MODUL MANAJEMEN TAMU (PREVIEW SESI 2) */}
+        {/* 3. MODUL MANAJEMEN TAMU (PRD §4.7) */}
         {/* ========================================================================= */}
-        <section className="rounded-2xl border border-[#E5D8C5] bg-white p-6 sm:p-8 shadow-sm">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="rounded-lg bg-[#FAF6F0] border border-gold-deep/30 px-3 py-1 text-xs font-bold tracking-wider text-gold-deep uppercase">
-                  Tahap Pengerjaan Berikutnya (Sesi 2)
-                </span>
-              </div>
-              <h3 className="mt-2 font-display text-2xl font-bold text-ink">
-                Manajemen Tamu &amp; Generator WhatsApp (PRD §4.7)
-              </h3>
-              <p className="mt-1 text-sm sm:text-base text-ink-soft">
-                Tabel 150 tamu lengkap, filter reminder tamu belum konfirmasi, generator pesan WhatsApp personal, tambah/edit tamu, impor CSV, dan ekspor data katering/tata kursi.
-              </p>
-            </div>
-            <button
-              disabled
-              className="cursor-not-allowed rounded-xl border border-[#D5C6B1] bg-[#F2EDE4] px-5 py-2.5 text-sm font-semibold text-ink-soft/60"
-            >
-              Segera Aktif di Sesi 2
-            </button>
-          </div>
-        </section>
+        <GuestManagement
+          guests={guests}
+          onGuestAdded={(newGuest) => setGuests((prev) => [newGuest, ...prev])}
+          onGuestUpdated={(updated) =>
+            setGuests((prev) => prev.map((g) => (g.id === updated.id ? updated : g)))
+          }
+          onGuestDeleted={(id) => setGuests((prev) => prev.filter((g) => g.id !== id))}
+          onGuestsImported={(count, newGuests) => {
+            if (newGuests && newGuests.length > 0) {
+              setGuests((prev) => [...newGuests, ...prev]);
+            }
+            router.refresh();
+          }}
+          setNotice={setNotice}
+        />
 
         {/* ========================================================================= */}
         {/* 4. MODUL MODERASI BUKU TAMU (PRD §4.4 & §4.7) */}

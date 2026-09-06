@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { verifyAdminSession } from '../../lib/auth';
-import { getGuestStats } from '../../lib/db/guests';
+import { getGuestStats, getAllGuests } from '../../lib/db/guests';
 import { getAllMessagesForAdmin } from '../../lib/db/messages';
 import AdminDashboardClient from '../../components/admin/dashboard-client';
 
@@ -12,16 +12,18 @@ export default async function AdminPage() {
     redirect('/admin/login');
   }
 
-  // Ambil data statistik dan seluruh pesan Buku Tamu secara paralel di sisi server
-  const [stats, messages] = await Promise.all([
+  // Ambil data statistik, pesan Buku Tamu, dan seluruh tamu secara paralel di sisi server
+  const [stats, messages, guests] = await Promise.all([
     getGuestStats(),
     getAllMessagesForAdmin(),
+    getAllGuests(),
   ]);
 
   return (
     <AdminDashboardClient
       initialStats={stats}
       initialMessages={messages}
+      initialGuests={guests}
       adminEmail={session.user.email}
     />
   );
