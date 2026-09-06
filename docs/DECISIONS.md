@@ -1,0 +1,171 @@
+# DECISIONS
+
+Keputusan yang sudah diambil, alasannya, dan apa yang ditolak. Ditulis supaya keputusan tidak dibongkar ulang tanpa sengaja di sesi berikutnya.
+
+Format tiap entri: keputusan, alasan, alternatif yang ditolak.
+
+---
+
+## Firestore, bukan Supabase
+
+**Keputusan:** Firebase Firestore sebagai basis data.
+
+**Alasan:** perilaku free tier. Supabase menonaktifkan project setelah sekitar tujuh hari tanpa aktivitas. Pola pemakaian produk ini punya periode sepi panjang — undangan disebar akhir Agustus, acaranya 10 Oktober, dan di antaranya hampir pasti ada minggu ketika semua yang ingin RSVP sudah RSVP. Jika project menonaktifkan diri di minggu seperti itu dan ada tamu membuka linknya, tamu itu menerima error, pada produk yang hanya punya satu kesempatan memberi kesan pertama.
+
+**Ditolak:** Supabase. Perlu dicatat bahwa Supabase juga mampu real-time — itu bukan faktor pembedanya. Yang membedakan hanya perilaku auto-pause.
+
+---
+
+## Next.js dan Vercel
+
+**Keputusan:** Next.js App Router di Vercel.
+
+**Alasan:** requirement penentunya adalah gambar preview WhatsApp yang berbeda untuk setiap tamu, dihasilkan otomatis. Kemampuan ini paling matang di Next.js.
+
+**Ditolak:** Astro, karena kemampuan yang sama harus disusun manual dan lebih rawan.
+
+---
+
+## Link boleh diteruskan, tanpa PIN
+
+**Keputusan:** keamanan link hanya berasal dari token acak. Tidak ada PIN atau penguncian perangkat.
+
+**Alasan:** untuk 150 tamu yang saling mengenal, risiko link diteruskan itu kecil, sementara gesekan UX dari PIN dibayar oleh semua tamu.
+
+**Risiko yang diterima:** penerima teruskan bisa mengisi RSVP atas nama tamu asli. Dimitigasi dengan menghitung jumlah perangkat berbeda per link dan menandai anomali di dashboard.
+
+---
+
+## Tidak ada mekanisme pembatas plus-one
+
+**Keputusan:** plus-one terbuka untuk semua tamu. Tidak ada kuota, penghitung, maupun sakelar penutup.
+
+**Alasan:** kuota otomatis menyelesaikan masalah sosial dengan cara teknis, dan ongkosnya dua sisi. Dari sisi kerja: penghitung transaksional, penanganan pengiriman bersamaan, tampilan formulir berubah kondisi. Dari sisi tamu: orang yang menjawab lebih lambat ditolak membawa pasangannya semata-mata karena urutan waktu, yang canggung di acara pernikahan.
+
+Pengendaliannya bersifat pengamatan. RSVP masuk bertahap selama enam minggu, jadi tren yang mengkhawatirkan terlihat berminggu-minggu sebelum menjadi masalah.
+
+**Konsekuensi:** angka proyeksi total di dashboard naik pangkat menjadi satu-satunya alat kendali kapasitas. Ia harus terbaca sekilas dan berubah warna saat mendekati 250.
+
+**Risiko yang diterima:** jika proyeksi melewati 250, satu-satunya jalan tersisa adalah menghubungi tamu yang sudah mengonfirmasi. Kemungkinannya kecil, tapi ini arah pemulihan yang paling mahal secara sosial.
+
+**Ditolak:** kuota bersama otomatis, lalu sakelar manual dengan ambang peringatan. Keduanya dianggap terlalu berat untuk risiko yang kecil.
+
+---
+
+## Tidak ada deadline RSVP keras
+
+**Keputusan:** formulir tetap terbuka sampai hari-H. Hanya ada tanggal anjuran 26 September 2026.
+
+**Alasan:** deadline keras memblokir tamu yang terlambat, padahal mereka tetap ingin datang. Tanggal anjuran ditambah daftar reminder di admin panel memberi angka yang dibutuhkan katering tanpa memblokir siapa pun.
+
+---
+
+## Layar sampul sebagai gerbang
+
+**Keputusan:** halaman undangan tidak langsung menampilkan isinya. Ada layar sampul dengan tombol buka.
+
+**Alasan:** satu elemen ini menopang tiga requirement berbeda. Ia menyediakan interaksi pengguna yang dibutuhkan browser sebelum mengizinkan pemutaran musik, ia memisahkan pembukaan asli oleh manusia dari kunjungan otomatis sistem preview WhatsApp, dan ia menciptakan momen pembukaan yang terasa personal.
+
+**Penting:** karena satu elemen menopang tiga hal, penghapusannya merusak fitur musik dan fitur pelacakan sekaligus.
+
+---
+
+## Rekening statis, bukan amplop digital
+
+**Keputusan:** nomor rekening ditampilkan sebagai teks dengan tombol salin. Tidak ada pencatatan transaksi, konfirmasi kirim, atau rekap hadiah.
+
+**Alasan:** fitur amplop digital penuh menambah beberapa hari pekerjaan ke Minggu 3 yang sudah terisi penuh. Tampilan statis memenuhi kebutuhan praktis tamu tanpa membebani jadwal.
+
+**Catatan:** fitur hadiah punya kecenderungan melebar sendiri — dari tombol salin menjadi konfirmasi kirim, lalu rekap di admin. Batas ini sengaja ditulis di tiga tempat.
+
+---
+
+## Arah desain dari referensi visual, bukan dari eksplorasi
+
+**Keputusan:** eksplorasi tiga konsep dibatalkan. Satu arah, mengikuti gambar referensi dari klien, termasuk tata letaknya.
+
+**Alasan:** klien sudah menunjukkan referensi yang mewakili selera mereka, jadi menghasilkan tiga arah berbeda hanya membakar waktu. Referensinya hasil generate AI sehingga tidak ada aset atau susunan milik pihak lain yang perlu dihindari.
+
+**Pelajaran yang perlu diingat:** dua kali klien memakai kata yang tidak sejalan dengan selera aslinya — "gemas", lalu "minimalist" — sementara referensi yang mereka pilih justru padat ornamen dan hangat. **Untuk klien ini, minta referensi visual, jangan minta deskripsi kata.**
+
+**Catatan teknis:** ornamen di gambar referensi berbentuk raster dan tidak bisa dipakai ulang sebagai SVG. Ornamen untuk implementasi harus digambar khusus atau diambil dari sumber berlisensi bebas yang jelas.
+
+---
+
+## Emas tidak untuk teks isi
+
+**Keputusan:** emas hanya untuk ornamen, ikon, dan garis.
+
+**Alasan:** emas di atas krem hampir pasti gagal kontras WCAG AA. Ini kesalahan paling umum pada desain bernuansa emas, dan referensinya sendiri sudah benar soal ini — teks ayat di referensi memakai cokelat gelap, bukan emas.
+
+---
+
+## Responsif penuh, bukan frame terpusat
+
+**Keputusan:** halaman undangan menata ulang dirinya untuk desktop, bukan tampil sebagai kolom selebar ponsel di tengah layar.
+
+**Alasan:** keputusan klien proyek.
+
+**Ongkos yang diterima:** kira-kira menggandakan kerja tata letak — sebelas seksi dikali dua susunan — dan itu jatuh di Minggu 2 yang sudah padat.
+
+**Masalah yang belum selesai (diperbarui 6 Sep 2026 — lihat "Sampul desktop: dua panel potret" di bawah):** ~~foto prewedding berorientasi potret... Butuh foto berorientasi lanskap dari klien.~~ Sudah diselesaikan di mockup tanpa perlu foto lanskap.
+
+**Ditolak:** frame terpusat dengan latar berornamen, yang lebih murah dan menjaga irama gulir vertikal.
+
+---
+
+## Tanpa subagent kustom
+
+**Keputusan:** tidak ada berkas di `.claude/agents/`.
+
+**Alasan:** dua rencana subagent gugur karena alat bawaan sudah menanganinya. Eksplorasi desain ditangani Claude Design. Peninjauan kode ditangani `/code-review`, yang sudah tersedia sebagai plugin bawaan dan memeriksa kepatuhan terhadap `CLAUDE.md` — persis tugas yang direncanakan untuk subagent `reviewer`.
+
+**Konsisten dengan keputusan lebih awal:** Everything Claude Code ditolak dengan alasan sama, yaitu overhead lapisan agent melebihi manfaatnya pada proyek sekecil ini.
+
+**Yang tidak tergantikan:** pemeriksaan visual di ponsel asli. Tidak ada agent yang bisa menilai apakah ornamen terasa berjejal di 390px.
+
+---
+
+## Konten terpusat di satu berkas config
+
+**Keputusan:** seluruh konten acara berada di satu berkas config, bukan tersebar di komponen.
+
+**Alasan:** revisi teks dari mempelai pasti terjadi dan biasanya berulang. Jika konten tersebar, setiap revisi kecil menjadi pekerjaan pencarian. Nama mempelai secara khusus dipakai berulang di seluruh halaman dan di preview WhatsApp.
+
+---
+
+## Sampul desktop: dua panel potret, bukan satu foto lanskap
+
+**Keputusan:** sampul desktop dibelah dua panel foto potret berdampingan (640×840, ≈4:5), bukan satu foto lanskap penuh lebar.
+
+**Alasan:** ini keputusan yang sudah diambil di dalam mockup yang diapprove mempelai (bukan keputusan baru sesi ini) — direkam di sini karena entri "Responsif penuh, bukan frame terpusat" di atas masih mencatatnya sebagai masalah terbuka yang butuh foto lanskap dari klien. Faktanya foto prewedding yang direncanakan semuanya potret (modern + adat Sunda), jadi sampul dirancang agar cocok dengan itu, bukan sebaliknya.
+
+**Ditolak (tercatat di mockup):** satu foto potret dibentang selebar 1280px — kepala terpangkas, dan sampul jadi terbatas tinggi dengan bidang kosong di kiri-kanan.
+
+**Konsekuensi:** item "foto lanskap untuk sampul desktop" di `PROGRESS.md` sudah tidak relevan. Foto yang masih ditunggu dari klien hanya foto potret (modern + adat Sunda), sama seperti untuk versi ponsel.
+
+---
+
+## Design system dikunci lewat token CSS (Tailwind v4), bukan file config terpisah
+
+**Keputusan:** palet, tipografi, dan ornamen dari mockup yang diapprove dituangkan sebagai token `@theme`/`@utility` di `app/globals.css`, bukan `tailwind.config.ts`.
+
+**Alasan:** `create-next-app@latest` men-generate Tailwind v4 dengan CSS-first config (tidak ada `tailwind.config.ts` lagi) — mengikuti default tooling saat ini alih-alih memaksa pola v3 yang sudah tidak dipakai versi terpasang.
+
+**Skala tipografi:** dienkode sebagai pasangan kelas eksplisit (`text-guest-name` + `lg:text-guest-name-lg`) persis mengikuti dua breakpoint yang didokumentasikan di mockup (390px/1280px) — bukan `clamp()` fluida, karena mockup tidak pernah memutuskan kurva interpolasi di antaranya, hanya dua titik tetap.
+
+**Ornamen:** seluruh simbol SVG (`sulur`, `spray`, `orn`, `wave`, `damaskPat`, `ico-cal/rings/pin`) diporting apa adanya dari mockup ke `components/ornaments.tsx` — sudah memenuhi syarat lisensi PRD (digambar khusus, bukan aset stok) karena memang aset yang sama.
+
+**Logo:** dari 3 varian PNG hasil generate (hitam/putih-transparan/emas), hanya varian putih yang bertransparansi alpha, sehingga hanya itu yang dipasang di monogram sampul & penutup (latar gelap). Varian hitam dan emas disimpan di `public/logo/` dan ditampilkan di `/styleguide` untuk referensi, belum dipakai di komponen manapun.
+
+**Ditolak:** menunda scaffold Next.js sampai ada foto asli. Ditolak karena token warna/tipografi/ornamen sudah lengkap dan disetujui terlepas dari foto — tidak ada alasan menunggu.
+
+---
+
+## Bun sebagai package manager, bukan npm
+
+**Keputusan:** `bun` menggantikan `npm` untuk install dan menjalankan script (`bun run build`, `bun run lint`, dst). `package-lock.json` dihapus, digantikan `bun.lock`.
+
+**Alasan:** permintaan langsung klien/pengembang. Vercel mendeteksi package manager otomatis dari lockfile yang ada di root, jadi kehadiran `bun.lock` sudah cukup — tidak perlu perubahan konfigurasi build di Vercel.
+
+**Dampak:** `README.md` masih mencantumkan npm/yarn/pnpm sebagai opsi (boilerplate `create-next-app`, belum dirapikan — di luar scope sesi ini). Script di `package.json` tidak berubah, hanya package manager yang menjalankannya.

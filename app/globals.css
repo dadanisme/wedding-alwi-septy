@@ -1,26 +1,111 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Design tokens — sumber: blok "Catatan Desain" di mockup yang sudah
+ * diapprove mempelai (Undangan Alwi & Septy.html, bagian Palet & rasio
+ * kontras / Font & skala). Jangan menambah warna atau ukuran baru di
+ * luar sesi mockup tanpa mencatat alasannya di docs/DECISIONS.md.
+ */
+@theme {
+  --color-cream: #f7efe1;
+  --color-cream-secondary: #f2e8d8;
+  --color-ink: #3a2a1c;
+  --color-ink-soft: #6b5236;
+  --color-espresso: #1a120b;
+  --color-warm-white: #f6efe6;
+  --color-label-on-dark: #e8dcc4;
+  --color-tertiary-on-dark: #c6b79b;
+  --color-on-photo: #fdfaf4;
+  --color-gold-deep: #8a6a22;
+  --color-gold-bright: #c9a227;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-cormorant), Georgia, serif;
+  --font-body: var(--font-crimson), Georgia, serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-ink);
+}
+
+/*
+ * Skala tipografi — tabel "Font & skala" di Catatan Desain, elemen ×
+ * ukuran 390px / 1280px. Pakai bersama varian breakpoint responsif Tailwind,
+ * mis. className="text-guest-name lg:text-guest-name-lg".
+ */
+@utility text-guest-name {
+  font-family: var(--font-display);
+  font-size: 27px;
+  line-height: 1.22;
+}
+@utility text-guest-name-lg {
+  font-size: 42px;
+}
+
+@utility text-bride-name {
+  font-family: var(--font-display);
+  font-size: 25px;
+  line-height: 1.15;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+@utility text-bride-name-lg {
+  font-size: 46px;
+  letter-spacing: 0.3em;
+}
+
+@utility text-section-label {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+}
+@utility text-section-label-lg {
+  font-size: 14px;
+  letter-spacing: 0.48em;
+}
+
+@utility text-full-name {
+  font-family: var(--font-display);
+  font-size: 25px;
+  line-height: 1.28;
+}
+@utility text-full-name-lg {
+  font-size: 34px;
+}
+
+@utility text-body {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.9;
+}
+@utility text-body-lg {
+  font-size: 18px;
+  line-height: 1.95;
+}
+
+@utility text-label-small {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.44em;
+  text-transform: uppercase;
+}
+@utility text-label-small-lg {
+  font-size: 11px;
+  letter-spacing: 0.5em;
+}
+
+/* Lebar baca maksimum teks isi — 330px ponsel, 620px (~66 karakter) desktop. */
+@utility max-w-reading {
+  max-width: 330px;
+}
+@utility max-w-reading-lg {
+  max-width: 620px;
 }
