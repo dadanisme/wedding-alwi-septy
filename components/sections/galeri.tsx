@@ -111,6 +111,8 @@ assertNoGridGaps(galleryTiles, 4);
 export function Galeri() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const isSwipingRef = useRef(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const triggerRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const lastOpenedIndexRef = useRef<number | null>(null);
@@ -224,57 +226,84 @@ export function Galeri() {
           role="dialog"
           aria-modal="true"
           aria-label={`Foto ${activeIndex + 1} dari ${TOTAL}`}
-          className="bg-espresso/95 fixed inset-0 z-50 flex items-center justify-center px-4 py-6 lg:px-10"
+          className="bg-espresso/95 fixed inset-0 z-50 flex items-center justify-center px-4 py-6 cursor-pointer lg:px-10"
+          onClick={() => {
+            if (isSwipingRef.current) {
+              isSwipingRef.current = false;
+              return;
+            }
+            close();
+          }}
           onTouchStart={(event) => {
             touchStartX.current = event.touches[0].clientX;
+            touchStartY.current = event.touches[0].clientY;
+            isSwipingRef.current = false;
           }}
           onTouchEnd={(event) => {
             if (touchStartX.current === null) return;
             const deltaX = event.changedTouches[0].clientX - touchStartX.current;
+            const deltaY =
+              event.changedTouches[0].clientY -
+              (touchStartY.current ?? event.changedTouches[0].clientY);
+            if (Math.hypot(deltaX, deltaY) > 10) {
+              isSwipingRef.current = true;
+            }
             if (deltaX > 48) showPrev();
             else if (deltaX < -48) showNext();
             touchStartX.current = null;
+            touchStartY.current = null;
           }}
         >
           <button
             ref={closeButtonRef}
             type="button"
-            onClick={close}
+            onClick={(e) => {
+              e.stopPropagation();
+              close();
+            }}
             aria-label="Tutup"
-            className="border-gold-bright/70 text-on-photo hover:border-gold-bright hover:bg-espresso absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full border transition-colors lg:top-6 lg:right-6"
+            className="border-gold-bright/70 text-on-photo hover:border-gold-bright hover:bg-espresso absolute top-4 right-4 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition-colors lg:top-6 lg:right-6"
           >
             <CloseIcon />
           </button>
 
           <button
             type="button"
-            onClick={showPrev}
+            onClick={(e) => {
+              e.stopPropagation();
+              showPrev();
+            }}
             aria-label="Foto sebelumnya"
-            className="border-gold-bright/70 text-on-photo hover:border-gold-bright hover:bg-espresso absolute left-2 flex h-10 w-10 items-center justify-center rounded-full border transition-colors lg:left-6 lg:h-12 lg:w-12"
+            className="border-gold-bright/70 text-on-photo hover:border-gold-bright hover:bg-espresso absolute left-2 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition-colors lg:left-6 lg:h-12 lg:w-12"
           >
             <ChevronIcon direction="left" />
           </button>
           <button
             type="button"
-            onClick={showNext}
+            onClick={(e) => {
+              e.stopPropagation();
+              showNext();
+            }}
             aria-label="Foto berikutnya"
-            className="border-gold-bright/70 text-on-photo hover:border-gold-bright hover:bg-espresso absolute right-2 flex h-10 w-10 items-center justify-center rounded-full border transition-colors lg:right-6 lg:h-12 lg:w-12"
+            className="border-gold-bright/70 text-on-photo hover:border-gold-bright hover:bg-espresso absolute right-2 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition-colors lg:right-6 lg:h-12 lg:w-12"
           >
             <ChevronIcon direction="right" />
           </button>
 
-          <div className="relative h-full max-h-[80vh] w-full max-w-4xl">
-            <Image
-              key={activePhoto.src}
-              src={activePhoto.src}
-              alt={activePhoto.alt}
-              fill
-              sizes="100vw"
-              className="object-contain"
-            />
-          </div>
+          <Image
+            key={activePhoto.src}
+            src={activePhoto.src}
+            alt={activePhoto.alt}
+            width={activePhoto.width}
+            height={activePhoto.height}
+            sizes="(min-width: 1024px) 1024px, 100vw"
+            priority
+            draggable={false}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[80vh] w-auto max-w-[calc(100vw-2rem)] cursor-default select-none object-contain shadow-2xl lg:max-w-4xl"
+          />
 
-          <span className="text-on-photo/80 absolute bottom-4 left-1/2 -translate-x-1/2 text-[11px] tracking-[0.3em] uppercase lg:bottom-6 lg:text-[12px]">
+          <span className="text-on-photo/80 pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 select-none text-[11px] uppercase tracking-[0.3em] lg:bottom-6 lg:text-[12px]">
             {activeIndex + 1} / {TOTAL}
           </span>
         </div>
