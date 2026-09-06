@@ -6,9 +6,9 @@ Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.
 
 ## Sedang Dikerjakan
 
-Setup infrastruktur backend Firebase (`wedding-alwi`), konfigurasi keamanan, dan lapisan akses data Firestore server-side telah selesai dan diverifikasi live 100%!
+Rute dinamis link tamu privat `/[guestSlug]` dan sistem pelacakan buka undangan (beserta pemfilteran bot WhatsApp preview & deteksi perangkat unik) telah selesai diimplementasikan dan diverifikasi live 100%!
 
-Fokus berikutnya adalah: **Implementasi rute link privat tamu `/[guestSlug]` (dynamic route), Server Actions untuk RSVP & Buku Tamu, serta integrasi pelacakan buka undangan (WhatsApp bot preview filtering)**.
+Fokus berikutnya adalah: **Integrasi Server Action Seksi RSVP (`components/sections/rsvp.tsx`) ke Cloud Firestore** (penyimpanan jawaban kehadiran, opsi pendamping tanpa kuota, pre-fill data jawaban sebelumnya jika tamu kembali, dan pencatatan riwayat audit).
 
 ## Selesai
 
@@ -49,13 +49,21 @@ Fokus berikutnya adalah: **Implementasi rute link privat tamu `/[guestSlug]` (dy
   - Utilitas pendeteksi bot WhatsApp preview & web crawler di `lib/bot-detection.ts`.
   - CRUD & Query layer: `lib/db/guests.ts` (lookup slug/token, tracking buka sampul, deteksi perangkat unik), `lib/db/rsvp.ts` (simpan RSVP & riwayat audit trail), `lib/db/messages.ts` (ambil ucapan aktif, kirim ucapan max 500 char & batas 3 ucapan/tamu, moderasi admin, fallback in-memory sorting).
   - Verifikasi live cloud end-to-end berhasil 100%, lint & build Next.js lulus tanpa peringatan.
+- **Rute Dinamis `/[guestSlug]`, Pelacakan Buka Undangan, & Penyaringan Bot WhatsApp** (6 Sep 2026):
+  - Rute dinamis Next.js `app/[guestSlug]/page.tsx` menangani format URL personal `/{nama-slug}-{token-acak}` (PRD §4.1) via server-side lookup `getGuestByFullSlug`.
+  - Halaman 404 generik elegan (`app/not-found.tsx`) dengan tema krem dan ornamen emas `#orn` tanpa membocorkan eksistensi data link.
+  - Proteksi mesin pencari via `app/robots.ts` (`Disallow: /`) dan metadata `robots: { index: false, follow: false, nocache: true }` (PRD §4.1).
+  - Metadata OpenGraph dinamis untuk pratinjau pesan WhatsApp dengan nama dan sapaan tamu (PRD §4.6).
+  - Pemisahan kunjungan bot WhatsApp preview via `isBotUserAgent` yang mencatat ke `autoVisitCount` tanpa mencemari metrik buka nyata `openCount` (PRD §4.5).
+  - Server Action `trackGuestOpenAction` (`app/actions/tracking.ts`) dipicu saat tamu nyata menekan tombol "Buka Undangan" di layar Sampul secara non-blocking.
+  - Indikator penerusan link via anonymous device hash SHA-256 (`lib/device.ts` & `uniqueDevices` di Firestore).
+  - Verifikasi live otomatis menyeluruh: unit integration Firestore test, HTTP server test, dan browser automation via Chrome DevTools MCP (klik tombol Sampul dan verifikasi penulisan real-time ke Firestore). Lolos lint dan build 100%.
 
 ## Berikutnya
 
-- Implementasi rute dinamis link tamu privat `/[guestSlug]`
-- Server Actions untuk pengiriman RSVP dan Buku Tamu langsung dari antarmuka undangan
-- Integrasi pelacakan buka undangan pada tombol sampul dengan penyaringan bot WhatsApp preview
-- Admin panel: login auth & pemantauan dashboard real-time
+- Integrasi Server Action Seksi RSVP (`components/sections/rsvp.tsx`) ke Cloud Firestore
+- Integrasi Server Action Seksi Buku Tamu (`components/sections/buku-tamu.tsx`) ke Cloud Firestore
+- Admin panel: login auth & pemantauan dashboard real-time (tabel tamu, generator link WhatsApp, filter belum respons, ekspor)
 
 
 ## Terkunci

@@ -458,3 +458,32 @@ Mencegah kebocoran data tamu dan kredensial database ke browser publik, menjaga 
 1. Memberikan Firebase Web SDK / API key publik langsung di frontend untuk baca/tulis Firestore (rentan manipulasi token tamu, spam RSVP/buku tamu, dan pembobolan kuota).
 2. Menyimpan berkas JSON service account mentah di dalam repository proyek (berisiko bocor saat commit).
 
+---
+
+## Rute Dinamis `/[guestSlug]`, Pelacakan Buka Undangan, dan Penyaringan Bot WhatsApp
+
+**Keputusan:**
+1. **Dynamic Route `/[guestSlug]` (`app/[guestSlug]/page.tsx`):**
+   - Menangani URL personal tamu dengan format `/{nama-slug}-{token-acak}` (misal: `/budi-santoso-a7f3k9m2`) sesuai PRD §4.1.
+   - Mengambil data tamu dari Firestore via `getGuestByFullSlug(fullSlug)` di sisi server (SSR).
+   - Menghasilkan metadata OpenGraph dinamis untuk pratinjau chat WhatsApp (nama tamu terpampang jelas di thumbnail/teks pengantar, PRD §4.6).
+   - Mencegah seluruh pengindeksan mesin pencari via `robots: { index: false, follow: false, nocache: true }` di metadata halaman serta aturan universal `Disallow: /` pada `app/robots.ts` (PRD §4.1).
+2. **Penyaringan Kunjungan Bot WhatsApp Preview vs Pembukaan Nyata (PRD §4.5):**
+   - Saat link dikirim di chat, sistem perayap preview WhatsApp (user-agent: `WhatsApp/...`) mengambil halaman secara otomatis sebelum penerima menyentuh apapun. Kunjungan ini dideteksi via `isBotUserAgent(userAgent)` saat SSR dan dicatat terpisah ke `autoVisitCount` tanpa menambah metrik `openCount` tamu nyata.
+   - Pembukaan nyata **hanya** dicatat saat tamu sungguhan menekan tombol **"Buka Undangan"** di layar Sampul melalui Server Action `trackGuestOpenAction(guestId, clientDeviceId)`.
+3. **Indikator Penerusan Link (Deteksi Perangkat Unik):**
+   - Menghasilkan anonymous hash SHA-256 (`deviceHash`) berbasis `clientDeviceId` (disimpan di `localStorage` peramban) dipadukan dengan IP dan User-Agent tanpa menyimpan data pribadi (PII).
+   - Disimpan ke array Firestore `uniqueDevices` via `FieldValue.arrayUnion`. Jika tamu membuka berulang kali di perangkat yang sama, hitungan `uniqueDevices` tidak bertambah; jika link diteruskan ke perangkat baru, `uniqueDevices` bertambah dan dapat dipantau anomali penerusannya di dashboard admin.
+4. **Halaman 404 Generik (`app/not-found.tsx`):**
+   - Jika link tidak ditemukan atau token salah, Next.js memanggil `notFound()` yang merender halaman bertema krem dengan ornamen `#orn` dan pesan santun tanpa membocorkan status apakah link pernah ada atau tidak (PRD §4.1).
+5. **Eksekusi Asinkron Non-Blocking:**
+   - Pemanggilan Server Action pelacakan buka pada klik tombol berjalan secara non-blocking di background, sehingga tidak pernah menghambat atau menunda transisi visual gulir halus (smooth-scroll) maupun pemutaran musik latar.
+
+**Alasan:**
+Memenuhi requirement fungsional PRD §4.1, §4.5, dan §4.6 secara presisi dengan keandalan data 100%, menjaga performa UX pengguna tetap instan, dan memisahkan kunjungan crawler dari statistik kehadiran aktual.
+
+**Ditolak:**
+1. Mencatat `recordGuestOpen` pada saat GET/load halaman pertama (akan merusak metrik karena perayap WhatsApp preview otomatis memicu GET).
+2. Mengharuskan PIN atau login tamu (ditolak di PRD §4.1 karena friksi UX).
+
+

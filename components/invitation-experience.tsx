@@ -15,7 +15,22 @@ import { BukuTamu } from "@/components/sections/buku-tamu";
 import { Hadiah } from "@/components/sections/hadiah";
 import { Penutup } from "@/components/sections/penutup";
 
+import { trackGuestOpenAction } from "@/app/actions/tracking";
+import { getClientDeviceId } from "@/lib/device";
+
+export interface GuestInfo {
+  id: string;
+  name: string;
+  salutation: string;
+  displayName: string;
+  fullSlug: string;
+  rsvpStatus?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rsvp?: any;
+}
+
 interface InvitationExperienceProps {
+  guest?: GuestInfo | null;
   guestName?: string;
 }
 
@@ -24,10 +39,13 @@ interface InvitationExperienceProps {
  * 1. Gerbang Sampul: mengunci scroll sebelum tombol "Buka Undangan" ditekan (PRD §4.2).
  * 2. Transisi pembukaan: membuka kunci scroll dan smooth-scroll ke seksi Ayat.
  * 3. Pemutar musik latar: memutar audio setelah gestur pengguna dan menampilkan tombol kontrol mengambang (PRD §7.1 & §7.3).
+ * 4. Pelacakan pembukaan nyata ke basis data saat tamu menekan tombol buka (PRD §4.5).
  */
 export function InvitationExperience({
+  guest,
   guestName = "Bapak/Ibu Budi Santoso",
 }: InvitationExperienceProps) {
+  const effectiveGuestName = guest?.displayName || guest?.name || guestName;
   const [isOpened, setIsOpened] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -63,6 +81,14 @@ export function InvitationExperience({
     document.documentElement.style.overflow = "";
     document.body.style.overflow = "";
     setIsOpened(true);
+
+    // Pelacakan pembukaan nyata oleh tamu ke basis data (PRD §4.5)
+    if (guest?.id) {
+      const clientDeviceId = getClientDeviceId();
+      trackGuestOpenAction(guest.id, clientDeviceId).catch((err) => {
+        console.warn("Gagal melacak pembukaan undangan:", err);
+      });
+    }
 
     // Putar musik latar dari gestur klik tombol (diizinkan oleh kebijakan autoplay browser/iOS Safari)
     if (audioRef.current) {
@@ -159,7 +185,7 @@ export function InvitationExperience({
           !isOpened ? "h-dvh overflow-hidden" : ""
         }`}
       >
-        <Sampul guestName={guestName} onOpen={handleOpen} />
+        <Sampul guestName={effectiveGuestName} onOpen={handleOpen} />
         <Ayat />
         <Pembuka />
         <Mempelai />
@@ -167,7 +193,7 @@ export function InvitationExperience({
         <Galeri />
         <Acara />
         <Rsvp />
-        <BukuTamu guestName={guestName} />
+        <BukuTamu guestName={effectiveGuestName} />
         <Hadiah />
         <Penutup />
       </main>
