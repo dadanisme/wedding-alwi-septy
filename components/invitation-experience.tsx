@@ -14,6 +14,7 @@ import { Rsvp } from "@/components/sections/rsvp";
 import { BukuTamu } from "@/components/sections/buku-tamu";
 import { Hadiah } from "@/components/sections/hadiah";
 import { Penutup } from "@/components/sections/penutup";
+import { AmbientPetals } from "@/components/ambient-petals";
 
 import { trackGuestOpenAction } from "@/app/actions/tracking";
 import { getClientDeviceId } from "@/lib/device";
@@ -221,6 +222,9 @@ export function InvitationExperience({
         onToggle={handleToggleAudio}
         isVisible={isOpened}
       />
+
+      {/* Partikel kelopak melati dan debu emas melayang */}
+      <AmbientPetals />
     </>
   );
 }

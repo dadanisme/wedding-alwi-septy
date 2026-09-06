@@ -16,6 +16,14 @@ Fokus berikutnya: **Admin panel** — login Firebase Auth, dashboard pemantauan 
 
 ## Selesai
 
+- **Sistem Animasi Kreatif & Parallax Scroll Seluruh Halaman Publik** (7 Sep 2026):
+  - Animasi native murni tanpa dependensi baru (Next.js 16 + React 19 + Tailwind CSS v4), terakselerasi GPU (`transform`/`opacity`), patuh pada token palet warna resmi, dan mendukung penuh `@media (prefers-reduced-motion: reduce)`.
+  - **Layar Sampul**: Efek *Ken Burns* zoom lembut pada foto prewedding, monogram mengambang perlahan (`animate-float-slow`), dan tombol CTA "Buka Undangan" berdenyut *beacon* emas + sapuan kilau (*shimmer sweep*).
+  - **Partikel Ambien Melati & Stardust** (`components/ambient-petals.tsx`): Kelopak melati adat Sunda dan debu emas melayang sinusoidal di latar belakang, `pointer-events-none`, sinkronisasi aman React 19 via `useSyncExternalStore`.
+  - **Pemutar Musik Latar** (`components/music-player.tsx`): Alur piringan hitam emas berputar (`animate-spin-vinyl`), pendaran aura beacon, dan 4 bilah gelombang suara (*dancing soundwave equalizer*) berdansa saat musik *Sabilulungan* aktif.
+  - **Sistem Scroll Reveal Sinematik** (`components/scroll-reveal.tsx`): Transisi *fade-up*, *zoom-in*, dan *blur-in* puitis di seluruh seksi publik (Ayat, Mempelai berdenyut *heartbeat* emas pada ampersand, linimasa Love Story dengan *diamond beacon*, Galeri kaskade bertahap, Detail Acara, RSVP, Buku Tamu, Hadiah dengan centang animasi saat salin rekening, dan Penutup dengan kilau emas monogram).
+  - **Parallax Scroll Seksi Pembuka** (`components/sections/pembuka.tsx`): Foto latar adat Sunda meluncur dalam kedalaman 3D anggun di balik bingkai ganda *wave divider* atas-bawah; GPU-driven via `translate3d` + `requestAnimationFrame`, bebas re-render React, dan terhindar dari celah hitam tepi berkat perluasan kontainer vertikal. Lolos verifikasi build dan lint.
+
 - PRD (`docs/PRD.md`)
 - Spesifikasi arah desain (`docs/spesifikasi-arah-desain.md`)
 - Data acara final dari klien: nama, orang tua, jadwal, venue, rekening

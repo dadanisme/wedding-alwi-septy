@@ -20,23 +20,23 @@ export function Sampul({
   return (
     <section className="relative min-h-dvh overflow-hidden bg-espresso">
       <div className="absolute inset-0 grid grid-cols-1 lg:grid-cols-2">
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <Image
             src={coverPhotos.modern}
             alt="Alwi & Septy — potret modern"
             fill
             priority
             sizes="(min-width: 1440px) 720px, (min-width: 1024px) 50vw, 100vw"
-            className="object-cover"
+            className="object-cover animate-ken-burns"
           />
         </div>
-        <div className="relative hidden lg:block">
+        <div className="relative hidden overflow-hidden lg:block">
           <Image
             src={coverPhotos.adatSunda}
             alt="Alwi & Septy — potret adat Sunda"
             fill
             sizes="(min-width: 1440px) 720px, 50vw"
-            className="object-cover"
+            className="object-cover animate-ken-burns"
           />
         </div>
       </div>
@@ -57,39 +57,39 @@ export function Sampul({
       </svg>
 
       <svg
-        className="absolute top-0 left-0 h-[132px] w-[132px] opacity-85 lg:h-[196px] lg:w-[196px]"
+        className="absolute top-0 left-0 h-[132px] w-[132px] opacity-85 transition-opacity duration-1000 lg:h-[196px] lg:w-[196px]"
         aria-hidden="true"
       >
         <use href="#sulur" />
       </svg>
       <svg
-        className="absolute top-0 right-0 h-[132px] w-[132px] -scale-x-100 opacity-85 lg:h-[196px] lg:w-[196px]"
+        className="absolute top-0 right-0 h-[132px] w-[132px] -scale-x-100 opacity-85 transition-opacity duration-1000 lg:h-[196px] lg:w-[196px]"
         aria-hidden="true"
       >
         <use href="#sulur" />
       </svg>
       <svg
-        className="absolute bottom-0 left-0 hidden h-[170px] w-[170px] -scale-y-100 opacity-60 lg:block"
+        className="absolute bottom-0 left-0 hidden h-[170px] w-[170px] -scale-y-100 opacity-60 transition-opacity duration-1000 lg:block"
         aria-hidden="true"
       >
         <use href="#sulur" />
       </svg>
       <svg
-        className="absolute bottom-0 right-0 hidden h-[170px] w-[170px] -scale-100 opacity-60 lg:block"
+        className="absolute bottom-0 right-0 hidden h-[170px] w-[170px] -scale-100 opacity-60 transition-opacity duration-1000 lg:block"
         aria-hidden="true"
       >
         <use href="#sulur" />
       </svg>
 
       <div className="relative z-10 flex min-h-dvh flex-col items-center justify-between px-[26px] pt-[52px] pb-[108px] lg:px-10 lg:pt-[56px] lg:pb-[156px]">
-        <span className="text-label-on-dark text-[10px] leading-none font-semibold tracking-[0.5em] indent-[0.5em] uppercase lg:text-[12px] lg:tracking-[0.62em] lg:indent-[0.62em]">
+        <span className="text-label-on-dark text-[10px] leading-none font-semibold tracking-[0.5em] indent-[0.5em] uppercase transition-all duration-700 lg:text-[12px] lg:tracking-[0.62em] lg:indent-[0.62em]">
           The Wedding Of
         </span>
 
-        <div className="flex flex-col items-center gap-[14px] lg:gap-5">
+        <div className="flex flex-col items-center gap-[14px] animate-float-slow lg:gap-5">
           <div className="flex items-center gap-[6px] lg:gap-4">
             <svg
-              className="h-[34px] w-[70px] -scale-x-100 lg:h-[72px] lg:w-[150px]"
+              className="h-[34px] w-[70px] -scale-x-100 transition-transform duration-500 hover:scale-105 lg:h-[72px] lg:w-[150px]"
               aria-hidden="true"
             >
               <use href="#spray" />
@@ -99,16 +99,16 @@ export function Sampul({
               alt="Monogram Alwi & Septy"
               width={1254}
               height={1254}
-              className="h-24 w-24 lg:h-[174px] lg:w-[174px]"
+              className="h-24 w-24 drop-shadow-[0_0_16px_rgba(255,255,255,0.25)] transition-transform duration-700 hover:scale-105 lg:h-[174px] lg:w-[174px]"
             />
             <svg
-              className="h-[34px] w-[70px] lg:h-[72px] lg:w-[150px]"
+              className="h-[34px] w-[70px] transition-transform duration-500 hover:scale-105 lg:h-[72px] lg:w-[150px]"
               aria-hidden="true"
             >
               <use href="#spray" />
             </svg>
           </div>
-          <h1 className="text-bride-name lg:text-bride-name-lg text-on-photo text-center indent-[0.2em] lg:indent-[0.3em]">
+          <h1 className="text-bride-name lg:text-bride-name-lg text-on-photo text-center indent-[0.2em] lg:indent-[0.3em] drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
             Alwi &amp; Septy
           </h1>
           <div className="flex items-center gap-3 lg:gap-5">
@@ -129,7 +129,7 @@ export function Sampul({
               </span>
               <span className="h-px w-8 bg-gradient-to-l from-transparent to-gold-bright lg:w-[52px]" />
             </div>
-            <p className="text-guest-name lg:text-guest-name-lg text-on-photo max-w-[296px] text-center text-balance lg:max-w-reading-lg">
+            <p className="text-guest-name lg:text-guest-name-lg text-on-photo max-w-[296px] text-center text-balance lg:max-w-reading-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
               {guestName}
             </p>
             <p className="text-caption-italic lg:text-caption-italic-lg text-label-on-dark/86 text-center lg:text-label-on-dark/88">
@@ -139,9 +139,19 @@ export function Sampul({
           <button
             type="button"
             onClick={onOpen}
-            className="border-gold-bright bg-espresso/34 text-on-photo hover:bg-gold-deep hover:border-gold-deep cursor-pointer border px-[30px] py-[15px] text-[10px] font-semibold tracking-[0.34em] indent-[0.34em] uppercase transition-colors duration-[350ms] lg:px-[42px] lg:py-[18px] lg:text-[11px] lg:tracking-[0.38em] lg:indent-[0.38em]"
+            className="group relative overflow-hidden border border-gold-bright bg-espresso/45 text-on-photo hover:bg-gold-deep hover:border-gold-deep cursor-pointer px-[32px] py-[16px] text-[10px] font-semibold tracking-[0.34em] indent-[0.34em] uppercase transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_4px_24px_rgba(0,0,0,0.5)] lg:px-[44px] lg:py-[18px] lg:text-[11px] lg:tracking-[0.38em] lg:indent-[0.38em]"
           >
-            Buka Undangan
+            {/* Gelombang denyut beacon keluar dari tombol */}
+            <span
+              className="pointer-events-none absolute inset-0 border border-gold-bright/60 animate-beacon"
+              aria-hidden="true"
+            />
+            {/* Sapuan kilau cahaya emas */}
+            <span
+              className="pointer-events-none absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent animate-shimmer"
+              aria-hidden="true"
+            />
+            <span className="relative z-10">Buka Undangan</span>
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useId, useState, useTransition } from "react";
 import { rsvpConfig } from "@/lib/event-config";
 import { submitRsvpAction } from "@/app/actions/rsvp";
+import { ScrollReveal } from "@/components/scroll-reveal";
 import type { RsvpAttendance, RsvpEntry } from "@/types/database";
 
 interface RsvpProps {
@@ -164,30 +165,33 @@ export function Rsvp({ fullSlug, initialRsvp = null }: RsvpProps) {
       {/* Konten Seksi */}
       <div className="relative flex flex-col items-center gap-[22px] px-[30px] pt-[52px] pb-[56px] lg:gap-[34px] lg:px-[40px] lg:pt-[88px] lg:pb-[96px]">
         {/* Header Seksi */}
-        <div className="flex flex-col items-center gap-[10px] lg:gap-[14px]">
-          <svg
-            className="h-[18px] w-[140px] opacity-85 lg:h-[24px] lg:w-[200px]"
-            aria-hidden="true"
-          >
-            <use href="#orn" />
-          </svg>
-          <h2
-            id="rsvp-title"
-            className="text-section-label lg:text-section-label-lg indent-[0.4em] text-ink-soft lg:indent-[0.48em]"
-          >
-            RSVP
-          </h2>
-          <p className="text-rsvp-desc lg:text-rsvp-desc-lg max-w-[280px] text-center text-ink-soft text-pretty lg:max-w-[560px]">
-            {deadlinePrompt}
-          </p>
-        </div>
+        <ScrollReveal animation="fade-down" delay={100}>
+          <div className="flex flex-col items-center gap-[10px] lg:gap-[14px]">
+            <svg
+              className="h-[18px] w-[140px] opacity-85 lg:h-[24px] lg:w-[200px]"
+              aria-hidden="true"
+            >
+              <use href="#orn" />
+            </svg>
+            <h2
+              id="rsvp-title"
+              className="text-section-label lg:text-section-label-lg indent-[0.4em] text-ink-soft lg:indent-[0.48em]"
+            >
+              RSVP
+            </h2>
+            <p className="text-rsvp-desc lg:text-rsvp-desc-lg max-w-[280px] text-center text-ink-soft text-pretty lg:max-w-[560px]">
+              {deadlinePrompt}
+            </p>
+          </div>
+        </ScrollReveal>
 
         {showForm ? (
           /* Formulir RSVP */
-          <form
-            onSubmit={handleSubmit}
-            className="flex w-full flex-col gap-[18px] lg:max-w-[560px] lg:gap-[24px]"
-          >
+          <ScrollReveal animation="fade-up" delay={200} className="w-full lg:max-w-[560px]">
+            <form
+              onSubmit={handleSubmit}
+              className="flex w-full flex-col gap-[18px] lg:gap-[24px]"
+            >
             {/* Fieldset Kehadiran */}
             <fieldset className="m-0 flex flex-col gap-[9px] border-0 p-0 lg:gap-[10px]">
               <legend className="text-rsvp-legend lg:text-rsvp-legend-lg pb-[9px] text-ink-soft lg:pb-[10px]">
@@ -367,45 +371,48 @@ export function Rsvp({ fullSlug, initialRsvp = null }: RsvpProps) {
               </p>
             )}
           </form>
+          </ScrollReveal>
         ) : savedRsvp ? (
           /* Kartu Konfirmasi / Umpan Balik Sukses */
-          <div className="flex w-full flex-col items-center gap-[10px] border border-gold-bright/70 bg-white/55 p-[26px_22px] text-center lg:max-w-[560px] lg:gap-[14px] lg:p-[38px_32px]">
-            <svg
-              className="h-[16px] w-[110px] opacity-85 lg:h-[20px] lg:w-[160px]"
-              aria-hidden="true"
-            >
-              <use href="#orn" />
-            </svg>
-            <p className="text-rsvp-thanks-title lg:text-rsvp-thanks-title-lg text-ink">
-              {rsvpConfig.successTitle}
-            </p>
-            <p className="text-rsvp-thanks-sub lg:text-rsvp-thanks-sub-lg text-ink-soft">
-              {savedRsvp.attendance === "attending"
-                ? rsvpConfig.successAttending
-                : rsvpConfig.successNotAttending}
-            </p>
-
-            {/* Ringkasan jawaban tersimpan, supaya tamu yang kembali langsung
-                tahu apa yang tercatat tanpa perlu membuka formulirnya. */}
-            <div className="mt-[4px] flex w-full flex-col gap-[5px] border border-gold-bright/55 bg-cream/70 p-[12px_14px] lg:mt-[6px] lg:gap-[6px] lg:p-[14px_18px]">
-              <p className="text-rsvp-summary lg:text-rsvp-summary-lg text-ink text-pretty">
-                {buildSummary(savedRsvp)}
+          <ScrollReveal animation="zoom-in" delay={150} className="w-full lg:max-w-[560px]">
+            <div className="flex w-full flex-col items-center gap-[10px] border border-gold-bright/70 bg-white/55 p-[26px_22px] text-center lg:gap-[14px] lg:p-[38px_32px]">
+              <svg
+                className="h-[16px] w-[110px] opacity-85 lg:h-[20px] lg:w-[160px]"
+                aria-hidden="true"
+              >
+                <use href="#orn" />
+              </svg>
+              <p className="text-rsvp-thanks-title lg:text-rsvp-thanks-title-lg text-ink">
+                {rsvpConfig.successTitle}
               </p>
-              {savedRsvp.notes ? (
-                <p className="text-rsvp-summary lg:text-rsvp-summary-lg text-ink-soft text-pretty">
-                  {rsvpConfig.summaryNotesPrefix}: {savedRsvp.notes}
-                </p>
-              ) : null}
-            </div>
+              <p className="text-rsvp-thanks-sub lg:text-rsvp-thanks-sub-lg text-ink-soft">
+                {savedRsvp.attendance === "attending"
+                  ? rsvpConfig.successAttending
+                  : rsvpConfig.successNotAttending}
+              </p>
 
-            <button
-              type="button"
-              onClick={handleEdit}
-              className="mt-[10px] cursor-pointer border border-gold-deep/60 bg-transparent px-[22px] py-[10px] text-rsvp-btn tracking-[0.28em] text-ink-soft uppercase indent-[0.28em] transition-colors duration-300 hover:border-gold-deep hover:bg-gold-deep hover:text-on-photo"
-            >
-              {rsvpConfig.editButtonLabel}
-            </button>
-          </div>
+              {/* Ringkasan jawaban tersimpan, supaya tamu yang kembali langsung
+                  tahu apa yang tercatat tanpa perlu membuka formulirnya. */}
+              <div className="mt-[4px] flex w-full flex-col gap-[5px] border border-gold-bright/55 bg-cream/70 p-[12px_14px] lg:mt-[6px] lg:gap-[6px] lg:p-[14px_18px]">
+                <p className="text-rsvp-summary lg:text-rsvp-summary-lg text-ink text-pretty">
+                  {buildSummary(savedRsvp)}
+                </p>
+                {savedRsvp.notes ? (
+                  <p className="text-rsvp-summary lg:text-rsvp-summary-lg text-ink-soft text-pretty">
+                    {rsvpConfig.summaryNotesPrefix}: {savedRsvp.notes}
+                  </p>
+                ) : null}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleEdit}
+                className="mt-[10px] cursor-pointer border border-gold-deep/60 bg-transparent px-[22px] py-[10px] text-rsvp-btn tracking-[0.28em] text-ink-soft uppercase indent-[0.28em] transition-all duration-300 hover:border-gold-deep hover:bg-gold-deep hover:text-on-photo hover:scale-[1.02] active:scale-98"
+              >
+                {rsvpConfig.editButtonLabel}
+              </button>
+            </div>
+          </ScrollReveal>
         ) : null}
       </div>
     </section>

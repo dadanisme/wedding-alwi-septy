@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { eventSchedule, venue } from "@/lib/event-config";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 /**
  * Seksi Detail Acara — Akad, Resepsi, Lokasi, Peta Tersemat, dan Tombol Arah & Kalender.
@@ -132,62 +133,66 @@ export function Acara() {
       {/* Konten Utama */}
       <div className="relative z-10 flex flex-col gap-[30px] px-[26px] pt-[48px] pb-[52px] lg:gap-[48px] lg:px-[120px] lg:pt-[80px] lg:pb-[88px]">
         {/* Header Seksi */}
-        <div className="flex flex-col items-center gap-[10px] lg:gap-[14px]">
-          <svg className="h-[20px] w-[150px] lg:h-[24px] lg:w-[200px]" aria-hidden="true">
-            <use href="#orn" />
-          </svg>
-          <h2 className="text-section-label lg:text-section-label-lg text-label-on-dark indent-[0.4em] lg:indent-[0.48em] text-center">
-            Detail Acara
-          </h2>
-          <p className="font-body font-light text-[15px] leading-[1.6] text-label-on-dark text-center lg:text-[19px]">
-            {eventSchedule.dayLabel}
-          </p>
-        </div>
+        <ScrollReveal animation="fade-down" delay={100}>
+          <div className="flex flex-col items-center gap-[10px] lg:gap-[14px]">
+            <svg className="h-[20px] w-[150px] lg:h-[24px] lg:w-[200px]" aria-hidden="true">
+              <use href="#orn" />
+            </svg>
+            <h2 className="text-section-label lg:text-section-label-lg text-label-on-dark indent-[0.4em] lg:indent-[0.48em] text-center">
+              Detail Acara
+            </h2>
+            <p className="font-body font-light text-[15px] leading-[1.6] text-label-on-dark text-center lg:text-[19px]">
+              {eventSchedule.dayLabel}
+            </p>
+          </div>
+        </ScrollReveal>
 
         {/* ========================================================================= */}
         {/* LAYOUT PONSEL (<1024px)                                                   */}
         {/* ========================================================================= */}
         <div className="flex flex-col gap-[26px] lg:hidden">
           {/* Bar Waktu: Akad & Resepsi Berdampingan */}
-          <div className="grid grid-cols-[1fr_1px_1fr] items-start gap-[16px]">
-            {/* Akad Nikah */}
-            <div className="flex flex-col items-center gap-[9px] text-center">
-              <svg className="h-[26px] w-[26px]" aria-hidden="true">
-                <use href="#ico-cal" />
-              </svg>
-              <span className="text-label-small indent-[0.32em] tracking-[0.32em] text-label-on-dark">
-                Akad Nikah
-              </span>
-              <span className="text-acara-time text-warm-white">
-                {eventSchedule.akad.label}
-              </span>
-              <span className="text-acara-sub text-tertiary-on-dark">
-                {eventSchedule.dayLabelShort}
-              </span>
-            </div>
+          <ScrollReveal animation="fade-up" delay={200}>
+            <div className="grid grid-cols-[1fr_1px_1fr] items-start gap-[16px]">
+              {/* Akad Nikah */}
+              <div className="flex flex-col items-center gap-[9px] text-center">
+                <svg className="h-[26px] w-[26px]" aria-hidden="true">
+                  <use href="#ico-cal" />
+                </svg>
+                <span className="text-label-small indent-[0.32em] tracking-[0.32em] text-label-on-dark">
+                  Akad Nikah
+                </span>
+                <span className="text-acara-time text-warm-white">
+                  {eventSchedule.akad.label}
+                </span>
+                <span className="text-acara-sub text-tertiary-on-dark">
+                  {eventSchedule.dayLabelShort}
+                </span>
+              </div>
 
-            {/* Pemisah Vertikal Gradien Emas */}
-            <span
-              className="h-full min-h-[96px] bg-gradient-to-b from-[rgba(201,162,39,0)] via-[rgba(201,162,39,0.6)] to-[rgba(201,162,39,0)]"
-              aria-hidden="true"
-            />
+              {/* Pemisah Vertikal Gradien Emas */}
+              <span
+                className="h-full min-h-[96px] bg-gradient-to-b from-[rgba(201,162,39,0)] via-[rgba(201,162,39,0.6)] to-[rgba(201,162,39,0)]"
+                aria-hidden="true"
+              />
 
-            {/* Resepsi */}
-            <div className="flex flex-col items-center gap-[9px] text-center">
-              <svg className="h-[26px] w-[26px]" aria-hidden="true">
-                <use href="#ico-rings" />
-              </svg>
-              <span className="text-label-small indent-[0.32em] tracking-[0.32em] text-label-on-dark">
-                Resepsi
-              </span>
-              <span className="text-acara-time text-warm-white">
-                {eventSchedule.resepsi.label}
-              </span>
-              <span className="text-acara-sub text-tertiary-on-dark">
-                {eventSchedule.dayLabelShort}
-              </span>
+              {/* Resepsi */}
+              <div className="flex flex-col items-center gap-[9px] text-center">
+                <svg className="h-[26px] w-[26px]" aria-hidden="true">
+                  <use href="#ico-rings" />
+                </svg>
+                <span className="text-label-small indent-[0.32em] tracking-[0.32em] text-label-on-dark">
+                  Resepsi
+                </span>
+                <span className="text-acara-time text-warm-white">
+                  {eventSchedule.resepsi.label}
+                </span>
+                <span className="text-acara-sub text-tertiary-on-dark">
+                  {eventSchedule.dayLabelShort}
+                </span>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Pemisah Horizontal Gradien Emas */}
           <span
@@ -196,162 +201,47 @@ export function Acara() {
           />
 
           {/* Blok Lokasi Ponsel */}
-          <div className="flex flex-col items-center gap-[10px] text-center">
-            <svg className="h-[26px] w-[26px]" aria-hidden="true">
-              <use href="#ico-pin" />
-            </svg>
-            <span className="text-label-small indent-[0.32em] tracking-[0.32em] text-label-on-dark">
-              Lokasi
-            </span>
-            <span className="text-acara-venue text-warm-white">
-              {venue.nameOnly}
-              <br />
-              <span className="text-[0.78em] text-label-on-dark">{venue.subName}</span>
-            </span>
-            <p className="text-acara-address text-tertiary-on-dark max-w-[290px]">
-              {venue.address}
-            </p>
-
-            {/* Peta Tersemat Ponsel */}
-            <div
-              className="relative mt-[6px] aspect-video w-full overflow-hidden border border-[rgba(201,162,39,0.45)] bg-[#2A1F15]"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(118deg,rgba(201,162,39,.1) 0 8px,rgba(0,0,0,0) 8px 18px)",
-              }}
-            >
-              <iframe
-                title="Peta Lokasi Steikhaus Bandung"
-                src={venue.mapsEmbedUrl}
-                className="h-full w-full border-0"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
-
-            {/* Tombol Aksi Ponsel */}
-            <div ref={mobileMenuRef} className="relative mt-[8px] flex w-full flex-col gap-[9px]">
-              <a
-                href={venue.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-acara-btn border border-gold-bright bg-gold-deep px-[18px] py-[14px] text-center text-on-photo indent-[0.3em] transition-colors duration-300 hover:bg-[#A07C28]"
-              >
-                Petunjuk Arah
-              </a>
-              <button
-                type="button"
-                aria-expanded={calendarMenuOpen}
-                aria-haspopup="menu"
-                onClick={() => setCalendarMenuOpen((prev) => !prev)}
-                className="text-acara-btn cursor-pointer border border-[rgba(201,162,39,0.7)] bg-transparent px-[18px] py-[14px] text-center text-warm-white indent-[0.3em] transition-colors duration-300 hover:bg-[rgba(201,162,39,0.16)]"
-              >
-                Simpan ke Kalender
-              </button>
-
-              {/* Menu Pilihan Kalender Ponsel */}
-              {calendarMenuOpen && (
-                <div
-                  role="menu"
-                  className="border-gold-bright/60 bg-espresso/95 shadow-page absolute bottom-full left-0 z-30 mb-2 flex w-full flex-col gap-1 border p-2 backdrop-blur-md"
-                >
-                  <a
-                    role="menuitem"
-                    href={googleCalendarUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setCalendarMenuOpen(false)}
-                    className="text-acara-btn hover:bg-gold-deep/30 px-3 py-2.5 text-center text-warm-white transition-colors"
-                  >
-                    Google Calendar
-                  </a>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={handleDownloadIcs}
-                    className="text-acara-btn hover:bg-gold-deep/30 cursor-pointer px-3 py-2.5 text-center text-warm-white transition-colors"
-                  >
-                    Apple Calendar / Outlook (.ics)
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* LAYOUT DESKTOP (≥1024px)                                                  */}
-        {/* ========================================================================= */}
-        <div className="hidden flex-col gap-[48px] lg:flex">
-          {/* Bar 3 Kolom: Akad Nikah | Resepsi | Lokasi */}
-          <div className="grid w-full grid-cols-[1fr_1px_1fr_1px_1.25fr] items-start gap-[44px]">
-            {/* Kolom 1: Akad Nikah */}
-            <div className="flex flex-col items-center gap-[12px] text-center">
-              <svg className="h-[34px] w-[34px]" aria-hidden="true">
-                <use href="#ico-cal" />
-              </svg>
-              <span className="text-label-small-lg indent-[0.4em] tracking-[0.4em] text-label-on-dark">
-                Akad Nikah
-              </span>
-              <span className="text-acara-time-lg text-warm-white">
-                {eventSchedule.akad.label}
-              </span>
-              <span className="text-acara-sub-lg text-tertiary-on-dark">
-                {eventSchedule.dayLabel}
-              </span>
-            </div>
-
-            {/* Pemisah Vertikal 1 */}
-            <span
-              className="h-full min-h-[150px] bg-gradient-to-b from-[rgba(201,162,39,0)] via-[rgba(201,162,39,0.55)] to-[rgba(201,162,39,0)]"
-              aria-hidden="true"
-            />
-
-            {/* Kolom 2: Resepsi */}
-            <div className="flex flex-col items-center gap-[12px] text-center">
-              <svg className="h-[34px] w-[34px]" aria-hidden="true">
-                <use href="#ico-rings" />
-              </svg>
-              <span className="text-label-small-lg indent-[0.4em] tracking-[0.4em] text-label-on-dark">
-                Resepsi
-              </span>
-              <span className="text-acara-time-lg text-warm-white">
-                {eventSchedule.resepsi.label}
-              </span>
-              <span className="text-acara-sub-lg text-tertiary-on-dark">
-                {eventSchedule.dayLabel}
-              </span>
-            </div>
-
-            {/* Pemisah Vertikal 2 */}
-            <span
-              className="h-full min-h-[150px] bg-gradient-to-b from-[rgba(201,162,39,0)] via-[rgba(201,162,39,0.55)] to-[rgba(201,162,39,0)]"
-              aria-hidden="true"
-            />
-
-            {/* Kolom 3: Lokasi */}
-            <div className="flex flex-col items-center gap-[12px] text-center">
-              <svg className="h-[34px] w-[34px]" aria-hidden="true">
+          <ScrollReveal animation="fade-up" delay={300}>
+            <div className="flex flex-col items-center gap-[10px] text-center">
+              <svg className="h-[26px] w-[26px]" aria-hidden="true">
                 <use href="#ico-pin" />
               </svg>
-              <span className="text-label-small-lg indent-[0.4em] tracking-[0.4em] text-label-on-dark">
+              <span className="text-label-small indent-[0.32em] tracking-[0.32em] text-label-on-dark">
                 Lokasi
               </span>
-              <span className="text-acara-venue-lg text-warm-white">
-                {venue.nameOnly}{" "}
-                <span className="text-[0.68em] text-label-on-dark">{venue.subName}</span>
+              <span className="text-acara-venue text-warm-white">
+                {venue.nameOnly}
+                <br />
+                <span className="text-[0.78em] text-label-on-dark">{venue.subName}</span>
               </span>
-              <p className="text-acara-address-lg text-tertiary-on-dark max-w-[330px]">
+              <p className="text-acara-address text-tertiary-on-dark max-w-[290px]">
                 {venue.address}
               </p>
 
-              {/* Tombol Aksi Desktop (Berdampingan) */}
-              <div ref={desktopMenuRef} className="relative mt-[6px] flex gap-[10px]">
+              {/* Peta Tersemat Ponsel */}
+              <div
+                className="relative mt-[6px] aspect-video w-full overflow-hidden border border-[rgba(201,162,39,0.45)] bg-[#2A1F15] transition-all duration-300 hover:shadow-[0_0_20px_rgba(201,162,39,0.3)]"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(118deg,rgba(201,162,39,.1) 0 8px,rgba(0,0,0,0) 8px 18px)",
+                }}
+              >
+                <iframe
+                  title="Peta Lokasi Steikhaus Bandung"
+                  src={venue.mapsEmbedUrl}
+                  className="h-full w-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+
+              {/* Tombol Aksi Ponsel */}
+              <div ref={mobileMenuRef} className="relative mt-[8px] flex w-full flex-col gap-[9px]">
                 <a
                   href={venue.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-acara-btn border border-gold-bright bg-gold-deep px-[20px] py-[14px] text-center text-on-photo indent-[0.3em] transition-colors duration-300 hover:bg-[#A07C28]"
+                  className="text-acara-btn border border-gold-bright bg-gold-deep px-[18px] py-[14px] text-center text-on-photo indent-[0.3em] transition-all duration-300 hover:bg-[#A07C28] hover:scale-[1.02] active:scale-98"
                 >
                   Petunjuk Arah
                 </a>
@@ -360,16 +250,16 @@ export function Acara() {
                   aria-expanded={calendarMenuOpen}
                   aria-haspopup="menu"
                   onClick={() => setCalendarMenuOpen((prev) => !prev)}
-                  className="text-acara-btn cursor-pointer border border-[rgba(201,162,39,0.7)] bg-transparent px-[20px] py-[14px] text-center text-warm-white indent-[0.3em] transition-colors duration-300 hover:bg-[rgba(201,162,39,0.16)]"
+                  className="text-acara-btn cursor-pointer border border-[rgba(201,162,39,0.7)] bg-transparent px-[18px] py-[14px] text-center text-warm-white indent-[0.3em] transition-all duration-300 hover:bg-[rgba(201,162,39,0.16)] active:scale-98"
                 >
                   Simpan ke Kalender
                 </button>
 
-                {/* Menu Pilihan Kalender Desktop */}
+                {/* Menu Pilihan Kalender Ponsel */}
                 {calendarMenuOpen && (
                   <div
                     role="menu"
-                    className="border-gold-bright/60 bg-espresso/95 shadow-page absolute top-full right-0 z-30 mt-2 flex w-[240px] flex-col gap-1 border p-2 backdrop-blur-md"
+                    className="border-gold-bright/60 bg-espresso/95 shadow-page absolute bottom-full left-0 z-30 mb-2 flex w-full flex-col gap-1 border p-2 backdrop-blur-md animate-fade-in"
                   >
                     <a
                       role="menuitem"
@@ -393,24 +283,149 @@ export function Acara() {
                 )}
               </div>
             </div>
+          </ScrollReveal>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* LAYOUT DESKTOP (≥1024px)                                                  */}
+        {/* ========================================================================= */}
+        <div className="hidden flex-col gap-[48px] lg:flex">
+          {/* Bar 3 Kolom: Akad Nikah | Resepsi | Lokasi */}
+          <div className="grid w-full grid-cols-[1fr_1px_1fr_1px_1.25fr] items-start gap-[44px]">
+            {/* Kolom 1: Akad Nikah */}
+            <ScrollReveal animation="fade-right" delay={150}>
+              <div className="flex flex-col items-center gap-[12px] text-center">
+                <svg className="h-[34px] w-[34px] transition-transform duration-300 hover:scale-110" aria-hidden="true">
+                  <use href="#ico-cal" />
+                </svg>
+                <span className="text-label-small-lg indent-[0.4em] tracking-[0.4em] text-label-on-dark">
+                  Akad Nikah
+                </span>
+                <span className="text-acara-time-lg text-warm-white">
+                  {eventSchedule.akad.label}
+                </span>
+                <span className="text-acara-sub-lg text-tertiary-on-dark">
+                  {eventSchedule.dayLabel}
+                </span>
+              </div>
+            </ScrollReveal>
+
+            {/* Pemisah Vertikal 1 */}
+            <span
+              className="h-full min-h-[150px] bg-gradient-to-b from-[rgba(201,162,39,0)] via-[rgba(201,162,39,0.55)] to-[rgba(201,162,39,0)]"
+              aria-hidden="true"
+            />
+
+            {/* Kolom 2: Resepsi */}
+            <ScrollReveal animation="fade-up" delay={250}>
+              <div className="flex flex-col items-center gap-[12px] text-center">
+                <svg className="h-[34px] w-[34px] transition-transform duration-300 hover:scale-110" aria-hidden="true">
+                  <use href="#ico-rings" />
+                </svg>
+                <span className="text-label-small-lg indent-[0.4em] tracking-[0.4em] text-label-on-dark">
+                  Resepsi
+                </span>
+                <span className="text-acara-time-lg text-warm-white">
+                  {eventSchedule.resepsi.label}
+                </span>
+                <span className="text-acara-sub-lg text-tertiary-on-dark">
+                  {eventSchedule.dayLabel}
+                </span>
+              </div>
+            </ScrollReveal>
+
+            {/* Pemisah Vertikal 2 */}
+            <span
+              className="h-full min-h-[150px] bg-gradient-to-b from-[rgba(201,162,39,0)] via-[rgba(201,162,39,0.55)] to-[rgba(201,162,39,0)]"
+              aria-hidden="true"
+            />
+
+            {/* Kolom 3: Lokasi */}
+            <ScrollReveal animation="fade-left" delay={350}>
+              <div className="flex flex-col items-center gap-[12px] text-center">
+                <svg className="h-[34px] w-[34px] transition-transform duration-300 hover:scale-110" aria-hidden="true">
+                  <use href="#ico-pin" />
+                </svg>
+                <span className="text-label-small-lg indent-[0.4em] tracking-[0.4em] text-label-on-dark">
+                  Lokasi
+                </span>
+                <span className="text-acara-venue-lg text-warm-white">
+                  {venue.nameOnly}{" "}
+                  <span className="text-[0.68em] text-label-on-dark">{venue.subName}</span>
+                </span>
+                <p className="text-acara-address-lg text-tertiary-on-dark max-w-[330px]">
+                  {venue.address}
+                </p>
+
+                {/* Tombol Aksi Desktop (Berdampingan) */}
+                <div ref={desktopMenuRef} className="relative mt-[6px] flex gap-[10px]">
+                  <a
+                    href={venue.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-acara-btn border border-gold-bright bg-gold-deep px-[20px] py-[14px] text-center text-on-photo indent-[0.3em] transition-all duration-300 hover:bg-[#A07C28] hover:scale-[1.02] active:scale-98"
+                  >
+                    Petunjuk Arah
+                  </a>
+                  <button
+                    type="button"
+                    aria-expanded={calendarMenuOpen}
+                    aria-haspopup="menu"
+                    onClick={() => setCalendarMenuOpen((prev) => !prev)}
+                    className="text-acara-btn cursor-pointer border border-[rgba(201,162,39,0.7)] bg-transparent px-[20px] py-[14px] text-center text-warm-white indent-[0.3em] transition-all duration-300 hover:bg-[rgba(201,162,39,0.16)] active:scale-98"
+                  >
+                    Simpan ke Kalender
+                  </button>
+
+                  {/* Menu Pilihan Kalender Desktop */}
+                  {calendarMenuOpen && (
+                    <div
+                      role="menu"
+                      className="border-gold-bright/60 bg-espresso/95 shadow-page absolute top-full right-0 z-30 mt-2 flex w-[240px] flex-col gap-1 border p-2 backdrop-blur-md animate-fade-in"
+                    >
+                      <a
+                        role="menuitem"
+                        href={googleCalendarUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setCalendarMenuOpen(false)}
+                        className="text-acara-btn hover:bg-gold-deep/30 px-3 py-2.5 text-center text-warm-white transition-colors"
+                      >
+                        Google Calendar
+                      </a>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={handleDownloadIcs}
+                        className="text-acara-btn hover:bg-gold-deep/30 cursor-pointer px-3 py-2.5 text-center text-warm-white transition-colors"
+                      >
+                        Apple Calendar / Outlook (.ics)
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </ScrollReveal>
           </div>
 
           {/* Peta Tersemat Desktop Selebar Kontainer */}
-          <div
-            className="relative h-[280px] w-full overflow-hidden border border-[rgba(201,162,39,0.45)] bg-[#2A1F15]"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(118deg,rgba(201,162,39,.09) 0 10px,rgba(0,0,0,0) 10px 22px)",
-            }}
-          >
-            <iframe
-              title="Peta Lokasi Steikhaus Bandung"
-              src={venue.mapsEmbedUrl}
-              className="h-full w-full border-0"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
+          <ScrollReveal animation="zoom-in" delay={400}>
+            <div
+              className="relative h-[280px] w-full overflow-hidden border border-[rgba(201,162,39,0.45)] bg-[#2A1F15] transition-all duration-500 hover:shadow-[0_0_25px_rgba(201,162,39,0.35)]"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(118deg,rgba(201,162,39,.09) 0 10px,rgba(0,0,0,0) 10px 22px)",
+              }}
+            >
+              <iframe
+                title="Peta Lokasi Steikhaus Bandung"
+                src={venue.mapsEmbedUrl}
+                className="h-full w-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

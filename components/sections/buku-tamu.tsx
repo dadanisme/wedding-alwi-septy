@@ -7,6 +7,7 @@ import {
   submitGuestMessageAction,
 } from "@/app/actions/messages";
 import { formatRelativeTimeId } from "@/lib/time";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 interface BukuTamuProps {
   guestName?: string;
@@ -384,27 +385,30 @@ export function BukuTamu({
       {/* Konten Seksi */}
       <div className="relative flex flex-col gap-[22px] px-[30px] pt-[52px] pb-[56px] lg:items-center lg:gap-[34px] lg:px-[40px] lg:pt-[88px] lg:pb-[96px]">
         {/* Header Seksi */}
-        <div className="flex flex-col items-center gap-[10px] lg:gap-[14px]">
-          <svg
-            className="h-[18px] w-[140px] opacity-85 lg:h-[24px] lg:w-[200px]"
-            aria-hidden="true"
-          >
-            <use href="#orn" />
-          </svg>
-          <h2
-            id="buku-tamu-title"
-            className="text-section-label lg:text-section-label-lg indent-[0.4em] text-ink-soft lg:indent-[0.48em]"
-          >
-            {guestBookConfig.title}
-          </h2>
-        </div>
+        <ScrollReveal animation="fade-down" delay={100}>
+          <div className="flex flex-col items-center gap-[10px] lg:gap-[14px]">
+            <svg
+              className="h-[18px] w-[140px] opacity-85 lg:h-[24px] lg:w-[200px]"
+              aria-hidden="true"
+            >
+              <use href="#orn" />
+            </svg>
+            <h2
+              id="buku-tamu-title"
+              className="text-section-label lg:text-section-label-lg indent-[0.4em] text-ink-soft lg:indent-[0.48em]"
+            >
+              {guestBookConfig.title}
+            </h2>
+          </div>
+        </ScrollReveal>
 
         {showForm ? (
           /* Formulir Buku Tamu */
-          <form
-            onSubmit={handleSubmit}
-            className="flex w-full flex-col gap-[14px] lg:max-w-[560px] lg:gap-[16px]"
-          >
+          <ScrollReveal animation="fade-up" delay={200} className="w-full lg:max-w-[560px]">
+            <form
+              onSubmit={handleSubmit}
+              className="flex w-full flex-col gap-[14px] lg:gap-[16px]"
+            >
             <input
               id={nameId}
               type="text"
@@ -452,7 +456,7 @@ export function BukuTamu({
               disabled={isPending || isPreview}
               aria-busy={isPending}
               aria-describedby={error ? errorId : undefined}
-              className="cursor-pointer border border-gold-deep bg-transparent p-[15px] text-buku-btn tracking-[0.32em] text-ink uppercase indent-[0.32em] transition-colors duration-300 hover:bg-gold-deep hover:text-on-photo disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:bg-transparent disabled:hover:text-ink lg:self-center lg:p-[16px_40px] lg:text-buku-btn-lg lg:tracking-[0.36em] lg:indent-[0.36em]"
+              className="cursor-pointer border border-gold-deep bg-transparent p-[15px] text-buku-btn tracking-[0.32em] text-ink uppercase indent-[0.32em] transition-all duration-300 hover:bg-gold-deep hover:text-on-photo hover:scale-[1.02] active:scale-98 disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:bg-transparent disabled:hover:text-ink disabled:hover:scale-100 lg:self-center lg:p-[16px_40px] lg:text-buku-btn-lg lg:tracking-[0.36em] lg:indent-[0.36em]"
             >
               {isPending
                 ? guestBookConfig.submittingLabel
@@ -466,6 +470,7 @@ export function BukuTamu({
               </p>
             )}
           </form>
+          </ScrollReveal>
         ) : (
           /* Jatah 3 ucapan sudah habis (PRD §4.4) */
           <p

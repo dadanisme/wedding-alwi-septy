@@ -773,6 +773,167 @@ body {
   );
 }
 
+/*
+ * =========================================================================
+ * SISTEM ANIMASI KREATIF (Creative Wedding Animations)
+ * Mewah, puitis, dan GPU-accelerated (transform/opacity) untuk 60fps di ponsel.
+ * Mendukung penuh @media (prefers-reduced-motion: reduce) demi aksesibilitas.
+ * =========================================================================
+ */
 
+@keyframes ken-burns {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
 
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-160%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(260%) skewX(-20deg);
+  }
+}
 
+@keyframes pulse-gentle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes heartbeat-gold {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px rgba(201, 162, 39, 0));
+  }
+  50% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 8px rgba(201, 162, 39, 0.65));
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spin-vinyl {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes soundwave-1 {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+@keyframes soundwave-2 {
+  0%, 100% { height: 14px; }
+  50% { height: 6px; }
+}
+
+@keyframes soundwave-3 {
+  0%, 100% { height: 7px; }
+  50% { height: 18px; }
+}
+
+@keyframes soundwave-4 {
+  0%, 100% { height: 12px; }
+  50% { height: 5px; }
+}
+
+@keyframes gold-gleam {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(201, 162, 39, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(201, 162, 39, 0.85));
+  }
+}
+
+@keyframes petal-fall {
+  0% {
+    transform: translate3d(0, -8vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: var(--petal-opacity, 0.65);
+  }
+  88% {
+    opacity: var(--petal-opacity, 0.65);
+  }
+  100% {
+    transform: translate3d(var(--drift-x, 40px), 108vh, 0) rotate(var(--rot, 360deg));
+    opacity: 0;
+  }
+}
+
+@keyframes beacon-wave {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+@utility animate-ken-burns {
+  animation: ken-burns 18s ease-in-out infinite alternate;
+}
+
+@utility animate-shimmer {
+  animation: shimmer-sweep 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@utility animate-pulse-gentle {
+  animation: pulse-gentle 3.5s ease-in-out infinite;
+}
+
+@utility animate-heartbeat-gold {
+  animation: heartbeat-gold 2.8s ease-in-out infinite;
+}
+
+@utility animate-float-slow {
+  animation: float-slow 4s ease-in-out infinite;
+}
+
+@utility animate-spin-vinyl {
+  animation: spin-vinyl 7s linear infinite;
+}
+
+@utility animate-gold-gleam {
+  animation: gold-gleam 4s ease-in-out infinite;
+}
+
+@utility animate-beacon {
+  animation: beacon-wave 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Aksesibilitas: Matikan animasi bila pengguna mengaktifkan prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

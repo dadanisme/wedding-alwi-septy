@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { galleryPhotos } from "@/lib/event-config";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 const TOTAL = galleryPhotos.length;
 
@@ -172,42 +173,49 @@ export function Galeri() {
 
   return (
     <section className="relative bg-cream">
-      <div className="flex flex-col items-center gap-[10px] px-[30px] pt-[52px] pb-6 lg:gap-[14px] lg:px-10 lg:pt-[88px] lg:pb-10">
-        <svg className="h-[18px] w-[140px] lg:h-6 lg:w-[200px]" aria-hidden="true">
-          <use href="#orn" />
-        </svg>
-        <h2 className="text-section-label lg:text-section-label-lg text-ink-soft indent-[0.4em] lg:indent-[0.48em]">
-          Galeri
-        </h2>
-      </div>
+      <ScrollReveal animation="fade-down" delay={100}>
+        <div className="flex flex-col items-center gap-[10px] px-[30px] pt-[52px] pb-6 lg:gap-[14px] lg:px-10 lg:pt-[88px] lg:pb-10">
+          <svg className="h-[18px] w-[140px] lg:h-6 lg:w-[200px]" aria-hidden="true">
+            <use href="#orn" />
+          </svg>
+          <h2 className="text-section-label lg:text-section-label-lg text-ink-soft indent-[0.4em] lg:indent-[0.48em]">
+            Galeri
+          </h2>
+        </div>
+      </ScrollReveal>
 
       <div className="grid grid-cols-2 gap-1.5 px-1.5 pb-[56px] lg:grid-cols-4 lg:gap-2.5 lg:px-2.5 lg:pb-[96px]">
         {galleryTiles.map((photo, index) => (
-          <button
+          <ScrollReveal
             key={photo.src}
-            ref={(el) => {
-              triggerRefs.current[index] = el;
-            }}
-            type="button"
-            onClick={() => openLightbox(index)}
-            aria-label={`Perbesar foto ${index + 1} dari ${TOTAL}`}
-            className={`group relative overflow-hidden focus-visible:z-10 ${photo.aspect} ${
-              photo.span === 2 ? "col-span-2" : ""
-            }`}
+            animation="zoom-in"
+            delay={(index % 4) * 75}
+            duration={700}
+            className={`${photo.span === 2 ? "col-span-2" : ""}`}
           >
-            <Image
-              src={photo.src}
-              alt={photo.alt}
-              fill
-              sizes={
-                photo.span === 2
-                  ? "(min-width: 1440px) 720px, (min-width: 1024px) 50vw, 100vw"
-                  : "(min-width: 1440px) 360px, (min-width: 1024px) 25vw, 50vw"
-              }
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-            <span className="bg-espresso/0 group-hover:bg-espresso/15 absolute inset-0 transition-colors duration-300" />
-          </button>
+            <button
+              ref={(el) => {
+                triggerRefs.current[index] = el;
+              }}
+              type="button"
+              onClick={() => openLightbox(index)}
+              aria-label={`Perbesar foto ${index + 1} dari ${TOTAL}`}
+              className={`group relative w-full overflow-hidden focus-visible:z-10 cursor-pointer ${photo.aspect}`}
+            >
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                fill
+                sizes={
+                  photo.span === 2
+                    ? "(min-width: 1440px) 720px, (min-width: 1024px) 50vw, 100vw"
+                    : "(min-width: 1440px) 360px, (min-width: 1024px) 25vw, 50vw"
+                }
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+              />
+              <span className="bg-espresso/0 group-hover:bg-espresso/15 absolute inset-0 transition-colors duration-300" />
+            </button>
+          </ScrollReveal>
         ))}
       </div>
 
