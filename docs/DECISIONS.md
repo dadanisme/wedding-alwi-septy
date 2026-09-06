@@ -296,3 +296,14 @@ Percobaan pertama pakai `object-top` (0%) — ini menghilangkan potongan kepala,
 3. Border garis vertikal di tepi container (terlihat seperti garis putih/artifak yang mengganggu).
 4. Warna gutter terlalu gelap seperti `#cbbca2` (dites dan ditolak pengguna karena terlalu gelap).
 
+---
+
+## Ornamen botani emas transisi wave berbasis AI
+
+**Keputusan:** transisi wave di bawah foto Sampul diperkaya dengan aset ornamen bunga & sulur botani foil emas (`public/ornaments/gold-floral-spray.webp`), yang di-generate via AI langsung dari acuan visual gambar referensi klien, dikonversi ke WebP transparan (alpha channel). Di mobile (390px), ukuran diperbesar (`w-[128px]` kanan, `w-[110px]` kiri) dengan orientasi mekar mengarah ke dalam foto.
+
+**Alasan:** mockup awal hanya memiliki pembatas garis wave geometris ganda polos karena keterbatasan alat saat itu dalam menggambar detail botani organik. Gambar referensi asli klien secara eksplisit menampilkan bunga mekar 5 kelopak dan dedaunan emas di atas garis lengkung wave. Aset raster WebP transparan berkualitas tinggi mempertahankan nuansa foil emas yang luwes dan mewah tanpa membebani performa (<101 KB).
+
+**Ditolak:**
+1. Menggambar manual dengan SVG sederhana (terlalu kaku dan datar, tidak bisa meniru tekstur foil emas dan kedalaman botani referensi).
+2. Membiarkan pembatas wave polos tanpa ornamen bunga (tidak sesuai dengan acuan referensi yang disukai klien).

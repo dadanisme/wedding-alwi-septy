@@ -22,6 +22,7 @@ export const couple = {
 export const eventSchedule = {
   date: "2026-10-10",
   dayLabel: "Sabtu, 10 Oktober 2026",
+  dayLabelShort: "Sabtu, 10 Okt 2026",
   akad: { start: "08:00", label: "08.00 WIB" },
   resepsi: { start: "11:00", end: "14:00", label: "11.00 – 14.00 WIB" },
   rsvpSuggestedDeadline: "2026-09-26",
@@ -29,9 +30,13 @@ export const eventSchedule = {
 
 export const venue = {
   name: "Steikhaus (Area Pabrik Bajoe)",
+  nameOnly: "Steikhaus",
+  subName: "(Area Pabrik Bajoe)",
   address:
     "Jl. Soekarno-Hatta No.575 D, Gumuruh, Kec. Batununggal, Kota Bandung, Jawa Barat 40275",
   mapsUrl: "https://share.google/LcN0r9PHzHVci6aX8",
+  mapsEmbedUrl:
+    "https://maps.google.com/maps?q=Steikhaus%20Pabrik%20Bajoe%20Bandung&z=16&output=embed",
 } as const;
 
 export const giftAccount = {
