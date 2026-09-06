@@ -1,20 +1,35 @@
 # PROGRESS
 
-Diperbarui: 7 September 2026 (sesi integrasi Buku Tamu)
+Diperbarui: 7 September 2026 (sesi Admin Panel Bagian 1: Auth, Dashboard & Moderasi)
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Integrasi Seksi Buku Tamu ke Cloud Firestore selesai dan diverifikasi live end-to-end. **Belum dikonfirmasi manusia di ponsel asli.**
+Admin Panel Bagian 1 (Autentikasi Firebase Auth, Proteksi Sesi Server, Dashboard Kapasitas 250 & RSVP, serta Antarmuka Moderasi Buku Tamu) selesai 100% dan diverifikasi live via browser automation Chrome DevTools MCP & unit integration tests.
 
-Fokus berikutnya: **Admin panel** — login Firebase Auth, dashboard pemantauan real-time (tabel tamu, generator link WhatsApp, filter belum respons, ekspor), dan antarmuka moderasi Buku Tamu.
-
-**Catatan penting untuk sesi admin panel:** fungsi moderasinya sudah ada dan teruji live (`toggleMessageVisibility`, `getAllMessagesForAdmin` di `lib/db/messages.ts`) — yang belum hanya antarmukanya. Penyembunyian sudah terbukti langsung hilang dari daftar publik tamu dalam ~12 detik lewat penyegaran berkala, tanpa tamu memuat ulang halaman.
-
-**Pelajaran sesi ini yang berlaku umum:** cacat-cacat paling serius lolos dari seluruh pengujian live saya karena **volume data ujinya terlalu kecil dan jalur gagalnya tidak pernah dipicu** — paginasi buntu baru muncul di atas 60 ucapan (data uji saya 13), dan tiga cacat lain hanya menyala saat sebuah elemen di-unmount pada render yang sama dengan pesan yang seharusnya ia tampilkan. Dua aturan yang layak dibawa ke sesi berikutnya: (1) seed data uji **di atas** setiap ambang numerik yang ada di kode, bukan sekadar data contoh; (2) setiap pesan yang di-set bersamaan dengan perubahan struktur render harus dirender di **luar** cabang yang hilang itu.
+Fokus berikutnya: **Admin Panel Bagian 2 (Manajemen Tamu Lengkap)**:
+1. Tabel 150 tamu: nama, grup, status buka, kehadiran, pendamping, deteksi perangkat unik.
+2. Filter tamu "Belum Respons" dengan tombol salin pesan reminder WhatsApp.
+3. Generator link personal dan pesan WhatsApp otomatis (sesuai PRD Lampiran B).
+4. Tambah / edit tamu satu per satu.
+5. Impor CSV dengan validasi format sebelum simpan ke Firestore.
+6. Ekspor data lengkap (CSV) untuk kebutuhan katering dan tata kursi.
 
 ## Selesai
+
+- **Admin Panel Bagian 1 — Autentikasi Firebase Auth, Dashboard Kapasitas 250, & Moderasi Buku Tamu** (7 Sep 2026):
+  - **Autentikasi Server-Side Firebase Auth**: Login email & kata sandi admin via Google Identity Toolkit REST API dan Firebase Admin SDK session cookie 5 hari terenkripsi di HTTP-only cookie `__session` (`lib/auth.ts`, `app/actions/auth.ts`). Sepenuhnya server-side tanpa menambah client SDK baru.
+  - **Halaman Login Admin** (`app/admin/login/page.tsx`, `components/admin/login-form.tsx`): Kartu login bertema elegan dengan monogram emas resmi Alwi & Septy, font Cormorant Garamond & Crimson Pro, proteksi auto-redirect jika sudah login, serta penanganan error inline yang informatif.
+  - **Proteksi Rute Admin** (`app/admin/page.tsx`): Menolak akses unauthenticated dengan redirect otomatis HTTP 307 ke `/admin/login`. Tombol logout di header langsung membersihkan cookie sesi dan mengalihkan kembali ke login.
+  - **Dashboard Pemantauan & Kendali Kapasitas 250 (PRD §2.4 & §4.7)**:
+    - Kartu sorotan utama Proyeksi Headcount Tamu (`Hadir + Pendamping + 50 Keluarga Inti/Panitia = Total Proyeksi`) disandingkan langsung dengan kapasitas 250 katering venue Steikhaus Bandung.
+    - Dilengkapi bilah kemajuan (progress bar) dan penanda warna adaptif: Hijau (<200), Amber (200–239), dan Merah Rose berdenyut (≥240) sebagai instrumen tunggal kendali kapasitas katering bagi mempelai.
+    - Grid metrik ringkas: Total Tamu Terdaftar (150), Sudah Buka Layar Sampul, RSVP Hadir (+ pendamping), RSVP Tidak Hadir, Belum Konfirmasi, dan Kunjungan Bot WhatsApp Preview (`autoVisitCount`, dipisahkan sesuai PRD §4.5).
+  - **Antarmuka Moderasi Buku Tamu Real-Time (PRD §4.4 & §4.7)**:
+    - Menampilkan seluruh ucapan tamu (termasuk yang disembunyikan), tab filter (*Semua*, *Tampil*, *Disembunyikan*), dan bilah pencarian instan nama/pesan.
+    - Tombol aksi "Sembunyikan" / "Tampilkan Kembali" dengan pembaruan UI optimistik dan eksekusi Server Action `toggleMessageVisibilityAction` yang terlindung verifikasi sesi admin. Perubahan di Firestore terbukti langsung sinkron ke tampilan publik tamu dalam ~12 detik tanpa muat ulang.
+  - **Verifikasi Menyeluruh**: Unit integration test suite (6 uji lulus 100%), pengujian live browser Chrome DevTools MCP pada desktop (1280×900) dan mobile (390×844), penanganan login gagal vs berhasil, navigasi logout, dan manipulasi moderasi ucapan live. Lolos `bun run lint` dan `bun run build` bersih tanpa peringatan.
 
 - **Sistem Animasi Kreatif & Parallax Scroll Seluruh Halaman Publik** (7 Sep 2026):
   - Animasi native murni tanpa dependensi baru (Next.js 16 + React 19 + Tailwind CSS v4), terakselerasi GPU (`transform`/`opacity`), patuh pada token palet warna resmi, dan mendukung penuh `@media (prefers-reduced-motion: reduce)`.

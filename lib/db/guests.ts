@@ -202,10 +202,14 @@ export async function getGuestStats(): Promise<GuestSummaryStats> {
   let notAttendingCount = 0;
   let pendingCount = 0;
   let totalPlusOne = 0;
+  let totalBotVisits = 0;
 
   for (const guest of guests) {
     if (guest.openedAt || guest.openCount > 0) {
       openedCount++;
+    }
+    if (guest.autoVisitCount) {
+      totalBotVisits += guest.autoVisitCount;
     }
     if (guest.rsvpStatus === 'attending') {
       attendingCount++;
@@ -230,6 +234,7 @@ export async function getGuestStats(): Promise<GuestSummaryStats> {
     notAttendingCount,
     pendingCount,
     totalPlusOne,
+    totalBotVisits,
     projectedHeadcount,
     maxCapacity: 250,
   };

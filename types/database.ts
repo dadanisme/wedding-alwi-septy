@@ -67,6 +67,7 @@ export interface GuestSummaryStats {
   notAttendingCount: number;
   pendingCount: number;
   totalPlusOne: number;
+  totalBotVisits: number; // Kunjungan bot WhatsApp / scraper preview
   projectedHeadcount: number; // attending + plusOne + keluarga inti (50)
   maxCapacity: number; // 250
 }

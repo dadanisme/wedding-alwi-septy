@@ -627,16 +627,39 @@ Memenuhi seluruh baris PRD §4.4 (moderasi tidak ada, pembaruan real-time, kontr
 
 ---
 
-## Favicon & App Icon: Penggunaan Monogram Emas Alwi & Septy
+---
+
+## Admin Panel (Bagian 1): Autentikasi Firebase Auth, Proteksi Sesi Server, Dashboard Kapasitas, & Moderasi Buku Tamu
 
 **Keputusan:**
-1. **Penggantian Favicon Default:** Mengganti favicon default Next.js dengan monogram resmi Alwi & Septy varian emas (`public/logo/monogram-gold.png`).
-2. **Multi-Resolusi & Format:**
-   - `app/favicon.ico`: ICO multi-frame (16×16, 32×32, 48×48, 64×64, 128×128, 256×256) berlatar transparan untuk kompatibilitas browser klasik dan fallback request `/favicon.ico`.
-   - `app/icon.png`: Master PNG 512×512 berlatar transparan untuk tab browser modern dan tampilan layar retina/HiDPI.
-   - `app/apple-icon.png`: Format PNG 180×180 dengan latar belakang espresso (`#1E1815`) agar terhindar dari perilaku default iOS yang mengisi transparansi dengan warna hitam pekat saat disimpan ke Home Screen / Bookmark.
-3. **Konvensi File-Based Metadata:** Menggunakan konvensi bawaan Next.js App Router (`app/favicon.ico`, `app/icon.png`, `app/apple-icon.png`) sehingga secara otomatis menghasilkan tag `<link rel="icon">` dan `<link rel="apple-touch-icon">` dengan hash statis di seluruh rute tanpa perlu konfigurasi manual.
+1. **Autentikasi Server-Side Tanpa Client SDK:**
+   - Memverifikasi login email dan kata sandi admin melalui Google Identity Toolkit REST API (`accounts:signInWithPassword`) di Server Action, lalu menerbitkan session cookie 5 hari terenkripsi via Firebase Admin SDK (`adminAuth.createSessionCookie(idToken)`).
+   - Session disimpan dalam cookie HTTP-only, secure, SameSite `lax` bernama `__session`.
+   - Mengikuti prinsip arsitektur yang dikunci di `AGENTS.md` ("Akses basis data hanya dari server. Klien tidak pernah memegang kredensial baca langsung").
+2. **Proteksi Rute `/admin`:**
+   - Halaman `/admin` memeriksa validitas session cookie via `verifyAdminSession()` (yang memverifikasi token dan status pembatalan di Firebase). Jika belum login atau sesi tidak sah/kedaluwarsa, server otomatis melakukan redirect ke `/admin/login` (HTTP 307).
+   - Sebaliknya, jika pengguna yang sudah login membuka `/admin/login`, halaman otomatis mengalihkan ke `/admin`.
+3. **Kendali Kapasitas Katering & Indikator Warna (PRD §2.4 & §4.7):**
+   - Proyeksi kehadiran dihitung dari: `Jumlah Tamu Hadir + Total Pendamping + 50 Keluarga Inti & Panitia`.
+   - Angka disandingkan langsung dengan kapasitas venue 250 orang, dilengkapi bilah kemajuan (progress bar) visual dan lencana status dinamis:
+     - **Aman (<200)**: Hijau lembut / emerald (`text-emerald-300`, `border-emerald-500/30`).
+     - **Waspada (200–239)**: Kuning amber (`text-amber-300`, `border-amber-500/40`).
+     - **Kapasitas Kritis / Penuh (≥240)**: Merah rose berdenyut (`text-rose-300`, `border-rose-500/50`, `animate-pulse`).
+   - Sesuai PRD §4.7, karena tidak ada mekanisme kuota otomatis untuk tamu tambahan (plus-one), angka proyeksi ini menjadi satu-satunya alat kendali kapasitas yang dimiliki mempelai.
+4. **Pemisahan Kunjungan Bot WhatsApp Preview (PRD §4.5):**
+   - Statistik bot preview (`autoVisitCount`) disajikan terpisah dari pembukaan nyata tamu (`openedCount`), mencegah bias statistik saat link undangan dibagikan di grup chat WhatsApp.
+5. **Antarmuka Moderasi Buku Tamu Real-Time:**
+   - Panel moderasi menyajikan daftar seluruh ucapan (termasuk yang disembunyikan), tab penyaring (*Semua*, *Tampil*, *Disembunyikan*), dan pencarian instan.
+   - Tombol "Sembunyikan" / "Tampilkan Kembali" memperbarui state lokal secara optimistik dan memanggil Server Action `toggleMessageVisibilityAction` yang dilindungi verifikasi sesi admin. Status langsung tersinkronisasi ke Firestore dan daftar publik tamu.
+6. **Pembagian Scope Sesi (Sesuai Konfirmasi Pengguna):**
+   - Sesi 1: Autentikasi Firebase Auth, Proteksi Sesi Server, Dashboard Kapasitas 250, dan Moderasi Buku Tamu.
+   - Sesi 2: Manajemen Tamu Lengkap (Tabel 150 tamu, filter reminder belum respons, generator pesan WhatsApp personal, form tambah/edit tamu, impor CSV, dan ekspor data).
 
 **Alasan:**
-Menyelaraskan identitas visual tab browser dengan branding undangan digital Alwi & Septy, memberikan impresi pertama yang konsisten dan elegan saat tautan dibuka di perangkat mobile maupun desktop.
+Memenuhi requirement fungsional PRD §4.4, §4.5, dan §4.7 dengan keamanan maksimal tanpa menambah dependensi npm baru, serta menjaga integritas visual design system bernuansa espresso dan aksen emas resmi Alwi & Septy.
+
+**Ditolak:**
+1. Menambahkan Firebase Web Client SDK di frontend browser (menambah beban dependensi dan melanggar prinsip server-only access).
+2. Password admin statis hardcoded di kode sumber tanpa Firebase Auth.
+3. Menghapus atau menggabungkan metrik bot WhatsApp dengan metrik buka nyata (merusak akurasi data kehadiran tamu).
 
