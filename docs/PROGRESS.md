@@ -6,9 +6,9 @@ Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.
 
 ## Sedang Dikerjakan
 
-Seluruh 11 seksi tampilan halaman undangan (Seksi 1 Sampul s.d. Seksi 11 Penutup sesuai PRD §4.2) **telah selesai diimplementasikan 100% pada lapisan antarmuka/frontend**! Urutan seksi kini lengkap dan presisi: Sampul (1) → Ayat (2) → Pembuka (3) → Mempelai (4) → Love Story (5) → Galeri (6) → Acara (7) → RSVP (8) → Buku Tamu (9) → Hadiah (10) → Penutup (11).
+Setup infrastruktur backend Firebase (`wedding-alwi`), konfigurasi keamanan, dan lapisan akses data Firestore server-side telah selesai dan diverifikasi live 100%!
 
-Fokus berikutnya adalah infrastruktur backend: **Setup Firebase/Firestore/Auth dan lapisan akses data server-side**.
+Fokus berikutnya adalah: **Implementasi rute link privat tamu `/[guestSlug]` (dynamic route), Server Actions untuk RSVP & Buku Tamu, serta integrasi pelacakan buka undangan (WhatsApp bot preview filtering)**.
 
 ## Selesai
 
@@ -41,12 +41,22 @@ Fokus berikutnya adalah infrastruktur backend: **Setup Firebase/Firestore/Auth d
 - **Seksi Buku Tamu** (`components/sections/buku-tamu.tsx`, dirender di `/` setelah RSVP) — formulir pengiriman ucapan & doa serta daftar pesan masuk (PRD §4.4). Desain ditranskrip persis dari mockup yang diapprove: latar krem hangat sekunder (`bg-cream-secondary`), pemisah garis atas emas `border-t border-gold-bright/35`, ornamen `#orn` di atas judul "Buku Tamu", sulur pojok kiri bawah pada ponsel (`110x110`, opacity 0.4) dan dua sulur bawah simetris pada desktop (`170x170`, opacity 0.34). Input nama otomatis terisi dari prop `guestName` namun tetap dapat disesuaikan tamu (dikonfirmasi user sesi ini), textarea doa dengan batas 500 karakter, tombol kirim berbingkai emas, dan daftar ucapan dengan font Cormorant Garamond untuk pengirim, Crimson Pro uppercase untuk penanda waktu, serta Crimson Pro untuk teks doa. Pesan baru langsung muncul instan di urutan teratas ("Baru saja") di state lokal sebelum integrasi basis data Firestore. Data terpusat di `lib/event-config.ts` (`guestBookConfig`, `guestBookInitialEntries`), utility tipografi baru di `app/globals.css` (`text-buku-*`). Diverifikasi visual dan interaksi kirim pesan di 390px dan 1280px via Chrome DevTools MCP, lolos lint & build. **Belum dikonfirmasi manusia di ponsel asli.**
 - **Seksi Hadiah** (`components/sections/hadiah.tsx`, dirender di `/` setelah Buku Tamu) — tampilan informasi rekening statis tanda kasih (PRD §4.8) bank digital Blu (BCA Digital) a.n. Septyara Khotimaharani dengan nada santun ("Kehadiran dan doa Anda sudah lebih dari cukup..."). Tombol "Salin nomor" menyalin nomor rekening ke papan klip dengan fallback seleksi otomatis dan umpan balik visual "Nomor tersalin" (`aria-live="polite"`) selama 2,2 detik. Desain ditranskrip persis dari mockup yang diapprove: latar krem gading (`bg-cream`), ornamen `#orn` di atas judul, nomor rekening berfont Cormorant Garamond besar, bingkai kartu bergaris emas `border-gold-bright/55`, dan tombol berbingkai `border-gold-deep` dengan efek hover `hover:bg-gold-deep hover:text-on-photo`. Seluruh konten terpusat di `lib/event-config.ts` (`giftConfig`, `giftAccount`), utility tipografi baru di `app/globals.css` (`text-hadiah-*`). Diverifikasi visual di 390px dan 1280px serta interaksi salin nomor via Chrome DevTools MCP, lolos lint & build. **Belum dikonfirmasi manusia di ponsel asli.**
 - **Seksi Penutup** (`components/sections/penutup.tsx`, dirender di `/` setelah Hadiah) — seksi penutup acara (PRD §4.2 item 11) berisi ucapan terima kasih & permohonan doa restu, salam Wassalamu'alaikum, monogram resmi emas Alwi & Septy (`monogram.gold`) diapit aksen daun `#spray`, serta nama kedua keluarga mempelai (`Kel. Dadang Sukandi · Kel. Uun Syukur`). Desain ditranskrip persis dari mockup yang diapprove: latar cokelat gelap espresso (`bg-espresso`), sulur 2 sudut pada ponsel (`120x120`, opacity 0.45, rotasi 180° di kanan bawah) dan 4 sudut simetris pada desktop (`180x180` atas opacity 0.45, `150x150` bawah opacity 0.35), serta ornamen pemisah `#orn`. Varian logo emas diproses transparansinya dari Downloads tanpa halo putih. Seluruh konten terpusat di `lib/event-config.ts` (`closingConfig`), utility tipografi baru di `app/globals.css` (`text-penutup-*`). Diverifikasi visual di 390px dan 1280px via Chrome DevTools MCP, lolos lint & build. **Belum dikonfirmasi manusia di ponsel asli.**
+- **Setup Firebase, Cloud Firestore & Lapisan Akses Data Server-Side** (6 Sep 2026):
+  - Project Firebase baru `wedding-alwi` (*Wedding Alwi Septy*) di region `asia-southeast2` (Jakarta) untuk latensi optimal tamu Indonesia.
+  - Berkas konfigurasi Firebase CLI (`.firebaserc`, `firebase.json`) dan security rules (`firestore.rules`) terkunci default (`allow read, write: if false;`) telah dideploy ke cloud demi keamanan penuh tanpa akses publik langsung.
+  - Dependensi `firebase-admin` terpasang via Bun dengan singleton instance (`lib/firebase-admin.ts`) dan service account aman di `.env.local` + `.env.example`.
+  - Tipe database lengkap di `types/database.ts` (Guest, RsvpEntry, GuestMessage, AccessLog, GuestSummaryStats).
+  - Utilitas pendeteksi bot WhatsApp preview & web crawler di `lib/bot-detection.ts`.
+  - CRUD & Query layer: `lib/db/guests.ts` (lookup slug/token, tracking buka sampul, deteksi perangkat unik), `lib/db/rsvp.ts` (simpan RSVP & riwayat audit trail), `lib/db/messages.ts` (ambil ucapan aktif, kirim ucapan max 500 char & batas 3 ucapan/tamu, moderasi admin, fallback in-memory sorting).
+  - Verifikasi live cloud end-to-end berhasil 100%, lint & build Next.js lulus tanpa peringatan.
 
 ## Berikutnya
 
-- Setup project Firebase — Firestore dan Auth
-- Lapisan akses data (penyimpanan RSVP & ucapan tamu ke Firestore)
-- Sistem token link tamu privat `/{slug}-{token}` dan pelacakan pembukaan undangan (WhatsApp preview bot filtering).
+- Implementasi rute dinamis link tamu privat `/[guestSlug]`
+- Server Actions untuk pengiriman RSVP dan Buku Tamu langsung dari antarmuka undangan
+- Integrasi pelacakan buka undangan pada tombol sampul dengan penyaringan bot WhatsApp preview
+- Admin panel: login auth & pemantauan dashboard real-time
+
 
 ## Terkunci
 

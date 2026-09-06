@@ -440,5 +440,21 @@ Menjaga konsistensi alur visual undangan digital, memenuhi wireframe mockup yang
 1. Mengubah struktur linimasa menjadi format carousel horizontal (mockup approved menggunakan alur vertikal yang serasi dengan ritme scroll halaman undangan).
 2. Menghilangkan seksi Love Story dari alur halaman (PRD §4.2 secara eksplisit mensyaratkan Love Story di antara Mempelai dan Galeri).
 
+---
 
+## Setup Firebase & Lapisan Akses Data Server-Side (Firestore Admin SDK)
+
+**Keputusan:**
+1. **Project & Region:** Firebase project baru dibuat khusus untuk acara ini dengan ID `wedding-alwi` (*Wedding Alwi Septy*). Firestore database dibuat dalam mode *Firestore Native* pada region `asia-southeast2` (Jakarta) untuk menjamin latensi akses paling rendah bagi tamu di Indonesia.
+2. **Keamanan & Server-Only Database Access:** Sesuai prinsip yang dikunci di `AGENTS.md` ("Akses basis data hanya dari server. Klien tidak pernah memegang kredensial baca langsung"), aturan `firestore.rules` dikunci default (`allow read, write: if false;`). Seluruh interaksi database dilakukan melalui `firebase-admin` singleton (`lib/firebase-admin.ts`) yang berjalan di server runtime.
+3. **Manajemen Kredensial:** Kredensial *service account key* (`firebase-adminsdk-fbsvc@wedding-alwi.iam.gserviceaccount.com`) dimuat melalui variabel lingkungan (`FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) di `.env.local` (terlindungi oleh `.gitignore`) dengan template dokumentasi di `.env.example`.
+4. **Pemisahan Kunjungan Nyata & Bot Preview:** Sesuai PRD §4.5, bot perayap pratinjau (WhatsApp, Telegram, dsb.) dideteksi melalui pola user-agent (`lib/bot-detection.ts`) dan dicatat terpisah ke `autoVisitCount` tanpa menambah metrik `openCount`. Pembukaan nyata hanya dihitung saat tombol buka sampul ditekan.
+5. **Ketahanan Indeks Komposit:** Query daftar pesan Buku Tamu (`isHidden == false`, `orderBy createdAt desc`) didaftarkan ke `firestore.indexes.json` dan dideploy ke cloud, disertai mekanisme fallback *in-memory sorting* di `lib/db/messages.ts` agar aplikasi tetap 100% stabil tanpa error 500 saat indeks Firestore sedang dalam masa *building*.
+
+**Alasan:**
+Mencegah kebocoran data tamu dan kredensial database ke browser publik, menjaga akurasi pelacakan buka undangan dari distorsi crawler WhatsApp, serta memenuhi seluruh ketentuan keamanan dan skalabilitas pada PRD §4.1, §4.3, §4.4, §4.5, dan §7.2.
+
+**Ditolak:**
+1. Memberikan Firebase Web SDK / API key publik langsung di frontend untuk baca/tulis Firestore (rentan manipulasi token tamu, spam RSVP/buku tamu, dan pembobolan kuota).
+2. Menyimpan berkas JSON service account mentah di dalam repository proyek (berisiko bocor saat commit).
 

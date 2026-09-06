@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Sesuai AGENTS.md & PRD: Seluruh akses basis data dilakukan hanya dari server (Next.js server-side).
+    // Klien publik tidak memegang kredensial baca/tulis langsung.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
