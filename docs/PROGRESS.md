@@ -1,16 +1,18 @@
 # PROGRESS
 
-Diperbarui: 6 September 2026 (malam, sesi integrasi RSVP)
+Diperbarui: 7 September 2026 (sesi integrasi Buku Tamu)
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Integrasi Seksi RSVP ke Cloud Firestore selesai dan diverifikasi live end-to-end.
+Integrasi Seksi Buku Tamu ke Cloud Firestore selesai dan diverifikasi live end-to-end. **Belum dikonfirmasi manusia di ponsel asli.**
 
-Fokus berikutnya: **Integrasi Server Action Seksi Buku Tamu (`components/sections/buku-tamu.tsx`) ke Cloud Firestore** — pengiriman ucapan, daftar real-time, batas 3 ucapan per tamu, dan moderasi admin. Lapisan datanya (`lib/db/messages.ts`) sudah ada dan teruji; yang belum hanya Server Action dan penyambungan komponennya.
+Fokus berikutnya: **Admin panel** — login Firebase Auth, dashboard pemantauan real-time (tabel tamu, generator link WhatsApp, filter belum respons, ekspor), dan antarmuka moderasi Buku Tamu.
 
-**Catatan penting untuk sesi Buku Tamu:** pola submit-nya sama persis dengan RSVP, jadi `await` di dalam `startTransition` **wajib** dibungkus `try/catch` — tanpa itu, kegagalan jaringan mengganti seluruh halaman undangan dengan layar galat, bukan sekadar menggagalkan seksinya. Lihat butir 8 pada entri RSVP di `docs/DECISIONS.md`.
+**Catatan penting untuk sesi admin panel:** fungsi moderasinya sudah ada dan teruji live (`toggleMessageVisibility`, `getAllMessagesForAdmin` di `lib/db/messages.ts`) — yang belum hanya antarmukanya. Penyembunyian sudah terbukti langsung hilang dari daftar publik tamu dalam ~12 detik lewat penyegaran berkala, tanpa tamu memuat ulang halaman.
+
+**Pelajaran sesi ini yang berlaku umum:** cacat-cacat paling serius lolos dari seluruh pengujian live saya karena **volume data ujinya terlalu kecil dan jalur gagalnya tidak pernah dipicu** — paginasi buntu baru muncul di atas 60 ucapan (data uji saya 13), dan tiga cacat lain hanya menyala saat sebuah elemen di-unmount pada render yang sama dengan pesan yang seharusnya ia tampilkan. Dua aturan yang layak dibawa ke sesi berikutnya: (1) seed data uji **di atas** setiap ambang numerik yang ada di kode, bukan sekadar data contoh; (2) setiap pesan yang di-set bersamaan dengan perubahan struktur render harus dirender di **luar** cabang yang hilang itu.
 
 ## Selesai
 
@@ -19,7 +21,7 @@ Fokus berikutnya: **Integrasi Server Action Seksi Buku Tamu (`components/section
 - Data acara final dari klien: nama, orang tua, jadwal, venue, rekening
 - Arah desain ditentukan klien lewat gambar referensi
 - Mockup desain (`docs/mockup/Undangan Alwi & Septy.html`) — diapprove mempelai. Sebelumnya di Downloads klien, dipindah ke repo 6 Sep supaya tidak perlu dicari ulang
-- Logo/monogram "A&S": 3 varian di Downloads klien (hitam solid, putih transparan, emas solid — semua 1254×1254 PNG, versi terpotong+dikompres di `public/logo/`). Varian putih transparan dipasang di monogram sampul & penutup mockup (ponsel & desktop, 4 titik total). Varian hitam dan emas belum dipakai di komponen — ditampilkan di `/styleguide` untuk referensi.
+- Logo/monogram "A&S": 3 varian di Downloads klien (hitam solid, putih transparan, emas solid — semua 1254×1254 PNG, versi terpotong+dikompres di `public/logo/`). Varian putih dipasang di sampul, emas dipasang di penutup serta favicon/app-icon resmi (`app/favicon.ico`, `app/icon.png`, `app/apple-icon.png`). Varian hitam ditampilkan di `/styleguide`.
 - Scaffold Next.js 16 (App Router, Turbopack) + TypeScript + Tailwind v4 + ESLint. `bun run build` dan `bun run lint` bersih.
 - Runtime/package manager diganti dari npm ke Bun (`bun.lock` menggantikan `package-lock.json`). Lihat `docs/DECISIONS.md`.
 - Design system dikunci: palet (11 warna + rasio kontras), font (Cormorant Garamond + Crimson Pro via `next/font/google`), skala tipografi (kelas `text-*`/`text-*-lg` di `app/globals.css`) — semua ditranskrip dari blok "Catatan Desain" di mockup, bukan ditebak ulang.
@@ -65,11 +67,24 @@ Fokus berikutnya: **Integrasi Server Action Seksi Buku Tamu (`components/section
   Perubahan pada seksi yang sudah diverifikasi, keduanya atas keputusan user sesi ini: (a) ringkasan jawaban tersimpan pada kartu konfirmasi, (b) placeholder catatan diubah ke maksud PRD §4.3 ("Alergi makanan atau kebutuhan khusus"). **Butir (b) menyimpang dari mockup yang diapprove mempelai — perlu dikonfirmasi ulang ke mereka.**
   Tiga bug ditemukan lewat pengujian, bukan lewat pembacaan kode, dan sudah diperbaiki: (1) rejeksi promise di `startTransition` mengganti seluruh halaman saat jaringan mati; (2) penulisan riwayat tidak atomik dengan pembaruan dokumen tamu — tamu bisa diberi tahu "belum tersimpan" untuk jawaban yang sudah tersimpan, dan riwayat pengiriman pertamanya hilang permanen; (3) rute `/` menampilkan kartu "tersimpan" palsu. Ditambahkan juga tombol "Batal" pada mode ubah (sebelumnya tamu terjebak di formulir).
   Verifikasi: 14 payload adversarial langsung ke Server Action tanpa melewati formulir (semua sesuai harapan) · uji transaksi live termasuk dua pengiriman bersamaan dari link yang sama · alur browser end-to-end di 390px & 1280px · kasus terburuk tata letak (nama pendamping 80 karakter + catatan 500 karakter, tanpa overflow) · simulasi jaringan mati lalu pulih · `bun run lint` & `bun run build` bersih · lolos `/code-review` dan review adversarial 5 lensa. Seluruh data uji sudah dihapus dari Firestore. **Belum dikonfirmasi manusia di ponsel asli.**
+- **Favicon & App Icon Resmi (Varian Monogram Emas)** (7 Sep 2026):
+  - Menggantikan favicon default Next.js dengan monogram emas resmi Alwi & Septy (`public/logo/monogram-gold.png`).
+  - `app/favicon.ico`: multi-resolution ICO (16×16, 32×32, 48×48, 64×64, 128×128, 256×256) berlatar transparan untuk fallback browser klasik.
+  - `app/icon.png`: master PNG 512×512 berlatar transparan untuk browser modern dan layar HiDPI/Retina.
+  - `app/apple-icon.png`: format PNG 180×180 dengan latar warna tema espresso (`#1E1815`) untuk bookmark/home screen iOS.
+  - Diinjeksi otomatis oleh Next.js App Router ke seluruh rute (`/`, `/[guestSlug]`, dsb). Terverifikasi via `next build` dan respons live HTTP server.
+
+
+- **Integrasi Seksi Buku Tamu ke Cloud Firestore** (7 Sep 2026) — Server Action `app/actions/messages.ts` (kirim ucapan + ambil halaman, keduanya bergerbang `fullSlug`), `lib/db/messages.ts` ditulis ulang (paginasi, jeda 30 detik, batas 3/tamu dalam satu transaksi), `lib/time.ts` baru (penanda waktu relatif), dan `components/sections/buku-tamu.tsx` disambungkan. Rasional tiap keputusan ada di `docs/DECISIONS.md` — jangan diulang di sini.
+  Empat keputusan diambil user sesi ini setelah ditawari opsi: (a) real-time PRD §4.4 dipenuhi lewat **polling Server Action ~20 detik** yang digerbangi visibilitas seksi & tab, bukan listener Firestore di klien — keputusan terkunci "akses DB hanya dari server" tetap utuh; (b) 3 ucapan contoh mockup **hanya** dipakai di rute pratinjau `/`, rute tamu memakai empty state; (c) paginasi tombol "Muat Ucapan Lainnya" 10 per muat; (d) jeda antar pengiriman 30 detik.
+  Seluruh baris tabel PRD §4.4 terpenuhi, termasuk yang sebelumnya belum ada sama sekali: jeda minimum antar pengiriman, paginasi, dan pembaruan real-time (ucapan baru **dan** penyembunyian admin sama-sama terlihat dalam ~12 detik tanpa reload — terukur).
+  **Sebelas cacat ditemukan lewat pengujian, review adversarial, dan `/code-review` — bukan lewat pembacaan kode — dan semuanya sudah diperbaiki.** Empat di antaranya lolos dari pengujian live saya sendiri: (1) **paginasi buntu di 60 ucapan** — `hasMore` dihitung setelah penjepitan, jadi ucapan ke-61+ tidak terjangkau siapa pun sementara tombolnya tampil selamanya (ditemukan 5 lensa terpisah; uji saya hanya punya 13 ucapan); (2) galat "Muat Ucapan Lainnya" dirender di dalam `<form>` ~1400px di atas tombolnya, dan hilang total saat jatah habis; (3) konfirmasi sukses ucapan ke-3 **dirender nol kali** karena formulirnya di-unmount pada render yang sama; (4) nama pra-isi `"Bapak/Ibu " + nama` bisa melewati batas server sehingga tamu ditolak untuk teks yang tidak ia ketik. Dua lagi dari pengujian saya: (5) teks panjang tanpa spasi (URL tempelan) terpotong diam-diam oleh `overflow-hidden`; (6) empty state palsu "Belum ada ucapan" saat Firestore gagal di render server. Ditambah satu perbaikan postur: aksi baca semula tanpa kredensial — seluruh buku tamu terbaca dari domain telanjang, tidak konsisten dengan 404-generik & `noindex` (PRD §4.1).
+  `/code-review` menemukan lima lagi, dua di antaranya serius: (7) **kegagalan transport setelah transaksi commit** memberi tahu "belum terkirim" untuk ucapan yang sudah tersimpan, lalu kirim ulangnya menghasilkan duplikat identik yang memakan 2 dari 3 jatah tamu — kelas yang sama dengan butir 2 entri RSVP; ditutup dengan kunci idempotensi buatan klien sebagai ID dokumen; (8) `initialLoadFailed` sebagai prop tidak pernah berubah, sehingga buku tamu yang gagal dibaca lalu pulih dan memang kosong merender **nihil** — tanpa daftar, tanpa empty state, tanpa perbaikan diri. Tiga sisanya: (9) penolakan `limit_reached` menyetel galat di dalam formulir yang di-unmount pada render yang sama, mengunci `error` non-null selamanya; (10) klien menyimpulkan keadaan jatah dengan membandingkan **teks galat yang sudah dilokalkan** — kini memakai `reason` yang dapat dibaca mesin; (11) halaman pertama Buku Tamu dibaca juga untuk pratinjau bot WhatsApp, ~11 pembacaan Firestore per penerusan link untuk sesuatu yang tidak dirender siapa pun.
+  Verifikasi: 29 asersi lapisan data live · 23 asersi idempotensi & validasi kunci · 28 payload adversarial langsung ke kedua Server Action tanpa melewati formulir · uji race 4 pengiriman bersamaan dari link sama (tepat 1 diterima, dokumen tersimpan == yang diterima) · rantai paginasi pada **75 ucapan** menembus ambang 60 dan menjangkau seluruhnya · penyembunyian admin hilang dari daftar publik dalam 12 detik · alur browser 390px & 1280px · kasus terburuk tata letak (nama 60 & pesan 500 karakter tanpa spasi) · simulasi jaringan mati pada kirim **dan** pada muat-lebih (halaman tetap utuh, teks tamu terjaga, kirim ulang berhasil) · simulasi commit-berhasil-respons-hilang lalu kirim ulang → tepat 1 dokumen, bukan 2 · kegagalan render server dipaksa lewat patch sementara → pulih 0,3 detik setelah seksi terlihat · pratinjau bot WhatsApp tidak memuat ucapan sama sekali sementara user-agent iPhone memuatnya · rute `/` tidak menyentuh Firestore bahkan setelah lewat satu siklus penyegaran · `bun run lint` & `bun run build` bersih. Seluruh data uji sudah dihapus dari Firestore. **Belum dikonfirmasi manusia di ponsel asli.**
 
 ## Berikutnya
 
-- Integrasi Server Action Seksi Buku Tamu (`components/sections/buku-tamu.tsx`) ke Cloud Firestore
-- Admin panel: login auth & pemantauan dashboard real-time (tabel tamu, generator link WhatsApp, filter belum respons, ekspor)
+- Admin panel: login auth & pemantauan dashboard real-time (tabel tamu, generator link WhatsApp, filter belum respons, ekspor) + antarmuka moderasi Buku Tamu
 - Konfirmasi ke mempelai: perubahan placeholder catatan RSVP dari "Doa atau pesan untuk kami" menjadi "Alergi makanan atau kebutuhan khusus"
 - Ganti aset yang perlu diganti (disebut user 6 Sep, daftar spesifiknya belum diberikan)
 

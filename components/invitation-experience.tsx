@@ -18,6 +18,7 @@ import { Penutup } from "@/components/sections/penutup";
 import { trackGuestOpenAction } from "@/app/actions/tracking";
 import { getClientDeviceId } from "@/lib/device";
 import type { RsvpEntry, RsvpStatus } from "@/types/database";
+import type { GuestBookEntry } from "@/lib/event-config";
 
 export interface GuestInfo {
   id: string;
@@ -32,6 +33,14 @@ export interface GuestInfo {
 interface InvitationExperienceProps {
   guest?: GuestInfo | null;
   guestName?: string;
+  /**
+   * Halaman pertama ucapan Buku Tamu. Rute tamu mengisinya dari Firestore;
+   * rute pratinjau "/" mengisinya dengan data contoh mockup.
+   */
+  guestBookEntries?: readonly GuestBookEntry[];
+  guestBookHasMore?: boolean;
+  /** Pengambilan halaman pertama Buku Tamu di server gagal. */
+  guestBookLoadFailed?: boolean;
 }
 
 /**
@@ -44,6 +53,9 @@ interface InvitationExperienceProps {
 export function InvitationExperience({
   guest,
   guestName = "Bapak/Ibu Budi Santoso",
+  guestBookEntries,
+  guestBookHasMore = false,
+  guestBookLoadFailed = false,
 }: InvitationExperienceProps) {
   const effectiveGuestName = guest?.displayName || guest?.name || guestName;
   const [isOpened, setIsOpened] = useState(false);
@@ -193,7 +205,13 @@ export function InvitationExperience({
         <Galeri />
         <Acara />
         <Rsvp fullSlug={guest?.fullSlug} initialRsvp={guest?.rsvp ?? null} />
-        <BukuTamu guestName={effectiveGuestName} />
+        <BukuTamu
+          guestName={effectiveGuestName}
+          fullSlug={guest?.fullSlug}
+          initialEntries={guestBookEntries}
+          initialHasMore={guestBookHasMore}
+          initialLoadFailed={guestBookLoadFailed}
+        />
         <Hadiah />
         <Penutup />
       </main>

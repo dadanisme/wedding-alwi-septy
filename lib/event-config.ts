@@ -251,11 +251,24 @@ export const galleryPhotos = [
 /**
  * Konfigurasi dan data awal seksi Buku Tamu (PRD §4.4).
  * Ditranskrip dari data mockup yang diapprove (docs/mockup/Undangan Alwi & Septy.html, seksi 9).
+ *
+ * PENTING: `guestBookInitialEntries` adalah data CONTOH dari mockup dengan
+ * nama-nama fiktif. Sejak integrasi Firestore, entri ini HANYA dipakai di rute
+ * pratinjau "/" supaya seksi masih bisa ditinjau visual tanpa data nyata.
+ * Rute tamu "/{slug}" tidak pernah menampilkannya — tamu sungguhan tidak boleh
+ * melihat ucapan yang tidak pernah ada. Lihat docs/DECISIONS.md.
  */
 export interface GuestBookEntry {
+  /** ID dokumen Firestore. Kosong hanya pada data contoh mode pratinjau. */
   id?: string;
   name: string;
-  when: string;
+  /**
+   * Penanda waktu statis. Hanya dipakai data contoh mockup di rute pratinjau —
+   * ucapan asli membawa `createdAt` dan penanda waktunya dihitung saat render.
+   */
+  when?: string;
+  /** ISO string dari Firestore. Sumber penanda waktu relatif ucapan asli. */
+  createdAt?: string;
   msg: string;
 }
 
@@ -282,8 +295,72 @@ export const guestBookConfig = {
   namePlaceholder: "Nama Anda",
   messagePlaceholder: "Tulis ucapan & doa",
   submitButtonLabel: "Kirim Ucapan",
+  submittingLabel: "Mengirim",
+
+  // Batas panjang input, ditegakkan di server (bukan hanya di klien).
   maxMessageLength: 500,
+  // 80, bukan 60: nilai bawaan kolom ini adalah "Bapak/Ibu " + nama lengkap
+  // tamu, dan sapaan itu sendiri sudah 10 karakter. Pada 60, nama Indonesia
+  // bergelar yang wajar ("Bapak/Ibu Haji Muhammad Abdurrahman Wahid
+  // Syaifuddin Zuhri" = 58) menyisakan ruang yang terlalu tipis, dan tamu
+  // ditolak server untuk teks yang tidak pernah ia ketik sendiri. Sama dengan
+  // batas nama pendamping di rsvpConfig.
+  maxNameLength: 80,
+
+  // Aturan anti-spam (PRD §4.4). Angka pada pesan galat di bawah harus sama
+  // dengan angka di sini.
   maxEntriesPerGuest: 3,
+  cooldownSeconds: 30,
+
+  // Paginasi (PRD §4.4 "terbaru di atas, dengan paginasi").
+  pageSize: 10,
+
+  // Batas jendela yang masih disegarkan berkala. Penyegaran mengambil ulang
+  // sebanyak yang sedang ditampilkan, jadi tamu yang menekan "Muat Ucapan
+  // Lainnya" berkali-kali akan memicu pembacaan yang makin besar tiap siklus.
+  // Di atas ambang ini penyegaran berhenti: tamu sedang membaca arsip, bukan
+  // menunggu ucapan baru.
+  //
+  // 100, bukan 60: ambangnya harus cukup jauh dari batas klik supaya
+  // pengiriman tamu sendiri tidak bisa menjatuhkannya. Pada 60, tamu yang
+  // sudah menekan muat-lebih lima kali (60 baris) lalu mengirim satu ucapan
+  // mendarat di 61 dan kehilangan pembaruan real-time PRD §4.4 untuk sisa
+  // sesinya. Dengan 100, dibutuhkan sepuluh klik sengaja — dan jatah kirim
+  // hanya 3. Lihat docs/DECISIONS.md.
+  maxPollWindow: 100,
+  loadMoreLabel: "Muat Ucapan Lainnya",
+  loadingMoreLabel: "Memuat",
+
+  // Penyegaran berkala menggantikan listener real-time. Keputusan terkunci di
+  // CLAUDE.md melarang klien memegang kredensial baca Firestore, jadi
+  // pembaruan ditarik lewat Server Action. Hanya berjalan saat seksi terlihat
+  // di layar dan tab sedang aktif — lihat docs/DECISIONS.md.
+  pollIntervalMs: 20000,
+
+  emptyStateText:
+    "Belum ada ucapan. Jadilah yang pertama menuliskan doa untuk kedua mempelai.",
+  justNowLabel: "Baru saja",
+
+  // Hanya tampil di rute "/" yang tidak punya data tamu. Tamu sungguhan selalu
+  // datang lewat link pribadi, jadi mereka tidak pernah melihat teks ini.
+  previewNotice:
+    "Mode pratinjau. Ucapan hanya dapat dikirim dari link undangan pribadi Anda.",
+
+  successNotice: "Ucapan Anda sudah tersimpan. Terima kasih atas doanya.",
+  quotaReachedNotice:
+    "Anda sudah mengirim 3 ucapan — batas untuk setiap tamu.",
+
+  errorGeneric:
+    "Ucapan belum terkirim. Mohon periksa koneksi Anda lalu coba lagi.",
+  errorNameRequired: "Mohon isi nama Anda.",
+  errorNameTooLong: "Nama maksimal 80 karakter.",
+  errorMessageRequired: "Mohon tuliskan ucapan Anda.",
+  errorMessageTooLong: "Ucapan maksimal 500 karakter.",
+  errorLimitReached:
+    "Anda sudah mengirim 3 ucapan — batas untuk setiap tamu.",
+  errorCooldown:
+    "Mohon tunggu sebentar sebelum mengirim ucapan berikutnya.",
+  errorLoadMore: "Gagal memuat ucapan lainnya. Mohon coba lagi.",
 } as const;
 
 /**

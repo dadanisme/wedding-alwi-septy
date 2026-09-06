@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import type { Metadata } from "next";
 import { getGuestByFullSlug, recordGuestBotVisit } from "@/lib/db/guests";
+import { getVisibleMessages } from "@/lib/db/messages";
+import { guestBookConfig, type GuestBookEntry } from "@/lib/event-config";
 import { isBotUserAgent } from "@/lib/bot-detection";
 import { InvitationExperience } from "@/components/invitation-experience";
 
@@ -91,6 +93,36 @@ export default async function GuestInvitationPage({ params }: PageProps) {
     ? `${guest.salutation} ${guest.name}`
     : guest.name;
 
+  // Halaman pertama Buku Tamu dirender di server supaya daftar sudah terisi
+  // saat tamu sampai ke seksinya, bukan berkedip kosong dulu (PRD §4.4).
+  //
+  // Dilewati untuk kunjungan bot: perayap pratinjau WhatsApp mengambil halaman
+  // ini setiap kali link diteruskan di chat, dan ia tidak pernah merender
+  // daftarnya. Membacanya berarti membayar ~11 pembacaan Firestore per
+  // penerusan link untuk sesuatu yang tidak dilihat siapa pun. Konsisten
+  // dengan pemisahan bot yang sudah ada di berkas ini (PRD §4.5).
+  //
+  // Kegagalan di sini tidak boleh menjatuhkan seluruh undangan: seksi cukup
+  // tampil tanpa daftar, lalu memulihkan diri saat tamu sampai ke seksinya.
+  let guestBookEntries: GuestBookEntry[] = [];
+  let guestBookHasMore = false;
+  let guestBookLoadFailed = false;
+  if (!isBot) {
+    try {
+      const page = await getVisibleMessages(guestBookConfig.pageSize);
+      guestBookEntries = page.messages.map((message) => ({
+        id: message.id,
+        name: message.guestName,
+        msg: message.message,
+        createdAt: message.createdAt,
+      }));
+      guestBookHasMore = page.hasMore;
+    } catch (err) {
+      console.error("Gagal memuat halaman pertama Buku Tamu:", err);
+      guestBookLoadFailed = true;
+    }
+  }
+
   return (
     <>
       {/*
@@ -121,6 +153,9 @@ export default async function GuestInvitationPage({ params }: PageProps) {
           rsvpStatus: guest.rsvpStatus,
           rsvp: guest.rsvp,
         }}
+        guestBookEntries={guestBookEntries}
+        guestBookHasMore={guestBookHasMore}
+        guestBookLoadFailed={guestBookLoadFailed}
       />
     </>
   );

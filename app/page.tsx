@@ -1,4 +1,5 @@
 import { InvitationExperience } from "@/components/invitation-experience";
+import { guestBookInitialEntries } from "@/lib/event-config";
 
 export default function Home() {
   return (
@@ -21,7 +22,15 @@ export default function Home() {
         />
       </div>
 
-      <InvitationExperience guestName="Bapak/Ibu Budi Santoso" />
+      {/*
+       * Rute pratinjau. Buku Tamu memakai 3 ucapan contoh dari mockup supaya
+       * seksi masih bisa ditinjau visual, dan tidak pernah menyentuh Firestore
+       * — tamu sungguhan tidak boleh melihat ucapan yang tidak pernah ada.
+       */}
+      <InvitationExperience
+        guestName="Bapak/Ibu Budi Santoso"
+        guestBookEntries={guestBookInitialEntries}
+      />
     </>
   );
 }

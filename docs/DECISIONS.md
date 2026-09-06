@@ -538,3 +538,105 @@ Memenuhi PRD §4.3 (kehadiran, pendamping tanpa kuota, nama pendamping untuk tat
 **Diketahui, sengaja tidak dikerjakan sesi ini:**
 - Peralihan teks batas anjuran dihitung dari tanggal **UTC**, sehingga berganti pukul 07.00 WIB pada 27 September, bukan tengah malam. Kode ini sudah ada sebelum sesi ini dan hanya memengaruhi kalimat anjuran, bukan kemampuan mengirim formulir (tidak ada deadline keras — PRD §4.3).
 - `rsvpHistory` tumbuh tanpa batas: pengiriman ulang yang isinya sama tetap menambah dokumen baru. Untuk 150 tamu, volumenya tidak bermasalah, dan pemangkasan justru bertentangan dengan tujuan jejak audit.
+
+---
+
+## Integrasi Buku Tamu ke Firestore: Polling Berkondisi, Transaksi Anti-Spam, dan Pemisahan Data Contoh
+
+**Keputusan:**
+
+1. **Real-time PRD §4.4 dipenuhi lewat polling Server Action, bukan listener Firestore di klien.** Diputuskan user 7 Sep 2026 setelah ditawari tiga opsi. PRD §4.4 minta ucapan baru muncul tanpa memuat ulang halaman, dan penyembunyian admin juga berlaku real-time. Cara paling langsung — `onSnapshot` dari Firebase Web SDK — menuntut klien memegang kredensial baca dan `firestore.rules` dibuka untuk koleksi `messages`. Itu **membalik keputusan terkunci** "akses basis data hanya dari server" (CLAUDE.md), menambah dependensi baru, dan membuka permukaan penyalahgunaan kuota. Yang dipilih: `fetchGuestMessagesAction` dipanggil berkala tiap 20 detik. Jedanya maksimal 20 detik, bukan instan — konsekuensi yang diterima secara sadar untuk buku tamu pernikahan, bukan ruang obrolan.
+
+2. **Polling hanya berjalan saat seksi terlihat di layar DAN tab sedang aktif.** Digerbangi `IntersectionObserver` (rootMargin 200px) plus `visibilitychange`. Tanpa gerbang ini, 150 tamu yang membiarkan tab terbuka akan membaca Firestore terus-menerus sepanjang hari-H. Tamu hanya berhenti sebentar di seksi ini, jadi biaya nyatanya beberapa siklus per tamu, bukan ratusan. Terverifikasi live: ucapan baru muncul dan ucapan yang disembunyikan admin hilang, keduanya dalam 12 detik tanpa memuat ulang halaman.
+
+3. **Paginasi memakai "limit yang tumbuh dari puncak", bukan cursor `startAfter`.** Ini terlihat boros dan memang membaca ulang halaman yang sudah dimuat, tetapi cursor tidak bisa memenuhi PRD §4.4. Cursor hanya mengambil **ekor** daftar; ucapan yang baru disembunyikan admin di tengah halaman yang sudah dimuat tidak akan pernah hilang dari layar tanpa memuat ulang halaman. Satu pembacaan dari puncak melayani dua ketentuan sekaligus — ucapan baru di atas dan penyembunyian di mana pun.
+
+   Biayanya dijaga oleh dua hal yang berbeda, dan **memang harus dua**: `MAX_PAGE_SIZE` di lapisan data (pertahanan terhadap pemanggil bermusuhan) dan `maxPollWindow` di komponen (penyegaran berhenti bila jendela yang dimuat sudah besar — tamu itu sedang membaca arsip, bukan menunggu ucapan baru). Percobaan pertama sesi ini menggabungkan keduanya menjadi satu angka `MAX_PAGE_SIZE = 60`, dan itu **cacat**: `hasMore` dihitung terhadap limit yang sudah dijepit, sehingga begitu ucapan tampil melewati 60, server menjawab "masih ada" untuk halaman yang tidak akan pernah ia layani. Daftar beku di 60, tombol "Muat Ucapan Lainnya" tampil selamanya tanpa pernah menambah baris, ucapan ke-61 dan seterusnya tidak terjangkau tamu mana pun, dan setiap klik mati tetap dibayar 61 pembacaan. Ditemukan review adversarial oleh 5 lensa secara terpisah; pengujian saya melewatkannya karena data ujinya hanya 13 ucapan. Sekarang `MAX_PAGE_SIZE = 500`, sengaja **di atas** plafon produk sendiri (150 tamu × 3 ucapan = 450) supaya ia tidak pernah memotong data nyata.
+
+   Ditambah **penjaga struktural** di `handleLoadMore`: bila satu pemuatan tidak menambah baris meski `hasMore` mengaku masih ada, `hasMore` dipaksa `false`. Ini membuat seluruh kelas bug "tombol berbohong" mustahil, apa pun nilai penjepitnya kelak. Diuji dengan 75 ucapan: rantai klik menembus 60 dengan benar, mencapai seluruh 75, lalu tombolnya berhenti jujur.
+
+4. **Batas 3 ucapan dan jeda 30 detik ditegakkan dalam SATU transaksi Firestore.** Kode sebelumnya memakai `count()` lalu `set()` terpisah. Karena link boleh diteruskan (PRD §4.1), dua perangkat memang bisa mengirim bersamaan dari link yang sama: keduanya membaca "sudah ada 2" dan keduanya menulis, menghasilkan 4 ucapan pada batas 3. Pembacaan di dalam transaksi membuat Firestore menserialisasi keduanya. Diuji live dengan 4 pengiriman bersamaan: tepat 1 diterima, 3 ditolak, dan jumlah dokumen tersimpan persis sama dengan jumlah yang diterima.
+
+5. **Satu pembacaan melayani dua aturan sekaligus.** Dokumen per tamu paling banyak 3, jadi mengambil semuanya (`where guestId ==`) lebih murah daripada `count()` plus query `orderBy` terpisah untuk mencari ucapan terakhir — dan tidak menuntut indeks gabungan baru yang harus menunggu masa *building* sebelum bisa dipakai.
+
+6. **Jeda antar pengiriman 30 detik.** Diputuskan user 7 Sep 2026; PRD §4.4 mensyaratkan "jeda minimum" tanpa menyebut angka. Cukup menahan klik ganda dan spam skrip tanpa menghukum tamu yang tulus ingin menambah ucapan. Digabung batas 3 ucapan, permukaan spamnya sangat kecil. Selisih waktu negatif (jam server kita di belakang jam Firestore) diperlakukan sebagai "baru saja mengirim", bukan sebagai jeda yang sudah lewat.
+
+7. **Ucapan yang disembunyikan admin TETAP menghitung jatah 3.** Penyembunyian adalah moderasi, bukan pengembalian jatah. Kalau dihitung ulang, tamu yang ucapannya disembunyikan justru mendapat kesempatan menulis ulang hal yang sama. Diuji live.
+
+8. **3 ucapan contoh dari mockup hanya dipakai di rute pratinjau `/`.** Diputuskan user 7 Sep 2026. `guestBookInitialEntries` berisi nama fiktif (Rizky & Nadia, Keluarga Hernawati, Teh Yuli) yang ditranskrip dari mockup. Sebelum integrasi, entri itu tampil ke semua orang sebagai state lokal. Sejak sesi ini, rute tamu `/{slug}` hanya menampilkan data Firestore; kalau kosong, tampil *empty state* ("Belum ada ucapan. Jadilah yang pertama..."). Tamu sungguhan tidak boleh melihat ucapan yang tidak pernah ada. Rute `/` tetap memakainya supaya seksi masih bisa ditinjau visual tanpa data nyata.
+
+9. **Pengiriman dimatikan di rute `/`, sama seperti RSVP.** Ucapan anonim tidak diterima sama sekali: batas 3 dan jeda 30 detik keduanya bersandar pada identitas tamu, jadi tanpa `guestId` tidak ada yang membatasi spam. Tombol kirim dinonaktifkan, ada keterangan "Mode pratinjau", dan ada penjaga terakhir di `handleSubmit` — diuji dengan memaksa `form.requestSubmit()` melewati tombol yang dinonaktifkan: tidak ada entri bertambah dan tidak ada notice sukses palsu.
+
+10. **Kegagalan pemuatan dibedakan dari "belum ada ucapan".** `fetchGuestMessagesAction` mengembalikan `{ success: false }`, bukan daftar kosong. Kalau tidak, satu penyegaran yang gagal akan mengosongkan daftar yang sedang dibaca tamu dan tampak seperti seluruh buku tamu terhapus. Penyegaran yang gagal diam saja (tamu tidak meminta apa pun); "Muat Ucapan Lainnya" yang gagal menampilkan galat.
+
+11. **Halaman pertama dirender di server, di dalam `try/catch`.** Daftar sudah terisi saat tamu sampai ke seksinya, bukan berkedip kosong. Kegagalan Firestore saat render **tidak boleh** menjatuhkan seluruh undangan: seksi cukup tampil kosong dan terisi pada penyegaran berikutnya.
+
+12. **Penanda waktu relatif dihitung saat render dari satu acuan `nowMs`.** Satu acuan untuk seluruh baris supaya tidak ada baris yang memakai jam berbeda. Karena nilai awalnya juga dihitung saat render server, teksnya bisa berbeda beberapa milidetik dari hasil hidrasi klien — ditangani `suppressHydrationWarning` pada elemen penanda waktu saja, bukan pada seluruh daftar. Waktu di masa depan diperlakukan sebagai "Baru saja", bukan angka negatif.
+
+13. **Formulir disembunyikan begitu jatah 3 habis**, diganti keterangan apresiasi. Tanpa itu, tamu mengetik ucapan keempat lalu baru ditolak setelah menekan kirim. Keadaan ini hanya bertahan selama sesi — memuat ulang halaman memunculkan formulir lagi karena jumlah ucapan tamu tidak diambil saat render halaman. Sengaja: menghitungnya berarti satu pembacaan Firestore tambahan per pembukaan undangan untuk kasus yang jarang, dan penolakan servernya tetap benar.
+
+14. **Nama pengirim tetap boleh diedit tamu**, meneruskan keputusan pada entri "Seksi Buku Tamu" di atas, meski PRD §4.4 menulis "tidak dapat diedit sendiri". Yang berubah sejak sesi ini: nama itu kini tersimpan permanen dan tampil ke seluruh tamu, bukan lagi state lokal. Konsekuensinya — tamu bisa menandatangani ucapan dengan nama orang lain — ditahan oleh moderasi admin (`isHidden`), bukan oleh pencegahan. Dicatat di sini supaya keputusannya sadar, bukan terlewat.
+
+15. **Batas nama 80 karakter, dan nilai pra-isinya dipangkas ke batas itu.** Nilai bawaan kolom nama adalah `"Bapak/Ibu " + nama lengkap tamu` — sapaannya sendiri sudah 10 karakter. Pada batas 60 (percobaan pertama sesi ini), nama Indonesia bergelar yang wajar sudah melewatinya, dan tamu **ditolak server untuk teks yang tidak pernah ia ketik**: atribut `maxLength` hanya membatasi pengetikan manusia, ia tidak memangkas nilai yang di-set program. Ditemukan review adversarial. Sekarang batasnya 80 (sama dengan nama pendamping di `rsvpConfig`) **dan** nilai awalnya dipangkas dengan `slice`. Diuji dengan nama 102 karakter: terpangkas tepat ke 80 dan diterima server.
+
+16. **Galat paginasi punya state sendiri, terpisah dari galat formulir.** Percobaan pertama memakai satu state untuk keduanya, dan akibatnya galat "Muat Ucapan Lainnya" dirender **di dalam `<form>`** — jauh di puncak seksi, sekitar 1400px di atas tombol yang memicunya pada seksi setinggi 1704px — lalu tidak dirender sama sekali begitu jatah tamu habis dan formulirnya di-unmount. Ditemukan review adversarial. Sekarang galatnya berada 22px di atas tombolnya sendiri (terukur), dan tidak bergantung pada keberadaan formulir.
+
+17. **Konfirmasi "sudah tersimpan" dirender DI LUAR `<form>`.** Pada ucapan ketiga, "simpan berhasil" dan "jatah habis" di-set pada render yang sama; React membatch keduanya, formulirnya di-unmount, dan notice yang dirender di dalamnya **dirender nol kali** — tamu mengirim ucapan terakhirnya lalu tidak melihat konfirmasi apa pun. Ditemukan review adversarial. Sekarang keduanya tampil bersusun: keterangan jatah menggantikan formulir, konfirmasi simpan berada di bawahnya. Diverifikasi di browser.
+
+18. **`fetchGuestMessagesAction` menuntut `fullSlug` yang sah, sama seperti pengiriman.** Percobaan pertama membiarkannya tanpa kredensial apa pun, dan itu dicatat sebagai batasan yang diketahui — keliru. ID Server Action ikut terkirim di bundel publik rute `/`, jadi tanpa gerbang ini seluruh buku tamu — berisi nama-nama orang yang diundang — terbaca dari domain telanjang. Itu tidak konsisten dengan seluruh postur privasi produk ini: halaman 404 generik yang sengaja tidak membocorkan keberadaan link, dan `noindex` menyeluruh (PRD §4.1). Ditemukan review adversarial oleh 3 lensa. Biayanya satu pembacaan dokumen tamu per pemanggilan — dapat diterima karena penyegaran sudah digerbangi visibilitas. Diuji dengan 9 bentuk payload tanpa kredensial: semuanya ditolak.
+
+19. **Empty state hanya tampil bila pembacaan memang berhasil dan kosong.** Bila `getVisibleMessages` gagal saat render server, menampilkan "Belum ada ucapan. Jadilah yang pertama..." adalah klaim palsu. Sekarang kegagalan itu diteruskan sebagai `initialLoadFailed`; seksi dibiarkan kosong tanpa klaim, dan satu percobaan ulang dipicu **saat seksi pertama kali terlihat** — bukan saat mount (tamu yang tidak pernah sampai ke seksi ini tidak perlu dibayari pembacaan Firestore) dan bukan menunggu siklus penyegaran 20 detik.
+
+20. **`break-words` + `min-w-0` pada nama dan isi ucapan.** Ditemukan lewat pengujian tata letak, bukan lewat pembacaan kode: nama 60 karakter tanpa spasi melebar 805px di kontainer 485px, dan pesan 500 karakter tanpa spasi melebar 4220px. Karena seksi memakai `overflow-hidden`, keduanya **terpotong diam-diam** tanpa scrollbar sebagai petunjuk. Pemicu nyatanya bukan teks adversarial, melainkan tautan panjang yang ditempel tamu. `text-pretty` saja tidak memecah kata tunggal, dan `min-w-0` dibutuhkan karena nama berada di dalam kontainer flex.
+
+21. **Kunci idempotensi buatan klien menjadi ID dokumen ucapan.** Ditemukan `/code-review`; kelas yang sama dengan butir 2 entri RSVP di berkas ini. Kegagalan transport **setelah** transaksi commit — jaringan 4G putus tepat saat respons kembali — membuat tamu diberi tahu "Ucapan belum terkirim" untuk ucapan yang sudah tersimpan. Sekitar 20 detik kemudian penyegaran menarik ucapannya sendiri ke daftar tepat di bawah pesan galat itu, saling membantah; lalu setelah jeda 30 detik lewat, kirim ulangnya menghasilkan ucapan **kedua yang identik** — tampil ke semua tamu dan memakan 2 dari 3 jatahnya.
+    Sekarang klien membuat satu kunci per naskah (`crypto.randomUUID()` tanpa tanda hubung), dan kunci itu menjadi ID dokumen. Transaksi memeriksa keberadaan dokumen itu **sebelum** memeriksa batas dan jeda — kirim ulang bukan pengiriman baru, jadi tidak boleh ditolak oleh keduanya; yang dikembalikan adalah ucapan yang sudah tersimpan, ditandai `replayed: true`. Kunci direset hanya setelah pengiriman berhasil.
+    Dua penjagaan menyertainya. **Bentuk kunci divalidasi** (`/^[A-Za-z0-9_-]{8,64}$/`) karena ia menjadi ID dokumen Firestore — tanpa itu pemanggil bisa mengirim `../`; kunci yang tidak lolos **dibuang, bukan ditolak**, sehingga pengiriman tetap jalan tanpa jaminan idempotensi. Dan bila dokumen dengan kunci itu ternyata milik **tamu lain**, pengiriman ditolak (`key_taken`) tanpa pernah membaca atau menimpanya — tabrakan UUID praktis mustahil, jadi jalur itu hanya menyala untuk pemanggil yang menebak-nebak ID.
+    Diverifikasi di browser dengan permintaan yang benar-benar dikirim lalu responsnya ditolak ke klien: kirim ulang menghasilkan **tepat 1 dokumen**, bukan 2.
+
+22. **`initialLoadFailed` disimpan sebagai state dan dibersihkan pada setiap pembacaan yang berhasil.** Ditemukan `/code-review`. Sebagai prop yang dibaca langsung saat render, nilainya tidak pernah berubah — sehingga buku tamu yang gagal dibaca di server, lalu berhasil dipulihkan dan memang **kosong** (keadaan normal sebelum ada tamu yang menulis, yaitu tepat setelah undangan disebar) merender **nihil**: tanpa daftar, tanpa empty state, tanpa penjelasan, tanpa perbaikan diri selama halaman itu terbuka. Diverifikasi dengan memaksa kegagalan render server: empty state muncul 0,3 detik setelah seksi terlihat.
+
+23. **Penolakan `limit_reached` sengaja TIDAK menyetel `error`.** Ditemukan `/code-review` — kelas yang sama dengan butir 17, yang saat itu diperbaiki untuk `notice` tetapi terlewat untuk `error`. Menyetelnya berarti merender notice galat di dalam `<form>` yang justru di-unmount pada render yang sama: ia dirender nol kali, **sekaligus mengunci `error` pada nilai non-null selamanya** karena kedua input yang membersihkannya sudah tidak ada — yang seterusnya memblokir blok `notice && !error`. Keterangan jatah yang menggantikan formulir sudah menyampaikan hal yang sama.
+
+24. **Server Action mengembalikan `reason` yang dapat dibaca mesin, bukan hanya teks galat.** Ditemukan `/code-review`. Klien semula menyimpulkan keadaan "jatah habis" dengan **membandingkan teks galat yang sudah dilokalkan** terhadap `guestBookConfig.errorLimitReached` — memaksa dua kunci config tetap identik byte demi byte hanya supaya antarmukanya koheren, dan cacatnya akan diam saja begitu salah satu teks disunting mempelai.
+
+25. **Halaman pertama Buku Tamu tidak dibaca untuk kunjungan bot.** Ditemukan `/code-review`. Perayap pratinjau WhatsApp mengambil `/[guestSlug]` setiap kali link diteruskan di chat, dan ia tidak pernah merender daftar ucapan — jadi setiap penerusan link membayar ~11 pembacaan Firestore untuk sesuatu yang tidak dilihat siapa pun. Berkas ini sudah memisahkan bot untuk keperluan metrik (PRD §4.5); pembacaannya sekarang ikut digerbangi `if (!isBot)`. Diverifikasi: HTML untuk user-agent WhatsApp tidak memuat penanda ucapan sama sekali, HTML untuk user-agent iPhone memuatnya.
+
+26. **`maxPollWindow` dinaikkan ke 100 dan diukur terhadap baris yang benar-benar tampil.** Ditemukan `/code-review`. Ambang semula 60 dan dibandingkan terhadap jumlah yang **diminta** — angka yang dinaikkan `handleLoadMore` (+10 per klik) maupun `handleSubmit` (+1 per ucapan). Akibatnya tamu yang menekan muat-lebih lima kali (60 baris) lalu mengirim satu ucapan mendarat di 61 dan **kehilangan pembaruan real-time PRD §4.4 untuk sisa sesinya**, tanpa jalan pulih selain memuat ulang halaman. Sekarang ambangnya diukur terhadap baris yang tampil (permintaan bisa jauh melebihi data yang ada), dan 100 cukup jauh dari batas klik sehingga jatah kirim 3 tidak mungkin menjatuhkannya.
+
+**Alasan:**
+Memenuhi seluruh baris PRD §4.4 (moderasi tidak ada, pembaruan real-time, kontrol sembunyi admin, panjang pesan dibatasi, maks 3 ucapan per tamu, jeda minimum antar pengiriman, atribusi nama, urutan terbaru di atas dengan paginasi) tanpa membalik keputusan terkunci "akses basis data hanya dari server", dan tanpa menambah dependensi.
+
+**Ditolak:**
+1. Firebase Web SDK + `onSnapshot` di klien (lihat butir 1).
+2. Cursor `startAfter` untuk paginasi (lihat butir 3).
+3. Menyeed 3 ucapan contoh mockup ke Firestore sebagai ucapan asli (lihat butir 8).
+4. Menerima ucapan anonim dari rute `/` (lihat butir 9).
+5. Indeks gabungan `(guestId, createdAt)` untuk mencari ucapan terakhir (lihat butir 5).
+6. Menghitung ulang jatah tamu saat render halaman `/[guestSlug]` (lihat butir 13).
+7. Satu angka penjepit untuk melayani dua tujuan berbeda — pertahanan terhadap pemanggil bermusuhan dan penghematan biaya penyegaran (lihat butir 3). Itulah akar cacat paginasi yang paling serius di sesi ini.
+8. Menyimpulkan keadaan antarmuka dengan membandingkan teks galat yang sudah dilokalkan (lihat butir 24).
+9. Menambahkan kalimat "cek daftar di bawah" pada pesan galat sebagai pengganti idempotensi. Itu memindahkan beban memverifikasi ke tamu, dan tetap membiarkan duplikatnya terjadi (lihat butir 21).
+
+**Diketahui, sengaja tidak dikerjakan sesi ini:**
+- Penyembunyian admin pada halaman yang **melewati** jumlah yang sedang ditampilkan tidak ikut tersegarkan sampai tamu menekan "Muat Ucapan Lainnya" lagi. Penyegaran selalu mengambil sebanyak yang sedang ditampilkan, jadi yang di luar itu tidak terpantau.
+- Penyegaran berhenti sama sekali di atas `maxPollWindow` (60 ucapan tampil). Tamu yang sudah menekan "Muat Ucapan Lainnya" enam kali tidak lagi menerima ucapan baru sampai ia menekannya lagi atau memuat ulang halaman.
+- Jatah tamu tidak diketahui saat halaman dimuat, jadi keadaan "jatah habis" hilang setiap muat ulang dan formulir muncul kembali. Penolakan servernya tetap benar; yang hilang hanya pencegahan dininya (lihat butir 13).
+- Pesan jeda tidak menyebut sisa detiknya, padahal `retryAfterSeconds` sudah dihitung di lapisan data. Menampilkan angka yang menghitung turun berarti menambah timer di komponen untuk kasus yang jarang.
+- Panel moderasi admin (`toggleMessageVisibility` dan `getAllMessagesForAdmin` sudah ada dan teruji) belum punya antarmuka — itu pekerjaan sesi admin panel.
+
+---
+
+## Favicon & App Icon: Penggunaan Monogram Emas Alwi & Septy
+
+**Keputusan:**
+1. **Penggantian Favicon Default:** Mengganti favicon default Next.js dengan monogram resmi Alwi & Septy varian emas (`public/logo/monogram-gold.png`).
+2. **Multi-Resolusi & Format:**
+   - `app/favicon.ico`: ICO multi-frame (16×16, 32×32, 48×48, 64×64, 128×128, 256×256) berlatar transparan untuk kompatibilitas browser klasik dan fallback request `/favicon.ico`.
+   - `app/icon.png`: Master PNG 512×512 berlatar transparan untuk tab browser modern dan tampilan layar retina/HiDPI.
+   - `app/apple-icon.png`: Format PNG 180×180 dengan latar belakang espresso (`#1E1815`) agar terhindar dari perilaku default iOS yang mengisi transparansi dengan warna hitam pekat saat disimpan ke Home Screen / Bookmark.
+3. **Konvensi File-Based Metadata:** Menggunakan konvensi bawaan Next.js App Router (`app/favicon.ico`, `app/icon.png`, `app/apple-icon.png`) sehingga secara otomatis menghasilkan tag `<link rel="icon">` dan `<link rel="apple-touch-icon">` dengan hash statis di seluruh rute tanpa perlu konfigurasi manual.
+
+**Alasan:**
+Menyelaraskan identitas visual tab browser dengan branding undangan digital Alwi & Septy, memberikan impresi pertama yang konsisten dan elegan saat tautan dibuka di perangkat mobile maupun desktop.
+
