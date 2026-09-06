@@ -75,7 +75,7 @@ export default function WhatsAppModal({ guest, origin, onClose }: Props) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl border border-[#E5D8C5] bg-[#FDFBF7] shadow-2xl"
+        className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[#E5D8C5] bg-[#FDFBF7] shadow-2xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#E5D8C5] px-6 py-5">
@@ -146,7 +146,7 @@ export default function WhatsAppModal({ guest, origin, onClose }: Props) {
         </div>
 
         {/* Footer Tombol Aksi */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E5D8C5] bg-[#FDFBF7] px-6 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E5D8C5] bg-[#FDFBF7] px-6 py-4 rounded-b-2xl">
           <button
             onClick={() => handleCopy(guestLink, 'link')}
             className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#FAF6F0]"

@@ -27,10 +27,12 @@ Fokus berikutnya:
     - Memperbaiki ukuran tombol WhatsApp agar seragam presisi `h-8` (32px) dengan tombol salin link, edit, dan hapus (`h-8 w-8`).
     - Menukar posisi email admin dan tombol "Lihat Undangan Publik" di header navigasi sesuai hierarki konteks akun.
     - Mengubah timestamp buka sampul dan detail `+1 Pendamping` menjadi floating tooltip elegan di atas chip (lengkap dengan panah pointer dan fallback aksesibilitas `title`), sehingga baris tabel tetap satu baris rapi dan bebas dari teks menggantung di bawah chip.
-  - **Perbaikan Interaksi Modal & Penyederhanaan Form Tamu**:
+  - **Perbaikan Interaksi & Tampilan Seluruh Dialog Modal (`components/admin/*-modal.tsx`)**:
+    - Memperbaiki padding interior modal form tamu yang sebelumnya hilang, merestorasi `p-6 space-y-5` pada `<form>` dan `px-6 py-5` pada header dengan pemisah garis elegan.
+    - Memperbaiki sudut bawah seluruh dialog modal (`WhatsAppModal`, `ImportCsvModal`, `GuestFormModal`, `DeleteGuestModal`) yang sebelumnya kotak/pecah dengan membungkus container utama dalam `rounded-2xl overflow-hidden` dan menambahkan `rounded-b-2xl` pada bilah aksi footer, sehingga lengkungan kartu tetap halus dan presisi.
     - Menghapus kotak opsi pembaruan slug URL pada modal edit tamu yang membingungkan; slug link tamu kini dipertahankan permanen dan aman tanpa membebani pengguna dengan detail teknis.
-    - Menambahkan interaksi penutupan dialog saat pengguna mengeklik area latar belakang luar (*click outside backdrop*) serta dukungan tombol keyboard `Escape` di seluruh 4 modal admin (Form Tamu, Generator WhatsApp, Hapus Tamu, dan Impor CSV).
-  - **Verifikasi**: Lolos 14/14 unit test (`bun test tests/guest-management.test.ts`), `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, serta verifikasi visual interaktif melalui Chrome DevTools MCP (pengujian desktop, hover state tooltip, click outside & Escape close modal).
+    - Menambahkan interaksi penutupan dialog saat pengguna mengeklik area latar belakang luar (*click outside backdrop*) serta dukungan tombol keyboard `Escape` di seluruh 4 modal admin.
+  - **Verifikasi**: Lolos 14/14 unit test (`bun test tests/guest-management.test.ts`), `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, serta verifikasi visual interaktif melalui Chrome DevTools MCP (pengujian desktop & mobile, inspeksi visual seluruh modal: Form Tamu, Generator WhatsApp, Hapus Tamu, dan CSV Impor, pengujian click outside & Escape close modal).
 
 - **Admin Panel Bagian 2 — Manajemen Tamu Lengkap, Generator WhatsApp, Impor CSV & Ekspor** (7 Sep 2026):
   - **Tabel Tamu Responsif**: Menampilkan daftar tamu lengkap dengan nama, sapaan, kategori grup, status buka (frekuensi & waktu buka), deteksi penerusan link via hash perangkat unik (`uniqueDevices > 1`), status RSVP (Hadir + pendamping, Tidak Hadir, Belum Respons), serta catatan/kebutuhan khusus.

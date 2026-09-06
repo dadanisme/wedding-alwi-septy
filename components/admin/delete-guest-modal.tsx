@@ -58,7 +58,7 @@ export default function DeleteGuestModal({ guest, isOpen, onClose, onDelete }: P
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-md rounded-2xl border border-rose-200 bg-[#FDFBF7] p-6 shadow-2xl"
+        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-rose-200 bg-[#FDFBF7] p-6 shadow-2xl"
       >
         <div className="flex items-center gap-3 text-rose-700">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-700">

@@ -136,9 +136,9 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex max-h-[90vh] w-full max-w-lg flex-col rounded-2xl border border-[#E5D8C5] bg-[#FDFBF7] shadow-2xl"
+        className="relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[#E5D8C5] bg-[#FDFBF7] shadow-2xl"
       >
-        <div className="flex items-center justify-between border-b border-[#E5D8C5] p-6 pb-4">
+        <div className="flex items-center justify-between border-b border-[#E5D8C5] px-6 py-5">
           <h3 className="font-display text-2xl font-bold text-ink">
             {isEdit ? 'Edit Data Tamu' : 'Tambah Tamu Baru'}
           </h3>
@@ -151,13 +151,12 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
           </button>
         </div>
 
-        {error && (
-          <div className="mt-4 rounded-xl border border-rose-300 bg-rose-50 p-3 text-sm text-rose-900">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
+          {error && (
+            <div className="rounded-xl border border-rose-300 bg-rose-50 p-3 text-sm text-rose-900">
+              {error}
+            </div>
+          )}
           {/* Sapaan */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-ink-soft">
