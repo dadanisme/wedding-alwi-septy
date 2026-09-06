@@ -1,8 +1,4 @@
-import { Acara } from "@/components/sections/acara";
-import { Ayat } from "@/components/sections/ayat";
-import { Galeri } from "@/components/sections/galeri";
-import { Pembuka } from "@/components/sections/pembuka";
-import { Sampul } from "@/components/sections/sampul";
+import { InvitationExperience } from "@/components/invitation-experience";
 
 export default function Home() {
   return (
@@ -25,13 +21,7 @@ export default function Home() {
         />
       </div>
 
-      <main className="relative mx-auto min-h-dvh w-full max-w-page overflow-x-clip bg-cream shadow-page">
-        <Sampul guestName="Bapak/Ibu Budi Santoso" />
-        <Ayat />
-        <Pembuka />
-        <Galeri />
-        <Acara />
-      </main>
+      <InvitationExperience guestName="Bapak/Ibu Budi Santoso" />
     </>
   );
 }

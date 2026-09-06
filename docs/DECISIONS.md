@@ -322,3 +322,21 @@ Memberikan kejelasan waktu dan navigasi lokasi tanpa redundansi bagi tamu undang
 2. Menggunakan hanya link Google Calendar tanpa file `.ics` (menyulitkan pengguna iOS/Apple Calendar yang tidak memasang Google Calendar).
 3. Hanya tombol tautan tanpa peta embed langsung (kurang informatif sebelum tamu memutuskan membuka aplikasi navigasi luar).
 
+---
+
+## Interaksi "Buka Undangan": Kunci Scroll, Smooth-Scroll ke Seksi Ayat, dan Pemutar Musik Latar
+
+**Keputusan:**
+1. **Gerbang Sampul:** Halaman undangan awalnya mengunci scroll (`overflow: hidden` pada html & body, serta `<main>` dengan `h-dvh overflow-hidden`), sehingga tamu tidak bisa menggulir melewati Sampul sebelum menekan tombol "Buka Undangan" (PRD §4.2).
+2. **Transisi Pembukaan:** Saat tombol "Buka Undangan" ditekan, kunci scroll dilepas (`overflow: visible/normal`), lalu halaman melakukan `smooth-scroll` ke seksi Ayat (`#ayat`). Sampul tetap bertahan di bagian atas sebagai seksi 1 dengan transisi wave ganda ke seksi Ayat.
+3. **Musik Latar:** Berkas audio gamelan Sunda Sabilulungan (`/audio/sabilulungan.mp3`) dimuat dengan `preload="none"` (tidak diunduh saat muat awal halaman untuk menjaga performa koneksi 4G, PRD §7.1). Pemutaran dipicu langsung oleh gestur klik pengguna pada tombol "Buka Undangan" sehingga diizinkan oleh kebijakan autoplay browser (termasuk iOS Safari).
+4. **Tombol Kontrol Mengambang (Floating Music Button):** Muncul mengambang di kanan bawah (`bottom-5 right-5` pada ponsel, `bottom-8 right-8` pada desktop, dan terkunci rapi di dalam container `max-w-page` pada ultrawide >1440px via `min-[1441px]:right-[calc((100vw-1440px)/2+2rem)]`). Tombol berbentuk lingkaran bernuansa gelap-emas (`bg-espresso/85`, border `border-gold-bright/70`) dengan ikon speaker universal (gelombang suara saat memutar, garis silang saat jeda/mati), memenuhi standar aksesibilitas WCAG dan PRD §7.3.
+
+**Alasan:**
+Menopang tiga fungsi utama gerbang sampul sesuai PRD §4.2 (momen pembukaan personal, izin pemutaran audio di browser, penyaringan bot preview pesan). Pilihan mempertahankan Sampul di atas dengan smooth-scroll (bukan overlay yang menghilang) menjaga keutuhan transisi visual wave ganda ke seksi Ayat dan memungkinkan tamu melihat kembali nama mereka kapan saja dengan scroll ke atas.
+
+**Ditolak:**
+1. Sampul sebagai modal/overlay fullscreen yang di-unmount/slide-up menghilang (menghilangkan transisi pembatas wave emas ganda ke seksi Ayat yang sudah diapprove klien).
+2. Preload audio saat page load (membebani kuota dan memperlambat LCP/FCP di jaringan 4G seluler).
+3. Ikon musik berbentuk piringan hitam tanpa indikator status yang jelas (kurang ramah bagi tamu kerabat orang tua dibandingkan ikon speaker standar).
+

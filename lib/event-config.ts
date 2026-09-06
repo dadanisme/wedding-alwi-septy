@@ -28,6 +28,19 @@ export const eventSchedule = {
   rsvpSuggestedDeadline: "2026-09-26",
 } as const;
 
+export const rsvpConfig = {
+  suggestedDeadline: "2026-09-26",
+  suggestedDeadlineLabel: "26 September 2026",
+  promptBeforeDeadline: "Mohon konfirmasi kehadiran sebelum 26 September 2026.",
+  promptAfterDeadline:
+    "Batas anjuran konfirmasi telah terlewat, mohon segera konfirmasi kehadiran Anda.",
+  successTitle: "Terima kasih atas konfirmasinya",
+  successAttending: "Kami menantikan kehadiran Anda.",
+  successNotAttending: "Terima kasih atas konfirmasi dan doa restunya.",
+  editButtonLabel: "Ubah Konfirmasi",
+} as const;
+
+
 export const venue = {
   name: "Steikhaus (Area Pabrik Bajoe)",
   nameOnly: "Steikhaus",
@@ -49,6 +62,16 @@ export const monogram = {
   white: "/logo/monogram-white.png",
   black: "/logo/monogram-black.png",
   gold: "/logo/monogram-gold.png",
+} as const;
+
+/**
+ * Musik latar undangan — lagu gamelan Sunda Sabilulungan.
+ * Dipicu oleh tombol "Buka Undangan" di layar sampul (PRD §4.2 & §7.1).
+ */
+export const backgroundMusic = {
+  title: "Sabilulungan",
+  subtitle: "Sundanese Gamelan",
+  src: "/audio/sabilulungan.mp3",
 } as const;
 
 /**

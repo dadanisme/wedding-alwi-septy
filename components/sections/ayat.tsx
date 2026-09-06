@@ -7,7 +7,7 @@ import { openingVerse } from "@/lib/event-config";
  */
 export function Ayat() {
   return (
-    <section className="relative overflow-hidden bg-cream">
+    <section id="ayat" className="relative overflow-hidden bg-cream scroll-mt-0">
       <svg
         className="absolute inset-0 h-full w-full opacity-[0.13] lg:opacity-[0.12]"
         aria-hidden="true"

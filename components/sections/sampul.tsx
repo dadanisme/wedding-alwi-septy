@@ -7,13 +7,15 @@ import { coverPhotos, monogram } from "@/lib/event-config";
  * Produk. Diporting dari mockup yang diapprove: ponsel memakai satu foto
  * potret penuh, desktop membelahnya jadi dua panel (modern + adat Sunda).
  *
- * Tombol "Buka Undangan" belum fungsional — reveal konten & pemicu musik
- * menyusul setelah seksi lain & pilihan musik latar tersedia.
+ * Tombol "Buka Undangan" memicu onOpen (membuka kunci scroll, smooth scroll
+ * ke seksi Ayat, dan memutar musik latar).
  */
 export function Sampul({
   guestName = "Bapak/Ibu/Saudara/i",
+  onOpen,
 }: {
   guestName?: string;
+  onOpen?: () => void;
 }) {
   return (
     <section className="relative min-h-dvh overflow-hidden bg-espresso">
@@ -136,7 +138,8 @@ export function Sampul({
           </div>
           <button
             type="button"
-            className="border-gold-bright bg-espresso/34 text-on-photo hover:bg-gold-deep hover:border-gold-deep border px-[30px] py-[15px] text-[10px] font-semibold tracking-[0.34em] indent-[0.34em] uppercase transition-colors duration-[350ms] lg:px-[42px] lg:py-[18px] lg:text-[11px] lg:tracking-[0.38em] lg:indent-[0.38em]"
+            onClick={onOpen}
+            className="border-gold-bright bg-espresso/34 text-on-photo hover:bg-gold-deep hover:border-gold-deep cursor-pointer border px-[30px] py-[15px] text-[10px] font-semibold tracking-[0.34em] indent-[0.34em] uppercase transition-colors duration-[350ms] lg:px-[42px] lg:py-[18px] lg:text-[11px] lg:tracking-[0.38em] lg:indent-[0.38em]"
           >
             Buka Undangan
           </button>
