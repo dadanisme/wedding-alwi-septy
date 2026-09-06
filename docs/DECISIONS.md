@@ -202,3 +202,23 @@ Pengendaliannya bersifat pengamatan. RSVP masuk bertahap selama enam minggu, jad
 **Alasan:** design system yang dikunci sebelumnya eksplisit hanya mencakup palet warna dan skala tipografi (lihat "Design system dikunci lewat token CSS" di atas) — spacing sengaja tidak masuk cakupan itu. Ini konsisten dengan keputusan "dua breakpoint tetap, bukan `clamp()` fluida": tiap seksi punya geometri piksel sendiri sesuai mockup, jadi token spacing generik justru bisa menyembunyikan bahwa dua seksi kebetulan mirip padahal didesain independen.
 
 **Batasan:** kalau sebuah nilai (padding, gap, ukuran ikon, dll.) ternyata dipakai identik di ≥2 seksi setelah beberapa seksi diimplementasikan, nilai itu harus diangkat jadi utility bersama di `app/globals.css` saat itu — bukan didiamkan sebagai duplikasi. Warna dan skala tipografi tetap wajib pakai token yang sudah ada, tanpa pengecualian.
+
+---
+
+## Seksi Pembuka: foto beda per breakpoint, bukan satu foto di-crop ulang
+
+**Keputusan:** latar seksi Pembuka memakai 2 foto adat Sunda yang berbeda — `adat-sunda-03.jpg` (potret) untuk ponsel, `adat-sunda-04.jpg` (lanskap asli) untuk desktop — bukan satu foto yang sama di-crop ulang ke dua rasio seperti pola Sampul.
+
+**Alasan:** mockup seksi Pembuka secara eksplisit minta foto lanskap PENUH untuk desktop (beda dari Sampul yang dulunya minta lanskap tapi akhirnya dipecah jadi 2 panel potret karena semua foto klien saat itu potret). Untuk Pembuka, ternyata ada beberapa foto di antara 21 foto klien yang orientasinya memang lanskap asli (adat-sunda-04 s/d 09, ~1.5:1), jadi tidak perlu kompromi tata letak seperti Sampul — cukup pilih foto yang aspeknya sudah cocok. Foto dipilih dari tinjau visual: `adat-sunda-03` (potret, komposisi jelas, cukup gelap secara alami sehingga scrim tidak perlu terlalu pekat) untuk ponsel; `adat-sunda-04` (busana akad formal simetris, latar tidak ramai) untuk desktop.
+
+**Konsekuensi:** `openingPhotos` di `lib/event-config.ts` punya key `portrait`/`landscape`, beda bentuk dari `coverPhotos` (`modern`/`adatSunda`) milik Sampul — sengaja tidak disatukan karena mewakili keputusan desain yang berbeda (foto identik lintas breakpoint vs foto berbeda per orientasi).
+
+**Ditolak:** memaksa satu foto potret di-object-cover ke kontainer lanskap 1280×660 desktop (akan memotong komposisi terlalu agresif, beda dengan kasus Sampul yang memang tidak punya pilihan foto lanskap sama sekali).
+
+---
+
+## Seksi Pembuka: `min-h` bukan `h` tetap untuk kontainer foto+teks
+
+**Keputusan:** kontainer seksi Pembuka pakai `min-h-[620px] lg:min-h-[660px]`, bukan `h-[620px] lg:h-[660px]` seperti angka literal di mockup.
+
+**Alasan:** ditemukan saat `/code-review` — tinggi tetap + `overflow-hidden` + konten teks yang di-bottom-align (`justify-end`) berarti kalau `openingGreeting` di `lib/event-config.ts` suatu saat direvisi jadi lebih panjang, teks bisa terpotong diam-diam dari atas tanpa error atau scrollbar. `min-h` menjaga tampilan saat ini identik (konten sudah pas di 620/660px) tapi memberi ruang tumbuh kalau kalimatnya berubah, tanpa mengubah posisi wave/sulur yang memang sudah di-anchor ke tepi (`top-[-1px]`/`bottom-0`), jadi aman untuk kontainer yang tingginya jadi dinamis.

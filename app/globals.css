@@ -192,3 +192,59 @@ body {
     color-mix(in srgb, var(--color-espresso) 86%, transparent) 100%
   );
 }
+
+/*
+ * Scrim gelap di atas foto latar seksi Pembuka — pola sama dengan
+ * bg-cover-scrim (Sampul), tapi stop gradasi ditranskrip terpisah dari
+ * mockup (seksi Pembuka ponsel/desktop), jadi bukan utility yang sama.
+ */
+@utility bg-pembuka-scrim {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-espresso) 24%, transparent) 0%,
+    color-mix(in srgb, var(--color-espresso) 10%, transparent) 34%,
+    color-mix(in srgb, var(--color-espresso) 72%, transparent) 74%,
+    color-mix(in srgb, var(--color-espresso) 94%, transparent) 100%
+  );
+}
+@utility bg-pembuka-scrim-lg {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-espresso) 28%, transparent) 0%,
+    color-mix(in srgb, var(--color-espresso) 8%, transparent) 30%,
+    color-mix(in srgb, var(--color-espresso) 66%, transparent) 70%,
+    color-mix(in srgb, var(--color-espresso) 94%, transparent) 100%
+  );
+}
+
+/*
+ * Kalimat salam pembuka ("Assalamu'alaikum...") — ditemukan saat
+ * implementasi seksi Pembuka, bukan di tabel skala awal. Nilai ditranskrip
+ * langsung dari mockup (seksi Pembuka ponsel/desktop), bukan ditebak.
+ */
+@utility text-pembuka-greeting {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.55;
+}
+@utility text-pembuka-greeting-lg {
+  font-size: 32px;
+  line-height: 1.4;
+}
+
+/*
+ * Paragraf pengantar seksi Pembuka — sedikit lebih kecil dari text-body di
+ * ponsel (15px vs 16px), ditemukan saat implementasi seksi Pembuka. Nilai
+ * ditranskrip langsung dari mockup (seksi Pembuka ponsel/desktop).
+ */
+@utility text-pembuka {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.85;
+}
+@utility text-pembuka-lg {
+  font-size: 18px;
+  line-height: 1.95;
+}

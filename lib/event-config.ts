@@ -66,3 +66,26 @@ export const openingVerse = {
   translation:
     "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sungguh, pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.",
 } as const;
+
+/**
+ * Salam & kalimat pengantar untuk seksi Pembuka. Tidak ada di PRD (PRD §4.2
+ * hanya menyebut "Salam dan kalimat pengantar") — ditranskrip dari mockup
+ * yang diapprove (docs/mockup/Undangan Alwi & Septy.html, seksi 3).
+ */
+export const openingGreeting = {
+  bismillah: "Bismillahirrahmanirrahim",
+  salutation: "Assalamu'alaikum Warahmatullahi Wabarakatuh",
+  body: "Dengan penuh rasa syukur atas rahmat Allah Subhanahu wa Ta'ala, kami bermaksud menyelenggarakan pernikahan putra dan putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.",
+} as const;
+
+/**
+ * Foto latar seksi Pembuka — beda dari coverPhotos (Sampul): mockup minta
+ * foto potret untuk ponsel dan foto lanskap PENUH untuk desktop (bukan foto
+ * potret yang sama di-crop lebar). Dua di antara 21 foto klien memang
+ * berorientasi lanskap asli, jadi dipilih foto berbeda per breakpoint,
+ * bukan satu foto yang dipaksa cocok ke dua rasio. Lihat docs/DECISIONS.md.
+ */
+export const openingPhotos = {
+  portrait: "/photos/adat-sunda-03.jpg",
+  landscape: "/photos/adat-sunda-04.jpg",
+} as const;
