@@ -372,8 +372,22 @@ Menyediakan pengalaman konfirmasi yang ramah, sopan, dan minim hambatan bagi tam
 **Alasan:**
 Menyelaraskan ketentuan PRD §4.4 dengan desain mockup visual yang telah disetujui klien, sekaligus memberi kebebasan tamu untuk memperjelas nama mereka tanpa kehilangan kemudahan atribusi otomatis.
 
+
+---
+
+## Seksi Hadiah: Tanda Kasih Statis, Salin Nomor Rekening, dan Umpan Balik Visual
+
+**Keputusan:**
+1. **Penyajian Statis:** Menampilkan nomor rekening bank digital Blu (BCA Digital) a.n. Septyara Khotimaharani (`giftConfig.account` di `lib/event-config.ts`) secara statis dengan nada santun yang tidak menonjol ("Kehadiran dan doa Anda sudah lebih dari cukup. Bila ingin mengirim tanda kasih, kami sediakan kanal berikut.") sesuai PRD §4.8.
+2. **Aksi Salin Nomor & Umpan Balik:** Tombol "Salin nomor" menyalin nomor rekening ke clipboard (`navigator.clipboard.writeText`) dengan fallback `textarea` seleksi otomatis untuk kompatibilitas lintas peramban/izin. Saat berhasil, teks tombol berubah menjadi "Nomor tersalin" (`aria-live="polite"`) selama 2,2 detik (2200ms) sebelum kembali ke kondisi semula.
+3. **Tipografi & Desain:** Ditranskrip persis dari mockup yang diapprove (`docs/mockup/Undangan Alwi & Septy.html`, seksi 10). Latar krem gading `#F7EFE1` (`bg-cream`) menyambung secara serasi setelah seksi Buku Tamu, dihiasi ornamen atas `#orn` (110×16px di ponsel, 160×20px di desktop), nomor rekening berfont Cormorant Garamond besar (`text-hadiah-account` 24px/34px), serta bingkai kartu atas-bawah dengan garis emas `border-gold-bright/55`.
+4. **Batas Cakupan:** Tidak ada mekanisme amplop digital, pencatatan transaksi, atau input nominal (PRD §4.8 & §10).
+
+**Alasan:**
+Menyediakan fasilitas praktis bagi tamu yang berhalangan hadir atau ingin memberi tanda kasih tanpa menambah kerumitan alur UX maupun beban jadwal teknis.
+
 **Ditolak:**
-1. Mengunci nama tamu secara kaku (read-only) tanpa opsi penyesuaian (ditolak via konfirmasi user agar tamu bebas menyertakan sapaan akrab atau pasangan/keluarga).
-2. Membiarkan input nama kosong tanpa default (memaksa tamu mengetik ulang nama yang sebenarnya sudah diketahui dari link personal).
+1. Fitur pencatatan amplop digital atau konfirmasi transfer (ditolak di PRD §4.8 & §10 karena membebani jadwal dan menambah gesekan bagi tamu).
+2. Tampilan nomor rekening yang mencolok atau bernada menuntut (ditolak di PRD §4.8).
 
 

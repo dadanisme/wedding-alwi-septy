@@ -506,3 +506,79 @@ body {
   line-height: 1.8;
 }
 
+/*
+ * Seksi Hadiah — ditranskrip persis dari mockup yang disetujui
+ * (Undangan Alwi & Septy.html, seksi 10).
+ */
+@utility text-hadiah-title {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+}
+@utility text-hadiah-title-lg {
+  font-size: 13px;
+  letter-spacing: 0.48em;
+}
+
+@utility text-hadiah-desc {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.8;
+}
+@utility text-hadiah-desc-lg {
+  font-size: 18px;
+  line-height: 1.9;
+}
+
+@utility text-hadiah-bank {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+@utility text-hadiah-bank-lg {
+  font-size: 10px;
+  letter-spacing: 0.36em;
+}
+
+@utility text-hadiah-account {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+}
+@utility text-hadiah-account-lg {
+  font-size: 34px;
+  letter-spacing: 0.12em;
+}
+
+@utility text-hadiah-holder {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 1.5;
+}
+@utility text-hadiah-holder-lg {
+  font-size: 16px;
+}
+
+@utility text-hadiah-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+@utility text-hadiah-btn-lg {
+  font-size: 10px;
+  letter-spacing: 0.34em;
+}
+

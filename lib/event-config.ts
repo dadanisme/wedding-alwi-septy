@@ -52,11 +52,23 @@ export const venue = {
     "https://maps.google.com/maps?q=Steikhaus%20Pabrik%20Bajoe%20Bandung&z=16&output=embed",
 } as const;
 
-export const giftAccount = {
-  bank: "Blu (BCA Digital)",
-  accountNumber: "005516270903",
-  accountName: "Septyara Khotimaharani",
+export const giftConfig = {
+  title: "Hadiah",
+  description:
+    "Kehadiran dan doa Anda sudah lebih dari cukup. Bila ingin mengirim tanda kasih, kami sediakan kanal berikut.",
+  account: {
+    bank: "Blu (BCA Digital)",
+    bankDisplay: "Blu · BCA Digital",
+    accountNumber: "005516270903",
+    accountName: "Septyara Khotimaharani",
+    accountHolderDisplay: "a.n. Septyara Khotimaharani",
+  },
+  copyButtonLabel: "Salin nomor",
+  copiedButtonLabel: "Nomor tersalin",
+  feedbackDurationMs: 2200,
 } as const;
+
+export const giftAccount = giftConfig.account;
 
 export const monogram = {
   white: "/logo/monogram-white.png",
