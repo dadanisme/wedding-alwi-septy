@@ -128,6 +128,39 @@ body {
 }
 
 /*
+ * Judul kutipan ayat (mis. "Q.S. Ar-Rum : 21") — ditemukan saat implementasi
+ * seksi Ayat, bukan di tabel skala awal. Nilai ditranskrip langsung dari
+ * mockup (seksi Ayat ponsel/desktop), bukan ditebak.
+ */
+@utility text-ayat-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 27px;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+@utility text-ayat-title-lg {
+  font-size: 40px;
+  line-height: 1.15;
+}
+
+/*
+ * Teks kutipan ayat — sedikit lebih lega dari teks-isi generik (text-body),
+ * ditemukan saat implementasi seksi Ayat. Nilai ditranskrip langsung dari
+ * mockup (seksi Ayat ponsel/desktop), bukan ditebak.
+ */
+@utility text-ayat {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.9;
+}
+@utility text-ayat-lg {
+  font-size: 19px;
+  line-height: 2.05;
+}
+
+/*
  * Scrim gelap di atas foto sampul supaya teks & tombol tetap terbaca.
  * Ditranskrip dari mockup (seksi Sampul ponsel/desktop). Pakai color-mix()
  * dengan token --color-espresso, bukan hex mentah, supaya tetap terikat

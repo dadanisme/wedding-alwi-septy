@@ -55,3 +55,14 @@ export const coverPhotos = {
   modern: "/photos/modern-01.jpg",
   adatSunda: "/photos/adat-sunda-02.jpg",
 } as const;
+
+/**
+ * Ayat Al-Qur'an untuk seksi Ayat. Tidak ada di PRD — ditranskrip dari
+ * mockup yang diapprove (docs/mockup/Undangan Alwi & Septy.html, seksi 2).
+ * Mockup hanya menyertakan terjemahan, tanpa teks Arab.
+ */
+export const openingVerse = {
+  reference: "Q.S. Ar-Rum : 21",
+  translation:
+    "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sungguh, pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.",
+} as const;

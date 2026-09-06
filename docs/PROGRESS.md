@@ -6,7 +6,7 @@ Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.
 
 ## Sedang Dikerjakan
 
-Seksi **Sampul** sudah diimplementasikan (`components/sections/sampul.tsx`, dirender di `/`) dan lolos code review. **Belum diverifikasi manusia di ponsel asli** — jangan tandai selesai sepenuhnya sampai itu terjadi (lihat CLAUDE.md § Protokol Sesi).
+Seksi **Sampul** dan **Ayat** sudah diimplementasikan (`components/sections/sampul.tsx`, `components/sections/ayat.tsx`, dirender di `/`) dan lolos code review. **Belum diverifikasi manusia di ponsel asli** — jangan tandai selesai sepenuhnya sampai itu terjadi (lihat CLAUDE.md § Protokol Sesi).
 
 Foto prewedding asli dari klien sudah masuk (`public/photos/`, 21 foto) — lihat "Selesai". Ini membuka blocker Sampul & Galeri, tapi **Mempelai** dan **Love Story** masih terkunci (lihat Terkunci) karena kebutuhannya beda: Mempelai butuh foto solo (semua 21 foto yang ada berdua), Love Story butuh naskah.
 
@@ -20,7 +20,7 @@ Firebase/Firestore/Auth dan lapisan akses data **belum** dikerjakan — masih di
 - Spesifikasi arah desain (`docs/spesifikasi-arah-desain.md`)
 - Data acara final dari klien: nama, orang tua, jadwal, venue, rekening
 - Arah desain ditentukan klien lewat gambar referensi
-- Mockup desain (`Undangan Alwi & Septy.html`) — diapprove mempelai
+- Mockup desain (`docs/mockup/Undangan Alwi & Septy.html`) — diapprove mempelai. Sebelumnya di Downloads klien, dipindah ke repo 6 Sep supaya tidak perlu dicari ulang
 - Logo/monogram "A&S": 3 varian di Downloads klien (hitam solid, putih transparan, emas solid — semua 1254×1254 PNG, versi terpotong+dikompres di `public/logo/`). Varian putih transparan dipasang di monogram sampul & penutup mockup (ponsel & desktop, 4 titik total). Varian hitam dan emas belum dipakai di komponen — ditampilkan di `/styleguide` untuk referensi.
 - Scaffold Next.js 16 (App Router, Turbopack) + TypeScript + Tailwind v4 + ESLint. `bun run build` dan `bun run lint` bersih.
 - Runtime/package manager diganti dari npm ke Bun (`bun.lock` menggantikan `package-lock.json`). Lihat `docs/DECISIONS.md`.
@@ -30,14 +30,15 @@ Firebase/Firestore/Auth dan lapisan akses data **belum** dikerjakan — masih di
 - **Foto prewedding asli dari klien** (21 foto, `public/photos/`) — di-resize & dikompresi (lihat `docs/DECISIONS.md`), dikategorikan `modern-01..12.jpg` / `adat-sunda-01..09.jpg`. Semua foto berdua, tidak ada solo shot.
 - **Berkas config konten acara** (`lib/event-config.ts`) — data mempelai, jadwal, venue, rekening (dari PRD §2), monogram, dan referensi foto sampul.
 - **Seksi Sampul** (`components/sections/sampul.tsx`, dirender di `/`) — ponsel: 1 foto potret modern full-bleed; desktop: 2 panel potret (modern + adat Sunda). Guest name masih contoh statis ("Bapak/Ibu Budi Santoso") — sistem link/token tamu belum ada. Tombol "Buka Undangan" belum fungsional (reveal konten + trigger musik menyusul). Diverifikasi visual di 390×844 & 1280×900 lewat Chrome DevTools MCP — cocok dengan mockup, tidak ada console error.
-- **Pembatas Wavy di bawah Sampul diperkaya** — symbol `wave` di `components/ornaments.tsx` sekarang punya 2 garis emas paralel (path `#waveLine` dipakai 2× lewat `<use>`, ketebalan & offset beda) alih-alih 1 garis tunggal, supaya transisi ke seksi Ayat tidak terlihat seperti dipotong polos. Diverifikasi di 390px & 1280px, lolos code review. **Referensi klien untuk transisi ini sebenarnya lebih kaya** (sulur pojok foto yang menjuntai melewati wave, flourish kecil, motif damask) — bagian flourish & motif damask itu milik latar seksi Ayat (belum dikerjakan), jadi sengaja tidak dikerjakan sekarang; klien memilih cukup garis ganda dulu.
+- **Pembatas Wavy di bawah Sampul diperkaya** — symbol `wave` di `components/ornaments.tsx` sekarang punya 2 garis emas paralel (path `#waveLine` dipakai 2× lewat `<use>`, ketebalan & offset beda) alih-alih 1 garis tunggal, supaya transisi ke seksi Ayat tidak terlihat seperti dipotong polos. Diverifikasi di 390px & 1280px, lolos code review. **Referensi klien untuk transisi ini sebenarnya lebih kaya** (sulur pojok foto yang menjuntai melewati wave, flourish kecil, motif damask) — bagian flourish & motif damask itu milik latar seksi Ayat, jadi sengaja tidak dikerjakan saat itu; klien memilih cukup garis ganda dulu.
+- **Seksi Ayat** (`components/sections/ayat.tsx`, dirender di `/` setelah Sampul) — kutipan Q.S. Ar-Rum : 21 (terjemahan saja, tanpa teks Arab) di atas latar krem berornamen (damask + sulur 4 sudut di desktop/2 sudut di ponsel + pembatas `orn`). Konten baru di `lib/event-config.ts` (`openingVerse`) — tidak ada di PRD, ditranskrip dari mockup karena PRD memang tidak mencantumkan teks ayat. Dua utility tipografi baru di `app/globals.css` (`text-ayat-title(-lg)`, `text-ayat(-lg)`) ditranskrip persis dari mockup, sedikit beda dari `text-body` generik (lebih lega). Diverifikasi visual di 390×844 & 1280×900, cocok dengan mockup, tidak ada console error baru, lolos code review.
 
 ## Berikutnya
 
-- **Verifikasi manusia**: buka `/` di ponsel asli, bandingkan dengan mockup (lihat CLAUDE.md § Protokol Sesi)
+- **Verifikasi manusia**: buka `/` di ponsel asli, bandingkan dengan mockup (lihat CLAUDE.md § Protokol Sesi) — mencakup Sampul & Ayat
 - Setup project Firebase — Firestore dan Auth
 - Lapisan akses data
-- Implementasi seksi berikutnya satu per satu — kandidat siap: **Galeri** (foto sudah ada, tidak ada blocker konten). Ayat/Pembuka/Detail Acara/RSVP/Buku Tamu/Hadiah/Penutup belum dicek blocker-nya secara spesifik.
+- Implementasi seksi berikutnya satu per satu — kandidat siap: **Galeri** (foto sudah ada) dan **Pembuka** (salam + kalimat pengantar sudah ketemu tertranskrip di mockup yang sama dengan Ayat, lihat `docs/mockup/Undangan Alwi & Septy.html`). Detail Acara/RSVP/Buku Tamu/Hadiah/Penutup belum dicek blocker-nya secara spesifik.
 
 ## Terkunci
 
