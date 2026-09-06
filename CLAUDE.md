@@ -5,6 +5,9 @@ Sabtu, 10 Oktober 2026 · Akad 08.00 WIB · Resepsi 11.00–14.00 WIB · Steikha
 
 Fitur inti: link privat per tamu, pelacakan pembukaan, RSVP dengan opsi pendamping, buku tamu real-time, admin panel.
 
+- **Live URL:** https://wedding-alwi.vercel.app
+- **Repository:** https://github.com/dadanisme/wedding-alwi-septy
+
 Data lengkap mempelai, venue, dan rekening ada di `docs/PRD.md` Bagian 2. Jangan menyalinnya ke dalam komponen — semua lewat berkas config.
 
 ## Status Terkini
@@ -21,7 +24,7 @@ Data lengkap mempelai, venue, dan rekening ada di `docs/PRD.md` Bagian 2. Jangan
 
 ## Stack
 
-Next.js (App Router) · Vercel · Firebase Firestore · Firebase Auth · Tailwind CSS
+Next.js 16 (App Router + Turbopack) · Bun · Vercel · Firebase Firestore · Firebase Auth (REST API) · Tailwind CSS v4
 
 ## Keputusan yang Sudah Dikunci
 
@@ -47,8 +50,10 @@ Alasan lengkap tiap butir ada di `docs/DECISIONS.md`.
 
 **Teknis**
 
-- Seluruh konten acara terpusat di satu berkas config.
+- Seluruh konten acara terpusat di satu berkas config (`config/wedding.ts`).
 - Akses basis data hanya dari server. Klien tidak pernah memegang kredensial baca langsung.
+- Deployment Vercel terhubung ke repository GitHub `dadanisme/wedding-alwi-septy` (branch `main`).
+- Kompatibilitas bundler: `serverExternalPackages: ["firebase-admin"]` di `next.config.ts` dan dependency override `jose@^4.15.9` di `package.json` untuk mencegah `ERR_REQUIRE_ESM` di Vercel.
 
 ## Konvensi
 
@@ -80,4 +85,6 @@ Pemeriksaan visual di ponsel asli dilakukan manusia, bukan agent. Jangan menyata
 
 ## Catatan
 
-Route `/styleguide` **belum ada**. Ia dibuat setelah design system dikunci dari mockup yang disetujui mempelai. Sampai itu terjadi, jangan mencarinya dan jangan mengerjakan implementasi seksi — kerjakan hanya pekerjaan yang tidak bergantung desain.
+- Route `/styleguide` **sudah ada** dan aktif sebagai living documentation untuk token desain visual, palet warna, tipografi, dan logo monogram resmi.
+- Admin Panel berada di `/admin` dengan proteksi autentikasi di `/admin/login`.
+- Seluruh 4 environment variables Firebase disinkronkan di Vercel (Production & Preview) via Secret.
