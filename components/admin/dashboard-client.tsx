@@ -7,6 +7,7 @@ import type { GuestSummaryStats, GuestMessage, Guest } from '../../types/databas
 import { logoutAdminAction } from '../../app/actions/auth';
 import { toggleMessageVisibilityAction } from '../../app/actions/moderation';
 import GuestManagement from './guest-management';
+import { IconUsers, IconMessageSquare, IconSearch, IconX } from './admin-icons';
 
 interface Props {
   initialStats: GuestSummaryStats;
@@ -22,6 +23,7 @@ export default function AdminDashboardClient({
   adminEmail,
 }: Props) {
   const router = useRouter();
+  const [activeMainTab, setActiveMainTab] = useState<'guests' | 'guestbook'>('guests');
   const [guests, setGuests] = useState<Guest[]>(initialGuests);
   const [messages, setMessages] = useState<GuestMessage[]>(initialMessages);
   const [moderationFilter, setModerationFilter] = useState<'all' | 'visible' | 'hidden'>('all');
@@ -387,153 +389,225 @@ export default function AdminDashboardClient({
         </section>
 
         {/* ========================================================================= */}
+        {/* TAB NAVIGASI UTAMA: MANAJEMEN TAMU vs BUKU TAMU */}
+        {/* ========================================================================= */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5D8C5] pb-2">
+          <div className="inline-flex items-center gap-1.5 rounded-2xl bg-[#EFE7D8]/80 p-1.5 border border-[#D5C6B1]/70 shadow-inner">
+            <button
+              onClick={() => setActiveMainTab('guests')}
+              className={`cursor-pointer inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm sm:text-base font-bold transition shadow-xs ${
+                activeMainTab === 'guests'
+                  ? 'bg-white text-gold-deep shadow-sm'
+                  : 'text-ink-soft hover:text-ink hover:bg-white/40'
+              }`}
+            >
+              <IconUsers size={18} />
+              <span>Manajemen Tamu</span>
+              <span
+                className={`ml-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                  activeMainTab === 'guests'
+                    ? 'bg-gold-deep/15 text-gold-deep'
+                    : 'bg-[#FAF6F0] text-ink-soft'
+                }`}
+              >
+                {guests.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveMainTab('guestbook')}
+              className={`cursor-pointer inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm sm:text-base font-bold transition shadow-xs ${
+                activeMainTab === 'guestbook'
+                  ? 'bg-white text-gold-deep shadow-sm'
+                  : 'text-ink-soft hover:text-ink hover:bg-white/40'
+              }`}
+            >
+              <IconMessageSquare size={18} />
+              <span>Buku Tamu &amp; Moderasi</span>
+              <span
+                className={`ml-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                  activeMainTab === 'guestbook'
+                    ? 'bg-gold-deep/15 text-gold-deep'
+                    : 'bg-[#FAF6F0] text-ink-soft'
+                }`}
+              >
+                {messages.length}
+              </span>
+            </button>
+          </div>
+
+          <div className="text-xs sm:text-sm text-ink-soft font-medium">
+            {activeMainTab === 'guests'
+              ? 'Kelola tautan personal tamu, generator WhatsApp, & ekspor katering'
+              : 'Pantau pesan ucapan tamu & moderasi visibilitas real-time'}
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
         {/* 3. MODUL MANAJEMEN TAMU (PRD §4.7) */}
         {/* ========================================================================= */}
-        <GuestManagement
-          guests={guests}
-          onGuestAdded={(newGuest) => setGuests((prev) => [newGuest, ...prev])}
-          onGuestUpdated={(updated) =>
-            setGuests((prev) => prev.map((g) => (g.id === updated.id ? updated : g)))
-          }
-          onGuestDeleted={(id) => setGuests((prev) => prev.filter((g) => g.id !== id))}
-          onGuestsImported={(count, newGuests) => {
-            if (newGuests && newGuests.length > 0) {
-              setGuests((prev) => [...newGuests, ...prev]);
+        {activeMainTab === 'guests' && (
+          <GuestManagement
+            guests={guests}
+            onGuestAdded={(newGuest) => setGuests((prev) => [newGuest, ...prev])}
+            onGuestUpdated={(updated) =>
+              setGuests((prev) => prev.map((g) => (g.id === updated.id ? updated : g)))
             }
-            router.refresh();
-          }}
-          setNotice={setNotice}
-        />
+            onGuestDeleted={(id) => setGuests((prev) => prev.filter((g) => g.id !== id))}
+            onGuestsImported={(count, newGuests) => {
+              if (newGuests && newGuests.length > 0) {
+                setGuests((prev) => [...newGuests, ...prev]);
+              }
+              router.refresh();
+            }}
+            setNotice={setNotice}
+          />
+        )}
 
         {/* ========================================================================= */}
         {/* 4. MODUL MODERASI BUKU TAMU (PRD §4.4 & §4.7) */}
         {/* ========================================================================= */}
-        <section className="rounded-2xl border border-[#E5D8C5] bg-white p-6 sm:p-8 shadow-md">
-          <div className="flex flex-col gap-4 border-b border-[#E5D8C5] pb-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
-              <h3 className="font-display text-2xl sm:text-3xl font-bold text-ink">
-                Moderasi Buku Tamu
-              </h3>
-              <p className="mt-1.5 text-sm sm:text-base text-ink-soft">
-                Penyembunyian ucapan berlaku secara real-time dan langsung hilang dari tampilan publik tamu dalam ~12 detik tanpa muat ulang.
-              </p>
+        {activeMainTab === 'guestbook' && (
+          <section className="rounded-2xl border border-[#E5D8C5] bg-white p-6 sm:p-8 shadow-md">
+            <div className="flex flex-col gap-4 border-b border-[#E5D8C5] pb-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-2xl">
+                <h3 className="font-display text-2xl sm:text-3xl font-bold text-ink">
+                  Moderasi Buku Tamu
+                </h3>
+                <p className="mt-1.5 text-sm sm:text-base text-ink-soft">
+                  Penyembunyian ucapan berlaku secara real-time dan langsung hilang dari tampilan publik tamu dalam ~12 detik tanpa muat ulang.
+                </p>
+              </div>
+
+              {/* Filter Tabs — 1 baris sejajar rapi tanpa bertumpuk */}
+              <div className="flex flex-nowrap shrink-0 items-center gap-2.5 overflow-x-auto pb-1 sm:pb-0 whitespace-nowrap">
+                <button
+                  onClick={() => setModerationFilter('all')}
+                  className={`cursor-pointer shrink-0 rounded-xl px-4 py-2 text-sm sm:text-base font-bold transition shadow-xs whitespace-nowrap ${
+                    moderationFilter === 'all'
+                      ? 'bg-gold-deep text-white shadow-md'
+                      : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
+                  }`}
+                >
+                  Semua ({messages.length})
+                </button>
+                <button
+                  onClick={() => setModerationFilter('visible')}
+                  className={`cursor-pointer shrink-0 rounded-xl px-4 py-2 text-sm sm:text-base font-bold transition shadow-xs whitespace-nowrap ${
+                    moderationFilter === 'visible'
+                      ? 'bg-emerald-700 text-white shadow-md'
+                      : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
+                  }`}
+                >
+                  Tampil ({visibleMessagesCount})
+                </button>
+                <button
+                  onClick={() => setModerationFilter('hidden')}
+                  className={`cursor-pointer shrink-0 rounded-xl px-4 py-2 text-sm sm:text-base font-bold transition shadow-xs whitespace-nowrap ${
+                    moderationFilter === 'hidden'
+                      ? 'bg-rose-700 text-white shadow-md'
+                      : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
+                  }`}
+                >
+                  Disembunyikan ({hiddenMessagesCount})
+                </button>
+              </div>
             </div>
 
-            {/* Filter Tabs — 1 baris sejajar rapi tanpa bertumpuk */}
-            <div className="flex flex-nowrap shrink-0 items-center gap-2.5 overflow-x-auto pb-1 sm:pb-0 whitespace-nowrap">
-              <button
-                onClick={() => setModerationFilter('all')}
-                className={`cursor-pointer shrink-0 rounded-xl px-4 py-2 text-sm sm:text-base font-bold transition shadow-xs whitespace-nowrap ${
-                  moderationFilter === 'all'
-                    ? 'bg-gold-deep text-white shadow-md'
-                    : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
-                }`}
-              >
-                Semua ({messages.length})
-              </button>
-              <button
-                onClick={() => setModerationFilter('visible')}
-                className={`cursor-pointer shrink-0 rounded-xl px-4 py-2 text-sm sm:text-base font-bold transition shadow-xs whitespace-nowrap ${
-                  moderationFilter === 'visible'
-                    ? 'bg-emerald-700 text-white shadow-md'
-                    : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
-                }`}
-              >
-                Tampil ({visibleMessagesCount})
-              </button>
-              <button
-                onClick={() => setModerationFilter('hidden')}
-                className={`cursor-pointer shrink-0 rounded-xl px-4 py-2 text-sm sm:text-base font-bold transition shadow-xs whitespace-nowrap ${
-                  moderationFilter === 'hidden'
-                    ? 'bg-rose-700 text-white shadow-md'
-                    : 'border border-[#D5C6B1] bg-[#FAF6F0] text-ink hover:bg-[#EFE7D8]'
-                }`}
-              >
-                Disembunyikan ({hiddenMessagesCount})
-              </button>
+            {/* Bar Pencarian */}
+            <div className="mt-6 mb-6 relative">
+              <IconSearch
+                size={18}
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-soft"
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari pengirim atau isi ucapan..."
+                className="w-full rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] pl-11 pr-10 py-3 text-base text-ink placeholder-[#9C8B7B] transition focus:border-gold-deep focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-deep/20"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="cursor-pointer absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink"
+                  title="Hapus pencarian"
+                >
+                  <IconX size={16} />
+                </button>
+              )}
             </div>
-          </div>
 
-          {/* Bar Pencarian */}
-          <div className="mt-6 mb-6">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari pengirim atau isi ucapan..."
-              className="w-full rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] px-4 py-3 text-base text-ink placeholder-[#9C8B7B] transition focus:border-gold-deep focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-deep/20"
-            />
-          </div>
+            {/* Daftar Ucapan */}
+            {filteredMessages.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-[#D5C6B1] py-14 text-center text-sm sm:text-base text-ink-soft">
+                {messages.length === 0
+                  ? 'Belum ada ucapan yang masuk di Buku Tamu.'
+                  : 'Tidak ada ucapan yang sesuai dengan filter atau pencarian.'}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredMessages.map((msg) => {
+                  const isProcessing = pendingMessageId === msg.id;
 
-          {/* Daftar Ucapan */}
-          {filteredMessages.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#D5C6B1] py-14 text-center text-sm sm:text-base text-ink-soft">
-              {messages.length === 0
-                ? 'Belum ada ucapan yang masuk di Buku Tamu.'
-                : 'Tidak ada ucapan yang sesuai dengan filter atau pencarian.'}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredMessages.map((msg) => {
-                const isProcessing = pendingMessageId === msg.id;
-
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col justify-between gap-4 rounded-2xl border p-5 sm:p-6 transition md:flex-row md:items-center ${
-                      msg.isHidden
-                        ? 'border-rose-200 bg-rose-50/50 opacity-80'
-                        : 'border-[#E5D8C5] bg-[#FAF6F0]'
-                    }`}
-                  >
-                    <div className="space-y-2 min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2.5">
-                        <span className="font-display text-lg sm:text-xl font-bold text-ink break-words">
-                          {msg.guestName}
-                        </span>
-                        <span className="text-xs sm:text-sm font-medium text-ink-soft">
-                          {formatDateTime(msg.createdAt)}
-                        </span>
-                        {msg.isHidden ? (
-                          <span className="rounded-full border border-rose-300 bg-rose-100 px-3 py-0.5 text-xs font-bold text-rose-800">
-                            Disembunyikan
+                  return (
+                    <div
+                      key={msg.id}
+                      className={`flex flex-col justify-between gap-4 rounded-2xl border p-5 sm:p-6 transition md:flex-row md:items-center ${
+                        msg.isHidden
+                          ? 'border-rose-200 bg-rose-50/50 opacity-80'
+                          : 'border-[#E5D8C5] bg-[#FAF6F0]'
+                      }`}
+                    >
+                      <div className="space-y-2 min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2.5">
+                          <span className="font-display text-lg sm:text-xl font-bold text-ink break-words">
+                            {msg.guestName}
                           </span>
-                        ) : (
-                          <span className="rounded-full border border-emerald-300 bg-emerald-100 px-3 py-0.5 text-xs font-bold text-emerald-800">
-                            Tampil Publik
+                          <span className="text-xs sm:text-sm font-medium text-ink-soft">
+                            {formatDateTime(msg.createdAt)}
                           </span>
-                        )}
+                          {msg.isHidden ? (
+                            <span className="rounded-full border border-rose-300 bg-rose-100 px-3 py-0.5 text-xs font-bold text-rose-800">
+                              Disembunyikan
+                            </span>
+                          ) : (
+                            <span className="rounded-full border border-emerald-300 bg-emerald-100 px-3 py-0.5 text-xs font-bold text-emerald-800">
+                              Tampil Publik
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-base sm:text-lg leading-relaxed text-[#2C1E14] break-words">
+                          {msg.message}
+                        </p>
                       </div>
-                      <p className="text-base sm:text-lg leading-relaxed text-[#2C1E14] break-words">
-                        {msg.message}
-                      </p>
-                    </div>
 
-                    <div className="shrink-0 pt-2 md:pt-0">
-                      <button
-                        onClick={() => handleToggleVisibility(msg.id, msg.isHidden)}
-                        disabled={isProcessing}
-                        className={`w-full sm:w-auto cursor-pointer rounded-xl px-5 py-2.5 text-sm sm:text-base font-bold tracking-wider uppercase transition shadow-xs disabled:cursor-not-allowed disabled:opacity-50 ${
-                          msg.isHidden
-                            ? 'border border-emerald-400 bg-emerald-600 text-white hover:bg-emerald-700'
-                            : 'border border-rose-300 bg-rose-100 text-rose-900 hover:bg-rose-200'
-                        }`}
-                      >
-                        {isProcessing ? (
-                          'Memproses...'
-                        ) : msg.isHidden ? (
-                          'Tampilkan Kembali'
-                        ) : (
-                          'Sembunyikan'
-                        )}
-                      </button>
+                      <div className="shrink-0 pt-2 md:pt-0">
+                        <button
+                          onClick={() => handleToggleVisibility(msg.id, msg.isHidden)}
+                          disabled={isProcessing}
+                          className={`w-full sm:w-auto cursor-pointer rounded-xl px-5 py-2.5 text-sm sm:text-base font-bold tracking-wider uppercase transition shadow-xs disabled:cursor-not-allowed disabled:opacity-50 ${
+                            msg.isHidden
+                              ? 'border border-emerald-400 bg-emerald-600 text-white hover:bg-emerald-700'
+                              : 'border border-rose-300 bg-rose-100 text-rose-900 hover:bg-rose-200'
+                          }`}
+                        >
+                          {isProcessing ? (
+                            'Memproses...'
+                          ) : msg.isHidden ? (
+                            'Tampilkan Kembali'
+                          ) : (
+                            'Sembunyikan'
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
       </main>
     </div>
   );

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import type { Guest } from '../../types/database';
 import { deleteGuestAction } from '../../app/actions/guests';
+import { IconAlertTriangle } from './admin-icons';
 
 interface Props {
   guest: Guest | null;
@@ -46,7 +47,9 @@ export default function DeleteGuestModal({ guest, isOpen, onClose, onDelete }: P
     >
       <div className="relative w-full max-w-md rounded-2xl border border-rose-200 bg-[#FDFBF7] p-6 shadow-2xl">
         <div className="flex items-center gap-3 text-rose-700">
-          <span className="text-2xl">⚠️</span>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-700">
+            <IconAlertTriangle size={22} />
+          </div>
           <h3 className="font-display text-2xl font-bold text-ink">
             Hapus Data Tamu
           </h3>

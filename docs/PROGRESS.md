@@ -6,7 +6,7 @@ Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.
 
 ## Sedang Dikerjakan
 
-Admin Panel Bagian 2 (Manajemen Tamu Lengkap: Tabel tamu, filter reminder Belum Respons, Generator WhatsApp PRD Lampiran B, Tambah/Edit/Hapus satuan, Impor CSV massal, dan Ekspor CSV Katering) selesai 100% dan diverifikasi live via browser automation Chrome DevTools MCP & unit integration tests.
+Penyempurnaan UI Admin Panel (Ikon SVG vektor murni pengganti emoji, perbaikan styling dropdown chevron & lebar modal form tamu, serta tab segmented pemisah Manajemen Tamu dan Buku Tamu) selesai 100% dan diverifikasi visual via Chrome DevTools MCP & unit integration tests.
 
 Fokus berikutnya:
 1. Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) sesuai PRD §4.6.
@@ -14,6 +14,16 @@ Fokus berikutnya:
 3. Persiapan input daftar 150 tamu resmi saat data final dari klien diserahkan.
 
 ## Selesai
+
+- **Penyempurnaan UI Admin Panel — Ikon Vektor SVG, Dropdown Select Styling, & Segmented Tabs** (7 Sep 2026):
+  - **Sistem Ikon Vektor Native (`components/admin/admin-icons.tsx`)**: Menggantikan seluruh emoji di admin panel dengan ikon SVG vektor konsisten (stroke 2px, fill currentColor, ukuran serasi): `IconUsers`, `IconUserPlus`, `IconUpload`, `IconDownload`, `IconWhatsApp`, `IconLink`, `IconEdit`, `IconTrash`, `IconCopy`, `IconCheck`, `IconSearch`, `IconX`, `IconChevronDown`, `IconMessageSquare`, `IconClock`, `IconAlertTriangle`, `IconFileText`, `IconMail`. Bebas dependensi pustaka ikon eksternal.
+  - **Perbaikan Dropdown Select & Form Modal (`components/admin/guest-form-modal.tsx`, `components/admin/guest-management.tsx`)**:
+    - Memperbaiki chevron dropdown native yang sebelumnya menempel/mepet di tepi kanan dengan menerapkan `appearance-none pr-10 pl-3.5 relative` dipadukan `IconChevronDown` positioned absolute di sisi kanan dengan padding elegan.
+    - Memperbaiki field "SAPAAN / SEBUTAN" di modal form tamu agar memenuhi `w-full` saat memilih preset (menghilangkan sisa ruang kosong setengah baris), dan hanya membuka grid 2 kolom (`sm:grid-cols-2`) saat opsi 'Kustom' dipilih.
+  - **Tab Navigasi Segmented Top-Level (`components/admin/dashboard-client.tsx`)**:
+    - Menghadirkan tab navigasi pill segmented elegan di bawah kartu metrik ringkasan untuk beralih antara modul **Manajemen Tamu** (`IconUsers`, badge counter tamu) dan **Buku Tamu & Moderasi** (`IconMessageSquare`, badge counter pesan).
+    - Mencegah halaman menjadi terlalu panjang dan padat ketika jumlah tamu (150) dan pesan ucapan bertambah banyak.
+  - **Verifikasi**: Lolos 14/14 unit test (`bun test tests/guest-management.test.ts`), `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, serta verifikasi visual interaktif melalui Chrome DevTools MCP (pengujian desktop & modal).
 
 - **Admin Panel Bagian 2 — Manajemen Tamu Lengkap, Generator WhatsApp, Impor CSV & Ekspor** (7 Sep 2026):
   - **Tabel Tamu Responsif**: Menampilkan daftar tamu lengkap dengan nama, sapaan, kategori grup, status buka (frekuensi & waktu buka), deteksi penerusan link via hash perangkat unik (`uniqueDevices > 1`), status RSVP (Hadir + pendamping, Tidak Hadir, Belum Respons), serta catatan/kebutuhan khusus.

@@ -7,6 +7,21 @@ import WhatsAppModal from './whatsapp-modal';
 import GuestFormModal from './guest-form-modal';
 import DeleteGuestModal from './delete-guest-modal';
 import ImportCsvModal from './import-csv-modal';
+import {
+  IconUserPlus,
+  IconUpload,
+  IconDownload,
+  IconWhatsApp,
+  IconLink,
+  IconEdit,
+  IconTrash,
+  IconCheck,
+  IconSearch,
+  IconX,
+  IconChevronDown,
+  IconClock,
+  IconAlertTriangle,
+} from './admin-icons';
 
 interface Props {
   guests: Guest[];
@@ -203,25 +218,25 @@ export default function GuestManagement({
         <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl bg-gold-deep px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-gold-deep/90"
+            className="cursor-pointer inline-flex items-center gap-2 rounded-xl bg-gold-deep px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-gold-deep/90"
           >
-            <span>+</span>
+            <IconUserPlus size={16} />
             <span>Tambah Tamu</span>
           </button>
 
           <button
             onClick={() => setIsImportModalOpen(true)}
-            className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] px-4 py-2.5 text-sm font-bold text-ink shadow-xs transition hover:bg-[#EFE7D8]"
+            className="cursor-pointer inline-flex items-center gap-2 rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] px-4 py-2.5 text-sm font-bold text-ink shadow-xs transition hover:bg-[#EFE7D8]"
           >
-            <span>📥</span>
+            <IconUpload size={16} />
             <span>Impor CSV</span>
           </button>
 
           <button
             onClick={() => handleExportCsv(false)}
-            className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 text-sm font-bold text-ink shadow-xs transition hover:bg-[#FAF6F0]"
+            className="cursor-pointer inline-flex items-center gap-2 rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 text-sm font-bold text-ink shadow-xs transition hover:bg-[#FAF6F0]"
           >
-            <span>📊</span>
+            <IconDownload size={16} />
             <span>Ekspor CSV</span>
           </button>
         </div>
@@ -301,55 +316,72 @@ export default function GuestManagement({
         {/* Baris Pencarian & Dropdown Kategori */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
+            <IconSearch
+              size={16}
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-soft"
+            />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="Cari nama tamu, sapaan, atau catatan..."
-              className="w-full rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] px-4 py-2.5 text-sm text-ink placeholder-[#9C8B7B] transition focus:border-gold-deep focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] pl-10 pr-9 py-2.5 text-sm text-ink placeholder-[#9C8B7B] transition focus:border-gold-deep focus:bg-white focus:outline-none"
             />
             {searchQuery && (
               <button
                 onClick={() => handleSearchChange('')}
-                className="cursor-pointer absolute right-3 top-2.5 text-sm text-ink-soft hover:text-ink"
+                className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink"
+                title="Hapus pencarian"
               >
-                ✕
+                <IconX size={15} />
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <select
-              value={groupFilter}
-              onChange={(e) => handleGroupFilterChange(e.target.value)}
-              className="rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] px-3 py-2.5 text-sm text-ink font-medium focus:border-gold-deep focus:outline-none"
-            >
-              <option value="all">Semua Kategori Grup</option>
-              {availableGroups.map((grp) => (
-                <option key={grp} value={grp}>
-                  {formatGuestGroup(grp)}
-                </option>
-              ))}
-            </select>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <select
+                value={groupFilter}
+                onChange={(e) => handleGroupFilterChange(e.target.value)}
+                className="cursor-pointer appearance-none rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] pl-3.5 pr-9 py-2.5 text-sm text-ink font-medium focus:border-gold-deep focus:outline-none"
+              >
+                <option value="all">Semua Kategori Grup</option>
+                {availableGroups.map((grp) => (
+                  <option key={grp} value={grp}>
+                    {formatGuestGroup(grp)}
+                  </option>
+                ))}
+              </select>
+              <IconChevronDown
+                size={15}
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft"
+              />
+            </div>
 
-            <select
-              value={pageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-              className="rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] px-3 py-2.5 text-sm text-ink font-medium focus:border-gold-deep focus:outline-none"
-            >
-              <option value={25}>25 / halaman</option>
-              <option value={50}>50 / halaman</option>
-              <option value={100}>100 / halaman</option>
-              <option value={9999}>Tampilkan Semua</option>
-            </select>
+            <div className="relative">
+              <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                className="cursor-pointer appearance-none rounded-xl border border-[#D5C6B1] bg-[#FAF6F0] pl-3.5 pr-9 py-2.5 text-sm text-ink font-medium focus:border-gold-deep focus:outline-none"
+              >
+                <option value={25}>25 / halaman</option>
+                <option value={50}>50 / halaman</option>
+                <option value={100}>100 / halaman</option>
+                <option value={9999}>Tampilkan Semua</option>
+              </select>
+              <IconChevronDown
+                size={15}
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft"
+              />
+            </div>
           </div>
         </div>
 
         {/* Ringkasan Filter & Tombol Reminder Cepat */}
         {rsvpFilter === 'pending' && counts.pending > 0 && (
           <div className="flex flex-col gap-2 rounded-xl border border-amber-300 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between text-amber-900">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">⏰</span>
+            <div className="flex items-center gap-2.5">
+              <IconClock size={20} className="shrink-0 text-amber-700" />
               <span className="text-sm font-semibold">
                 Ada {counts.pending} tamu belum konfirmasi RSVP. Disarankan mulai kirim reminder menjelang 26 September 2026.
               </span>
@@ -413,14 +445,16 @@ export default function GuestManagement({
                       {isOpened ? (
                         <div className="space-y-1">
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold text-emerald-800">
-                            ✓ Dibuka ({guest.openCount}x)
+                            <IconCheck size={12} className="stroke-[3]" />
+                            <span>Dibuka ({guest.openCount}x)</span>
                           </span>
                           <div className="text-[11px] text-ink-soft">
                             {formatDateTime(guest.lastOpenedAt || guest.openedAt)}
                           </div>
                           {hasMultipleDevices && (
-                            <div className="inline-block rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-900" title="Tautan dibuka dari beberapa perangkat berbeda">
-                              ⚠️ {guest.uniqueDevices.length} Perangkat
+                            <div className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-900" title="Tautan dibuka dari beberapa perangkat berbeda">
+                              <IconAlertTriangle size={11} className="text-amber-800 shrink-0" />
+                              <span>{guest.uniqueDevices.length} Perangkat</span>
                             </div>
                           )}
                         </div>
@@ -479,38 +513,42 @@ export default function GuestManagement({
                         {/* Tombol WhatsApp */}
                         <button
                           onClick={() => setSelectedWaGuest(guest)}
-                          className="cursor-pointer inline-flex items-center gap-1 rounded-lg bg-[#25D366] px-2.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#20bd5a] transition"
+                          className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-2.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#20bd5a] transition"
                           title="Buka Generator WhatsApp"
                         >
-                          <span>💬</span>
+                          <IconWhatsApp size={14} />
                           <span className="hidden xl:inline">WhatsApp</span>
                         </button>
 
                         {/* Tombol Salin Link */}
                         <button
                           onClick={() => handleCopyLink(guest)}
-                          className="cursor-pointer rounded-lg border border-[#D5C6B1] bg-white px-2.5 py-1.5 text-xs font-semibold text-ink hover:bg-[#FAF6F0] transition"
+                          className="cursor-pointer rounded-lg border border-[#D5C6B1] bg-white p-2 text-xs font-semibold text-ink hover:bg-[#FAF6F0] transition"
                           title="Salin tautan personal"
                         >
-                          {copiedGuestId === guest.id ? '✓' : '🔗'}
+                          {copiedGuestId === guest.id ? (
+                            <IconCheck size={14} className="text-emerald-700 stroke-[3]" />
+                          ) : (
+                            <IconLink size={14} />
+                          )}
                         </button>
 
                         {/* Tombol Edit */}
                         <button
                           onClick={() => setEditingGuest(guest)}
-                          className="cursor-pointer rounded-lg border border-[#D5C6B1] bg-white px-2.5 py-1.5 text-xs font-semibold text-ink hover:bg-[#FAF6F0] transition"
+                          className="cursor-pointer rounded-lg border border-[#D5C6B1] bg-white p-2 text-xs font-semibold text-ink hover:bg-[#FAF6F0] transition"
                           title="Edit tamu"
                         >
-                          ✏️
+                          <IconEdit size={14} />
                         </button>
 
                         {/* Tombol Hapus */}
                         <button
                           onClick={() => setDeletingGuest(guest)}
-                          className="cursor-pointer rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-800 hover:bg-rose-100 transition"
+                          className="cursor-pointer rounded-lg border border-rose-200 bg-rose-50 p-2 text-xs font-semibold text-rose-800 hover:bg-rose-100 transition"
                           title="Hapus tamu"
                         >
-                          🗑️
+                          <IconTrash size={14} />
                         </button>
                       </div>
                     </td>

@@ -4,6 +4,13 @@ import React, { useState, useMemo } from 'react';
 import type { Guest } from '../../types/database';
 import { parseGuestsCsv, formatGuestGroup } from '../../lib/guest-utils';
 import { importGuestsAction } from '../../app/actions/guests';
+import {
+  IconUpload,
+  IconFileText,
+  IconAlertTriangle,
+  IconCheck,
+  IconX,
+} from './admin-icons';
 
 interface Props {
   isOpen: boolean;
@@ -91,8 +98,10 @@ export default function ImportCsvModal({ isOpen, onClose, onImportSuccess }: Pro
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#E5D8C5] px-6 py-5">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">📥</span>
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gold-deep/15 text-gold-deep">
+                <IconUpload size={20} />
+              </div>
               <h3 className="font-display text-2xl font-bold text-ink">
                 Impor Data Tamu (CSV)
               </h3>
@@ -104,8 +113,9 @@ export default function ImportCsvModal({ isOpen, onClose, onImportSuccess }: Pro
           <button
             onClick={onClose}
             className="cursor-pointer rounded-xl p-2 text-ink-soft hover:bg-[#FAF6F0] hover:text-ink transition"
+            aria-label="Tutup"
           >
-            ✕
+            <IconX size={18} />
           </button>
         </div>
 
@@ -114,23 +124,25 @@ export default function ImportCsvModal({ isOpen, onClose, onImportSuccess }: Pro
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('upload')}
-              className={`cursor-pointer border-b-2 px-4 py-2 text-sm font-bold transition ${
+              className={`cursor-pointer inline-flex items-center gap-1.5 border-b-2 px-4 py-2 text-sm font-bold transition ${
                 activeTab === 'upload'
                   ? 'border-gold-deep text-gold-deep'
                   : 'border-transparent text-ink-soft hover:text-ink'
               }`}
             >
-              📁 Unggah Berkas .CSV
+              <IconUpload size={16} />
+              <span>Unggah Berkas .CSV</span>
             </button>
             <button
               onClick={() => setActiveTab('paste')}
-              className={`cursor-pointer border-b-2 px-4 py-2 text-sm font-bold transition ${
+              className={`cursor-pointer inline-flex items-center gap-1.5 border-b-2 px-4 py-2 text-sm font-bold transition ${
                 activeTab === 'paste'
                   ? 'border-gold-deep text-gold-deep'
                   : 'border-transparent text-ink-soft hover:text-ink'
               }`}
             >
-              📋 Tempel Teks CSV
+              <IconFileText size={16} />
+              <span>Tempel Teks CSV</span>
             </button>
           </div>
 
@@ -154,7 +166,9 @@ export default function ImportCsvModal({ isOpen, onClose, onImportSuccess }: Pro
           {activeTab === 'upload' ? (
             <div>
               <label className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D5C6B1] bg-white p-8 text-center cursor-pointer hover:border-gold-deep hover:bg-[#FAF6F0] transition">
-                <span className="text-4xl mb-2">📄</span>
+                <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FAF6F0] text-gold-deep">
+                  <IconFileText size={32} />
+                </div>
                 <span className="text-base font-bold text-ink">
                   {fileName ? fileName : 'Pilih berkas CSV atau seret ke sini'}
                 </span>
@@ -188,12 +202,14 @@ export default function ImportCsvModal({ isOpen, onClose, onImportSuccess }: Pro
           {csvText.trim() && (
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
-                  ✓ {parseResult.valid.length} Tamu Siap Diimpor
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                  <IconCheck size={14} />
+                  <span>{parseResult.valid.length} Tamu Siap Diimpor</span>
                 </span>
                 {parseResult.errors.length > 0 && (
-                  <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-800">
-                    ⚠ {parseResult.errors.length} Baris Bermasalah
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-800">
+                    <IconAlertTriangle size={14} />
+                    <span>{parseResult.errors.length} Baris Bermasalah</span>
                   </span>
                 )}
               </div>

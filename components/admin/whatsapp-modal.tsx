@@ -6,6 +6,15 @@ import {
   generateWhatsAppInvitation,
   generateWhatsAppReminder,
 } from '../../lib/guest-utils';
+import {
+  IconWhatsApp,
+  IconMail,
+  IconClock,
+  IconLink,
+  IconCopy,
+  IconCheck,
+  IconX,
+} from './admin-icons';
 
 interface Props {
   guest: Guest | null;
@@ -57,8 +66,10 @@ export default function WhatsAppModal({ guest, origin, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#E5D8C5] px-6 py-5">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">💬</span>
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366]/15 text-[#25D366]">
+                <IconWhatsApp size={22} />
+              </div>
               <h3 className="font-display text-2xl font-bold text-ink">
                 Generator Pesan WhatsApp
               </h3>
@@ -72,7 +83,7 @@ export default function WhatsAppModal({ guest, origin, onClose }: Props) {
             className="cursor-pointer rounded-xl p-2 text-ink-soft hover:bg-[#FAF6F0] hover:text-ink transition"
             aria-label="Tutup"
           >
-            ✕
+            <IconX size={18} />
           </button>
         </div>
 
@@ -80,23 +91,25 @@ export default function WhatsAppModal({ guest, origin, onClose }: Props) {
         <div className="flex border-b border-[#E5D8C5] bg-[#FAF6F0] px-6 pt-3">
           <button
             onClick={() => setTemplateType('invitation')}
-            className={`cursor-pointer border-b-2 px-4 py-2.5 text-sm font-bold transition ${
+            className={`cursor-pointer inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-bold transition ${
               templateType === 'invitation'
                 ? 'border-gold-deep text-gold-deep'
                 : 'border-transparent text-ink-soft hover:text-ink'
             }`}
           >
-            ✉️ Undangan Resmi (PRD Lampiran B)
+            <IconMail size={16} />
+            <span>Undangan Resmi (PRD Lampiran B)</span>
           </button>
           <button
             onClick={() => setTemplateType('reminder')}
-            className={`cursor-pointer border-b-2 px-4 py-2.5 text-sm font-bold transition ${
+            className={`cursor-pointer inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-bold transition ${
               templateType === 'reminder'
                 ? 'border-gold-deep text-gold-deep'
                 : 'border-transparent text-ink-soft hover:text-ink'
             }`}
           >
-            ⏰ Pengingat / Reminder RSVP
+            <IconClock size={16} />
+            <span>Pengingat / Reminder RSVP</span>
           </button>
         </div>
 
@@ -122,23 +135,44 @@ export default function WhatsAppModal({ guest, origin, onClose }: Props) {
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E5D8C5] bg-[#FDFBF7] px-6 py-4">
           <button
             onClick={() => handleCopy(guestLink, 'link')}
-            className="cursor-pointer rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#FAF6F0]"
+            className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#FAF6F0]"
           >
-            {copiedType === 'link' ? '✓ Tautan Tersalin!' : '🔗 Salin Tautan Saja'}
+            {copiedType === 'link' ? (
+              <>
+                <IconCheck size={16} className="text-emerald-600" />
+                <span>Tautan Tersalin!</span>
+              </>
+            ) : (
+              <>
+                <IconLink size={16} />
+                <span>Salin Tautan Saja</span>
+              </>
+            )}
           </button>
 
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => handleCopy(currentText, 'message')}
-              className="cursor-pointer rounded-xl border border-gold-deep bg-white px-4 py-2.5 text-sm font-bold text-gold-deep transition hover:bg-gold-deep/10"
+              className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-gold-deep bg-white px-4 py-2.5 text-sm font-bold text-gold-deep transition hover:bg-gold-deep/10"
             >
-              {copiedType === 'message' ? '✓ Pesan Tersalin!' : '📋 Salin Pesan Lengkap'}
+              {copiedType === 'message' ? (
+                <>
+                  <IconCheck size={16} className="text-emerald-600" />
+                  <span>Pesan Tersalin!</span>
+                </>
+              ) : (
+                <>
+                  <IconCopy size={16} />
+                  <span>Salin Pesan Lengkap</span>
+                </>
+              )}
             </button>
             <button
               onClick={handleSendWhatsApp}
-              className="cursor-pointer rounded-xl bg-[#25D366] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#20bd5a]"
+              className="cursor-pointer inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#20bd5a]"
             >
-              Kirim via WhatsApp ↗
+              <IconWhatsApp size={18} />
+              <span>Kirim via WhatsApp ↗</span>
             </button>
           </div>
         </div>

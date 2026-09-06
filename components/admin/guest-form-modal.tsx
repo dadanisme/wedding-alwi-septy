@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import type { Guest } from '../../types/database';
 import { createGuestAction, updateGuestAction } from '../../app/actions/guests';
+import { IconChevronDown, IconX } from './admin-icons';
 
 interface Props {
   guest: Guest | null;
@@ -132,8 +133,9 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
           <button
             onClick={onClose}
             className="cursor-pointer rounded-xl p-2 text-ink-soft hover:bg-[#FAF6F0] hover:text-ink transition"
+            aria-label="Tutup"
           >
-            ✕
+            <IconX size={18} />
           </button>
         </div>
 
@@ -149,26 +151,32 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
             <label className="block text-xs font-bold uppercase tracking-wider text-ink-soft">
               Sapaan / Sebutan
             </label>
-            <div className="mt-1 flex gap-2">
-              <select
-                value={salutationPreset}
-                onChange={(e) => setSalutationPreset(e.target.value)}
-                className="w-1/2 rounded-xl border border-[#D5C6B1] bg-white px-3 py-2.5 text-sm text-ink focus:border-gold-deep focus:outline-none"
-              >
-                {SALUTATION_PRESETS.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
+            <div className={`mt-1.5 ${salutationPreset === 'Kustom' ? 'grid grid-cols-1 gap-2.5 sm:grid-cols-2' : ''}`}>
+              <div className="relative">
+                <select
+                  value={salutationPreset}
+                  onChange={(e) => setSalutationPreset(e.target.value)}
+                  className="w-full appearance-none rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 pr-10 text-sm text-ink transition focus:border-gold-deep focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-deep/20"
+                >
+                  {SALUTATION_PRESETS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+                <IconChevronDown
+                  size={16}
+                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-soft"
+                />
+              </div>
 
               {salutationPreset === 'Kustom' && (
                 <input
                   type="text"
-                  placeholder="Ketik sapaan..."
+                  placeholder="Ketik sapaan khusus..."
                   value={customSalutation}
                   onChange={(e) => setCustomSalutation(e.target.value)}
-                  className="w-1/2 rounded-xl border border-[#D5C6B1] bg-white px-3 py-2.5 text-sm text-ink focus:border-gold-deep focus:outline-none"
+                  className="w-full rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 text-sm text-ink placeholder-[#A89886] transition focus:border-gold-deep focus:outline-none focus:ring-2 focus:ring-gold-deep/20"
                 />
               )}
             </div>
@@ -185,7 +193,7 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
               placeholder="Contoh: Budi Santoso"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 text-base text-ink placeholder-[#A89886] focus:border-gold-deep focus:outline-none"
+              className="mt-1.5 w-full rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 text-base text-ink placeholder-[#A89886] transition focus:border-gold-deep focus:outline-none focus:ring-2 focus:ring-gold-deep/20"
             />
           </div>
 
@@ -194,17 +202,23 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
             <label className="block text-xs font-bold uppercase tracking-wider text-ink-soft">
               Kategori / Grup Tamu
             </label>
-            <select
-              value={groupPreset}
-              onChange={(e) => setGroupPreset(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-[#D5C6B1] bg-white px-3 py-2.5 text-sm text-ink focus:border-gold-deep focus:outline-none"
-            >
-              {GROUP_PRESETS.map((g) => (
-                <option key={g.value} value={g.value}>
-                  {g.label}
-                </option>
-              ))}
-            </select>
+            <div className="mt-1.5 relative">
+              <select
+                value={groupPreset}
+                onChange={(e) => setGroupPreset(e.target.value)}
+                className="w-full appearance-none rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 pr-10 text-sm text-ink transition focus:border-gold-deep focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-deep/20"
+              >
+                {GROUP_PRESETS.map((g) => (
+                  <option key={g.value} value={g.value}>
+                    {g.label}
+                  </option>
+                ))}
+              </select>
+              <IconChevronDown
+                size={16}
+                className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-soft"
+              />
+            </div>
 
             {groupPreset === 'custom' && (
               <input
@@ -212,7 +226,7 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
                 placeholder="Nama grup baru (misal: komunitas_gowes)"
                 value={customGroup}
                 onChange={(e) => setCustomGroup(e.target.value)}
-                className="mt-2 w-full rounded-xl border border-[#D5C6B1] bg-white px-3 py-2.5 text-sm text-ink focus:border-gold-deep focus:outline-none"
+                className="mt-2 w-full rounded-xl border border-[#D5C6B1] bg-white px-4 py-2.5 text-sm text-ink placeholder-[#A89886] transition focus:border-gold-deep focus:outline-none focus:ring-2 focus:ring-gold-deep/20"
               />
             )}
           </div>
