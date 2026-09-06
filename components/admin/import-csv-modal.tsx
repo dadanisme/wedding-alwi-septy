@@ -37,6 +37,16 @@ export default function ImportCsvModal({ isOpen, onClose, onImportSuccess }: Pro
     return parseGuestsCsv(csvText);
   }, [csvText]);
 
+  // Tutup dialog saat tombol Escape ditekan
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,9 +102,13 @@ export default function ImportCsvModal({ isOpen, onClose, onImportSuccess }: Pro
     <div
       role="dialog"
       aria-modal="true"
+      onClick={onClose}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-200"
     >
-      <div className="relative flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl border border-[#E5D8C5] bg-[#FDFBF7] shadow-2xl">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl border border-[#E5D8C5] bg-[#FDFBF7] shadow-2xl"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#E5D8C5] px-6 py-5">
           <div>

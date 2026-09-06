@@ -16,6 +16,16 @@ export default function DeleteGuestModal({ guest, isOpen, onClose, onDelete }: P
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Tutup dialog saat tombol Escape ditekan
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !guest) return null;
 
   const hasActivity = guest.openCount > 0 || guest.rsvpStatus !== 'pending';
@@ -43,9 +53,13 @@ export default function DeleteGuestModal({ guest, isOpen, onClose, onDelete }: P
     <div
       role="dialog"
       aria-modal="true"
+      onClick={onClose}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-200"
     >
-      <div className="relative w-full max-w-md rounded-2xl border border-rose-200 bg-[#FDFBF7] p-6 shadow-2xl">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md rounded-2xl border border-rose-200 bg-[#FDFBF7] p-6 shadow-2xl"
+      >
         <div className="flex items-center gap-3 text-rose-700">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-700">
             <IconAlertTriangle size={22} />

@@ -51,10 +51,18 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
   const [customSalutation, setCustomSalutation] = useState(isPresetSalutation ? '' : initialSalutation);
   const [groupPreset, setGroupPreset] = useState(matchGroup ? initialGroup : 'custom');
   const [customGroup, setCustomGroup] = useState(matchGroup ? '' : initialGroup);
-  const [updateSlug, setUpdateSlug] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Tutup dialog saat tombol Escape ditekan
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   if (!isOpen) return null;
 
@@ -85,7 +93,7 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
           name: finalName,
           salutation: finalSalutation,
           guestGroup: finalGroup,
-          updateSlug,
+          updateSlug: false,
         });
 
         if (!res.success || !res.guest) {
@@ -123,10 +131,14 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
     <div
       role="dialog"
       aria-modal="true"
+      onClick={onClose}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-200"
     >
-      <div className="relative w-full max-w-lg rounded-2xl border border-[#E5D8C5] bg-[#FDFBF7] p-6 sm:p-8 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[#E5D8C5] pb-4">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative flex max-h-[90vh] w-full max-w-lg flex-col rounded-2xl border border-[#E5D8C5] bg-[#FDFBF7] shadow-2xl"
+      >
+        <div className="flex items-center justify-between border-b border-[#E5D8C5] p-6 pb-4">
           <h3 className="font-display text-2xl font-bold text-ink">
             {isEdit ? 'Edit Data Tamu' : 'Tambah Tamu Baru'}
           </h3>
@@ -230,27 +242,6 @@ export default function GuestFormModal({ guest, isOpen, onClose, onSave }: Props
               />
             )}
           </div>
-
-          {/* Opsi Update Slug saat Edit */}
-          {isEdit && guest && (
-            <div className="rounded-xl border border-[#E5D8C5] bg-[#FAF6F0] p-4 text-xs space-y-2 text-ink-soft">
-              <div className="flex items-center justify-between">
-                <span>Slug URL saat ini:</span>
-                <span className="font-mono font-semibold text-gold-deep">{guest.fullSlug}</span>
-              </div>
-              <label className="flex items-start gap-2 pt-2 cursor-pointer border-t border-[#E5D8C5]">
-                <input
-                  type="checkbox"
-                  checked={updateSlug}
-                  onChange={(e) => setUpdateSlug(e.target.checked)}
-                  className="mt-0.5 rounded border-[#D5C6B1] text-gold-deep focus:ring-gold-deep"
-                />
-                <span className="text-ink">
-                  Perbarui tautan slug jika nama berubah (jangan dicentang jika tautan sudah disebar ke tamu).
-                </span>
-              </label>
-            </div>
-          )}
 
           {/* Tombol Simpan */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E5D8C5]">

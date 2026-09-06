@@ -27,7 +27,10 @@ Fokus berikutnya:
     - Memperbaiki ukuran tombol WhatsApp agar seragam presisi `h-8` (32px) dengan tombol salin link, edit, dan hapus (`h-8 w-8`).
     - Menukar posisi email admin dan tombol "Lihat Undangan Publik" di header navigasi sesuai hierarki konteks akun.
     - Mengubah timestamp buka sampul dan detail `+1 Pendamping` menjadi floating tooltip elegan di atas chip (lengkap dengan panah pointer dan fallback aksesibilitas `title`), sehingga baris tabel tetap satu baris rapi dan bebas dari teks menggantung di bawah chip.
-  - **Verifikasi**: Lolos 14/14 unit test (`bun test tests/guest-management.test.ts`), `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, serta verifikasi visual interaktif melalui Chrome DevTools MCP (pengujian desktop, hover state tooltip, & modal).
+  - **Perbaikan Interaksi Modal & Penyederhanaan Form Tamu**:
+    - Menghapus kotak opsi pembaruan slug URL pada modal edit tamu yang membingungkan; slug link tamu kini dipertahankan permanen dan aman tanpa membebani pengguna dengan detail teknis.
+    - Menambahkan interaksi penutupan dialog saat pengguna mengeklik area latar belakang luar (*click outside backdrop*) serta dukungan tombol keyboard `Escape` di seluruh 4 modal admin (Form Tamu, Generator WhatsApp, Hapus Tamu, dan Impor CSV).
+  - **Verifikasi**: Lolos 14/14 unit test (`bun test tests/guest-management.test.ts`), `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, serta verifikasi visual interaktif melalui Chrome DevTools MCP (pengujian desktop, hover state tooltip, click outside & Escape close modal).
 
 - **Admin Panel Bagian 2 — Manajemen Tamu Lengkap, Generator WhatsApp, Impor CSV & Ekspor** (7 Sep 2026):
   - **Tabel Tamu Responsif**: Menampilkan daftar tamu lengkap dengan nama, sapaan, kategori grup, status buka (frekuensi & waktu buka), deteksi penerusan link via hash perangkat unik (`uniqueDevices > 1`), status RSVP (Hadir + pendamping, Tidak Hadir, Belum Respons), serta catatan/kebutuhan khusus.
