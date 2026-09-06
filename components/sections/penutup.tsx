@@ -68,10 +68,10 @@ export function Penutup() {
             <use href="#spray" />
           </svg>
           <Image
-            src={monogram.white}
+            src={monogram.gold}
             alt={closingConfig.monogramAlt}
-            width={1254}
-            height={1254}
+            width={635}
+            height={700}
             className="h-[49px] w-auto lg:h-[87px]"
           />
           <svg
