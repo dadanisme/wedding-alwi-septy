@@ -240,3 +240,13 @@ Percobaan pertama pakai `object-top` (0%) — ini menghilangkan potongan kepala,
 2. **`max-w-[1600px]`** — HANYA untuk foto desktop (lanskap), supaya rasio kontainer tidak makin ekstrem tanpa batas di monitor sangat lebar; foto ponsel tidak perlu ini karena sudah otomatis dibatasi breakpoint `lg` (1024px). Angka 1600 dipilih supaya laptop/monitor umum (≤1920px) nyaris tidak pernah kena batas ini (1920 masih lebih lebar dari kebanyakan browser window yang benar-benar maximized), sementara monitor ultrawide (>1600px) dapat "pita foto" bar-bar hitam di kanan-kiri yang berbaur dengan `bg-espresso` section — bukan foto yang makin gepeng tak berujung. Ini BUKAN "frame terpusat" untuk seluruh halaman (yang memang ditolak di keputusan "Responsif penuh, bukan frame terpusat") — cuma membatasi satu elemen foto full-bleed di satu seksi, atas permintaan langsung saat sesi ini ("kayaknya perlu dibatasin deh lebarnya pake container system").
 
 **Konsekuensi:** di breakpoint referensi 1280px (di bawah 1600px, jadi `max-w` belum berlaku), framing hampir sama dengan `object-center` awal, cocok dengan mockup. Tidak menyelesaikan rasio ekstrem <1600px lebar tapi sangat pendek (mis. window di-resize manual jadi sangat landscape) — itu di luar skenario realistis (device/monitor sungguhan) yang dicek sesi ini.
+
+---
+
+## Seksi Pembuka: `max-w-[1600px]` di atas dicabut lagi — foto desktop full-bleed tanpa batas
+
+**Keputusan:** wrapper `relative mx-auto h-full max-w-[1600px]` dihapus. Foto latar desktop (`openingPhotos.landscape`) sekarang langsung `fill` di dalam `absolute inset-0` induknya, `sizes` dikembalikan ke `100vw` polos (bukan `(min-width: 1600px) 1600px, 100vw`). `object-[center_20%]` dari keputusan sebelumnya **tetap dipakai, tidak diubah**.
+
+**Alasan:** permintaan langsung sesi ini ("hapus limit width dari gambar di pembuka"). Karena ini membalik keputusan di atas, dikonfirmasi dulu ke user (bukan diasumsikan) — user memilih hapus total dan menerima risiko rasio kontainer jadi ekstrem tak terbatas di monitor sangat lebar.
+
+**Verifikasi ulang:** setelah pencabutan, diuji ulang di 1280px (referensi mockup, tidak berubah), 2200px, 2560px, dan 3440px (resolusi ultrawide sungguhan) lewat Chrome DevTools MCP. Di semua titik itu kepala pasangan **masih penuh terlihat dengan ruang di atas** — `object-[center_20%]` ternyata sudah cukup kuat sendirian tanpa perlu dibantu `max-w`, setidaknya sampai 3440px. Belum diuji di lebar >3440px (mis. monitor 5K/setup multi-monitor) karena dianggap di luar skenario realistis; kalau nanti ada laporan kepala terpotong di monitor yang lebih lebar dari itu, ini titik pertama yang perlu dicek ulang.
