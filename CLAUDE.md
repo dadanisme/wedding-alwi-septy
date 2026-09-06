@@ -74,6 +74,10 @@ Alasan lengkap tiap butir ada di `docs/DECISIONS.md`.
 
 Pemeriksaan visual di ponsel asli dilakukan manusia, bukan agent. Jangan menyatakan sebuah seksi selesai sebelum itu terjadi.
 
+## Aturan Wajib: Tanya Dulu Kalau Tidak Yakin
+
+**Kalau ada requirement, data, atau keputusan yang ambigu atau tidak jelas, TANYA ke user dulu. Jangan langsung asumsi dan mengerjakan.** Ini berlaku untuk apa pun — konten, desain, keputusan teknis, scope seksi yang dikerjakan, dsb. Lebih baik berhenti dan bertanya daripada salah asumsi lalu mengerjakan hal yang keliru.
+
 ## Catatan
 
 Route `/styleguide` **belum ada**. Ia dibuat setelah design system dikunci dari mockup yang disetujui mempelai. Sampai itu terjadi, jangan mencarinya dan jangan mengerjakan implementasi seksi — kerjakan hanya pekerjaan yang tidak bergantung desain.
