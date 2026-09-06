@@ -7,11 +7,14 @@ import {
   updateGuest,
   deleteGuest,
   batchImportGuests,
+  getGuestStats,
+  getAllGuests,
   type CreateGuestInput,
   type UpdateGuestInput,
   type BatchImportGuestItem,
 } from '../../lib/db/guests';
-import type { Guest } from '../../types/database';
+import { getAllMessagesForAdmin } from '../../lib/db/messages';
+import type { Guest, GuestSummaryStats, GuestMessage } from '../../types/database';
 
 export interface GuestActionResult {
   success: boolean;
@@ -19,6 +22,14 @@ export interface GuestActionResult {
   guest?: Guest;
   guests?: Guest[];
   count?: number;
+}
+
+export interface RefreshAdminDataResult {
+  success: boolean;
+  error?: string;
+  stats?: GuestSummaryStats;
+  messages?: GuestMessage[];
+  guests?: Guest[];
 }
 
 /**
@@ -196,3 +207,35 @@ export async function importGuestsAction(
     };
   }
 }
+
+/**
+ * Server Action untuk menyegarkan seluruh data dashboard admin secara live
+ * (statistik kapasitas, pesan Buku Tamu, dan daftar seluruh tamu).
+ */
+export async function refreshAdminDataAction(): Promise<RefreshAdminDataResult> {
+  const session = await verifyAdminSession();
+  if (!session.authenticated) {
+    return {
+      success: false,
+      error: 'Sesi admin tidak sah atau telah kedaluwarsa. Silakan login kembali.',
+    };
+  }
+
+  try {
+    const [stats, messages, guests] = await Promise.all([
+      getGuestStats(),
+      getAllMessagesForAdmin(),
+      getAllGuests(),
+    ]);
+
+    revalidatePath('/admin');
+    return { success: true, stats, messages, guests };
+  } catch (err) {
+    console.error('Gagal refreshAdminDataAction:', err);
+    return {
+      success: false,
+      error: 'Terjadi kesalahan saat menyegarkan data dari server.',
+    };
+  }
+}
+

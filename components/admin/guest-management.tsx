@@ -21,6 +21,7 @@ import {
   IconChevronDown,
   IconClock,
   IconAlertTriangle,
+  IconRefresh,
 } from './admin-icons';
 
 interface Props {
@@ -30,6 +31,8 @@ interface Props {
   onGuestDeleted: (guestId: string) => void;
   onGuestsImported: (count: number, newGuests?: Guest[]) => void;
   setNotice: (notice: { type: 'success' | 'error'; text: string }) => void;
+  onRefresh?: () => void | Promise<void>;
+  isRefreshing?: boolean;
 }
 
 type RsvpFilter = 'all' | 'pending' | 'attending' | 'not_attending' | 'opened' | 'unopened';
@@ -41,6 +44,8 @@ export default function GuestManagement({
   onGuestDeleted,
   onGuestsImported,
   setNotice,
+  onRefresh,
+  isRefreshing = false,
 }: Props) {
   const [rsvpFilter, setRsvpFilter] = useState<RsvpFilter>('all');
   const [groupFilter, setGroupFilter] = useState<string>('all');
@@ -200,7 +205,7 @@ export default function GuestManagement({
     <section className="rounded-2xl border border-[#E5D8C5] bg-white p-6 sm:p-8 shadow-md">
       {/* Header Bagian Manajemen Tamu */}
       <div className="flex flex-col gap-4 border-b border-[#E5D8C5] pb-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+        <div className="max-w-xl">
           <div className="flex items-center gap-2">
             <span className="rounded-lg bg-[#FAF6F0] border border-gold-deep/30 px-3 py-1 text-xs font-bold tracking-wider text-gold-deep uppercase">
               Manajemen Tamu (PRD §4.7)
@@ -214,8 +219,8 @@ export default function GuestManagement({
           </p>
         </div>
 
-        {/* Tombol Aksi Utama: Tambah, Impor, Ekspor */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        {/* Tombol Aksi Utama: Tambah, Impor, Ekspor, Refresh Data — 1 Baris Sejajar */}
+        <div className="flex shrink-0 items-center gap-2 overflow-x-auto pb-1 sm:pb-0 whitespace-nowrap">
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="cursor-pointer inline-flex items-center gap-2 rounded-xl bg-gold-deep px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-gold-deep/90"
@@ -239,6 +244,19 @@ export default function GuestManagement({
             <IconDownload size={16} />
             <span>Ekspor CSV</span>
           </button>
+
+          {onRefresh && (
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              title="Segarkan data"
+              aria-label="Segarkan data"
+              className="cursor-pointer inline-flex h-[42px] w-[42px] items-center justify-center rounded-xl border border-[#D5C6B1] bg-white text-ink shadow-xs transition hover:border-gold-deep hover:bg-[#FAF6F0] hover:text-gold-deep disabled:opacity-50"
+            >
+              <IconRefresh size={18} className={isRefreshing ? 'animate-spin text-gold-deep' : ''} />
+            </button>
+          )}
         </div>
       </div>
 

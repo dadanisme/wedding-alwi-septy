@@ -32,7 +32,12 @@ Fokus berikutnya:
     - Memperbaiki sudut bawah seluruh dialog modal (`WhatsAppModal`, `ImportCsvModal`, `GuestFormModal`, `DeleteGuestModal`) yang sebelumnya kotak/pecah dengan membungkus container utama dalam `rounded-2xl overflow-hidden` dan menambahkan `rounded-b-2xl` pada bilah aksi footer, sehingga lengkungan kartu tetap halus dan presisi.
     - Menghapus kotak opsi pembaruan slug URL pada modal edit tamu yang membingungkan; slug link tamu kini dipertahankan permanen dan aman tanpa membebani pengguna dengan detail teknis.
     - Menambahkan interaksi penutupan dialog saat pengguna mengeklik area latar belakang luar (*click outside backdrop*) serta dukungan tombol keyboard `Escape` di seluruh 4 modal admin.
-  - **Verifikasi**: Lolos 14/14 unit test (`bun test tests/guest-management.test.ts`), `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, serta verifikasi visual interaktif melalui Chrome DevTools MCP (pengujian desktop & mobile, inspeksi visual seluruh modal: Form Tamu, Generator WhatsApp, Hapus Tamu, dan CSV Impor, pengujian click outside & Escape close modal).
+  - **Tombol Segarkan Data ("Refresh Data") 1-Line Sejajar** (7 Sep 2026):
+    - Menambahkan tombol aksi penyegar data instan berbasis ikon SVG murni (`IconRefresh`, tanpa teks) di baris tombol aksi Manajemen Tamu (`[Tambah Tamu] [Impor CSV] [Ekspor CSV] [🔄]`) dan di tab Buku Tamu & Moderasi.
+    - Menjaga seluruh 4 tombol aksi tetap berada dalam **1 baris sejajar presisi** tanpa terpotong atau turun ke baris kedua (`shrink-0 flex-nowrap items-center gap-2 overflow-x-auto` dan pembatasan `max-w-xl` pada judul kiri).
+    - Membangun Server Action `refreshAdminDataAction()` di `app/actions/guests.ts` yang memuat ulang data tamu, statistik kapasitas, dan pesan ucapan secara live paralel tanpa perlu hard browser reload.
+    - Menghadirkan indikator pemuatan halus animasi putar (`animate-spin`) dan sinkronisasi state klien real-time.
+  - **Verifikasi**: Lolos 15/15 unit test (`bun test tests/guest-management.test.ts`), `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, serta verifikasi visual interaktif melalui Chrome DevTools MCP (pengujian desktop & mobile, klik tombol refresh dan verifikasi tata letak 1 baris).
 
 - **Admin Panel Bagian 2 — Manajemen Tamu Lengkap, Generator WhatsApp, Impor CSV & Ekspor** (7 Sep 2026):
   - **Tabel Tamu Responsif**: Menampilkan daftar tamu lengkap dengan nama, sapaan, kategori grup, status buka (frekuensi & waktu buka), deteksi penerusan link via hash perangkat unik (`uniqueDevices > 1`), status RSVP (Hadir + pendamping, Tidak Hadir, Belum Respons), serta catatan/kebutuhan khusus.

@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import type { GuestSummaryStats, GuestMessage, Guest } from '../../types/database';
 import { logoutAdminAction } from '../../app/actions/auth';
 import { toggleMessageVisibilityAction } from '../../app/actions/moderation';
+import { refreshAdminDataAction } from '../../app/actions/guests';
 import GuestManagement from './guest-management';
-import { IconUsers, IconMessageSquare, IconSearch, IconX } from './admin-icons';
+import { IconUsers, IconMessageSquare, IconSearch, IconX, IconRefresh } from './admin-icons';
 
 interface Props {
   initialStats: GuestSummaryStats;
@@ -30,6 +31,7 @@ export default function AdminDashboardClient({
   const [searchQuery, setSearchQuery] = useState('');
   const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [, startTransition] = useTransition();
 
   // Proyeksi headcount & metrik dihitung langsung dari data guests terbaru
@@ -161,6 +163,26 @@ export default function AdminDashboardClient({
       });
     } finally {
       setPendingMessageId(null);
+    }
+  };
+
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      const res = await refreshAdminDataAction();
+      if (res.success) {
+        if (res.guests) setGuests(res.guests);
+        if (res.messages) setMessages(res.messages);
+      } else if (res.error) {
+        setNotice({ type: 'error', text: res.error });
+      }
+      router.refresh();
+    } catch (err) {
+      console.error('Gagal menyegarkan data:', err);
+      setNotice({ type: 'error', text: 'Terjadi galat jaringan saat menyegarkan data.' });
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -461,6 +483,8 @@ export default function AdminDashboardClient({
               router.refresh();
             }}
             setNotice={setNotice}
+            onRefresh={handleRefresh}
+            isRefreshing={isRefreshing}
           />
         )}
 
@@ -479,7 +503,7 @@ export default function AdminDashboardClient({
                 </p>
               </div>
 
-              {/* Filter Tabs — 1 baris sejajar rapi tanpa bertumpuk */}
+              {/* Filter Tabs & Refresh — 1 baris sejajar rapi tanpa bertumpuk */}
               <div className="flex flex-nowrap shrink-0 items-center gap-2.5 overflow-x-auto pb-1 sm:pb-0 whitespace-nowrap">
                 <button
                   onClick={() => setModerationFilter('all')}
@@ -510,6 +534,16 @@ export default function AdminDashboardClient({
                   }`}
                 >
                   Disembunyikan ({hiddenMessagesCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  title="Segarkan data"
+                  aria-label="Segarkan data"
+                  className="cursor-pointer inline-flex h-[42px] w-[42px] items-center justify-center rounded-xl border border-[#D5C6B1] bg-white text-ink shadow-xs transition hover:border-gold-deep hover:bg-[#FAF6F0] hover:text-gold-deep disabled:opacity-50"
+                >
+                  <IconRefresh size={18} className={isRefreshing ? 'animate-spin text-gold-deep' : ''} />
                 </button>
               </div>
             </div>

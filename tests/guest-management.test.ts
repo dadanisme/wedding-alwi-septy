@@ -12,6 +12,7 @@ import {
   updateGuestAction,
   deleteGuestAction,
   importGuestsAction,
+  refreshAdminDataAction,
 } from '../app/actions/guests';
 
 describe('Manajemen Tamu: parseGuestsCsv', () => {
@@ -161,6 +162,12 @@ describe('Manajemen Tamu: Proteksi Server Actions', () => {
 
   it('menolak importGuestsAction saat tanpa sesi admin', async () => {
     const res = await importGuestsAction([{ name: 'Tamu A' }]);
+    expect(res.success).toBe(false);
+    expect(res.error).toContain('Sesi admin tidak sah');
+  });
+
+  it('menolak refreshAdminDataAction saat tanpa sesi admin', async () => {
+    const res = await refreshAdminDataAction();
     expect(res.success).toBe(false);
     expect(res.error).toContain('Sesi admin tidak sah');
   });
