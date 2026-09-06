@@ -7,17 +7,37 @@
 export const couple = {
   groom: {
     fullName: "Mochamad Ilham Alwi Rifa, S.T.",
+    firstNamePart: "Mochamad Ilham Alwi",
+    titlePart: "Rifa, S.T.",
     nickname: "Alwi",
     father: "Dadang Sukandi",
     mother: "Tini Hernawati",
+    parentLabel: "Putra dari Bapak Dadang Sukandi\n& Ibu Tini Hernawati",
+    photo: null as string | null,
+    photoPlaceholderText: "foto mempelai pria\n3:4",
+    photoPlaceholderDesktopText: "foto mempelai pria\n3:4 · 290 × 387",
+    instagram: null as string | null,
   },
   bride: {
     fullName: "Septyara Khotimaharani, S.Pd.",
+    firstNamePart: "Septyara",
+    titlePart: "Khotimaharani, S.Pd.",
     nickname: "Septy",
     father: "Uun Syukur",
     mother: "Imas Yuliah",
+    parentLabel: "Putri dari Bapak Uun Syukur\n& Ibu Imas Yuliah",
+    photo: null as string | null,
+    photoPlaceholderText: "foto mempelai wanita\n3:4",
+    photoPlaceholderDesktopText: "foto mempelai wanita\n3:4 · 290 × 387",
+    instagram: null as string | null,
   },
 } as const;
+
+export const mempelaiConfig = {
+  sectionLabel: "Mempelai",
+  temporaryNote: "* Foto dan detail profil bersifat sementara dan dapat disesuaikan kembali.",
+} as const;
+
 
 export const eventSchedule = {
   date: "2026-10-10",

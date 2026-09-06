@@ -627,4 +627,67 @@ body {
   text-indent: 0.28em;
 }
 
+/*
+ * Seksi Mempelai — ditranskrip persis dari mockup yang disetujui
+ * (Undangan Alwi & Septy.html, seksi 4).
+ */
+@utility text-mempelai-parents {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.75;
+}
+@utility text-mempelai-parents-lg {
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+@utility text-mempelai-nickname {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1;
+}
+
+@utility text-mempelai-ampersand {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1;
+}
+@utility text-mempelai-ampersand-lg {
+  font-size: 34px;
+}
+
+@utility text-mempelai-note {
+  font-family: ui-monospace, monospace;
+  font-weight: 400;
+  font-size: 8px;
+  line-height: 1.7;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+@utility text-mempelai-note-lg {
+  font-size: 9px;
+}
+
+@utility bg-mempelai-placeholder {
+  background-color: #d8ccb4;
+  background-image: repeating-linear-gradient(
+    118deg,
+    rgba(58, 42, 28, 0.07) 0 8px,
+    transparent 8px 18px
+  );
+}
+@utility bg-mempelai-placeholder-lg {
+  background-image: repeating-linear-gradient(
+    118deg,
+    rgba(58, 42, 28, 0.07) 0 10px,
+    transparent 10px 22px
+  );
+}
+
+
 

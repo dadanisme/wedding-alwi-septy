@@ -405,8 +405,25 @@ Menyediakan fasilitas praktis bagi tamu yang berhalangan hadir atau ingin member
 Memberikan penutup visual yang hangat, elegan, dan megah dengan bingkai gelap espresso yang mengimbangi layar Sampul di awal halaman, sesuai kaidah desain yang disepakati (aksen gelap proporsional).
 
 **Ditolak:**
-1. Menambahkan wave divider sebelum Penutup (mockup approved secara eksplisit menggunakan transisi warna lurus dan bersih dari seksi Hadiah ke seksi Penutup).
-2. Menggunakan warna putih mentah `#FFFFFF` atau teks emas untuk isi pesan (melanggar aturan WCAG AA dan kesepakatan palet warna terkunci).
+---
+
+## Seksi 4 Mempelai: Tata Letak, Penanganan Gelar Akademik, dan Placeholder Foto Sementara
+
+**Keputusan:**
+1. **Implementasi Lebih Awal dari Status Terkunci:** Atas permintaan pengguna ("kerjakan saja yang terkunci, tapi kasih notes gambar & konten bisa berubah"), Seksi Mempelai diimplementasikan sebelum tersedianya foto solo resmi dari klien.
+2. **Penyajian Placeholder Foto 3:4 yang Elegan:** Menggunakan pola placeholder dari mockup yang disetujui (`docs/mockup/Undangan Alwi & Septy.html`, seksi 4) yaitu kotak berasio 3:4 dengan motif arsir halus (`bg-mempelai-placeholder`) berbingkai garis emas ganda (`border border-gold-bright` dan `lg:outline lg:outline-1 lg:outline-gold-bright/35 lg:outline-offset-8`). Menampilkan teks penanda ukuran dan label `(sementara)` yang fleksibel jika nanti tautan foto dimasukkan ke `couple.groom.photo` / `couple.bride.photo`.
+3. **Uji Penanganan Nama Panjang Bergelar pada Layar 390px:** Sesuai arahan `docs/spesifikasi-arah-desain.md` §5, nama lengkap bergelar *Mochamad Ilham Alwi Rifa, S.T.* dan *Septyara Khotimaharani, S.Pd.* diuji ketat di viewport 390px. Nama dipisah menjadi bagian depan dan bagian penutup bergelar (`whitespace-nowrap`) sehingga pemenggalan baris terjadi secara alami antara baris nama dan gelar tanpa memutuskan singkatan gelar (misal `Rifa, S.T.` dan `Khotimaharani, S.Pd.` selalu utuh di satu baris).
+4. **Tata Letak Responsif:**
+   - **Ponsel:** 1 kolom vertikal bertumpuk dipisah oleh pembatas horizontal garis gradien emas mengapit simbol ampersand `&` (*Cormorant Garamond* italic). Ornamen sulur `#sulur` dipasang di sudut kanan atas (110×110px, opacity 0.45).
+   - **Desktop:** Grid 3 kolom sejajar (`grid-cols-[1fr_88px_1fr]`), di mana kolom tengah memuat garis gradien emas vertikal atas-bawah (panjang 80px) mengapit simbol ampersand `&` (*Cormorant Garamond* 34px). Ornamen sulur dipasang simetris di sudut kiri dan kanan atas (170×170px, opacity 0.4).
+5. **Sentralisasi Konten & Catatan:** Seluruh teks nama, gelar, panggilan, orang tua, dan catatan disclaimer ("* Foto dan detail profil bersifat sementara dan dapat disesuaikan kembali.") disimpan terpusat di `lib/event-config.ts` (`couple` dan `mempelaiConfig`). Tipografi didaftarkan sebagai token `@utility` baru di `app/globals.css` (`text-mempelai-parents(-lg)`, `text-mempelai-nickname`, `text-mempelai-ampersand(-lg)`, `text-mempelai-note(-lg)`, dan `bg-mempelai-placeholder(-lg)`).
+
+**Alasan:**
+Memungkinkan pengerjaan seksi terus bergerak maju tanpa menunggu foto solo, sembari memastikan struktur visual, ritme spasi, dan hierarki tipografi sudah terpasang sempurna dan cocok dengan mockup approved.
+
+**Ditolak:**
+1. Memotong paksa foto prewedding berdua untuk solo shot tanpa persetujuan klien (dapat merusak resolusi dan komposisi asli foto).
+2. Memakai foto dummy acak dari luar yang tidak senada dengan gaya prewedding asli.
 
 
 

@@ -6,6 +6,7 @@ import { MusicPlayer } from "@/components/music-player";
 import { Sampul } from "@/components/sections/sampul";
 import { Ayat } from "@/components/sections/ayat";
 import { Pembuka } from "@/components/sections/pembuka";
+import { Mempelai } from "@/components/sections/mempelai";
 import { Galeri } from "@/components/sections/galeri";
 import { Acara } from "@/components/sections/acara";
 import { Rsvp } from "@/components/sections/rsvp";
@@ -160,6 +161,7 @@ export function InvitationExperience({
         <Sampul guestName={guestName} onOpen={handleOpen} />
         <Ayat />
         <Pembuka />
+        <Mempelai />
         <Galeri />
         <Acara />
         <Rsvp />
