@@ -18,21 +18,22 @@ export function Pembuka() {
           alt="Alwi & Septy — busana adat Sunda"
           fill
           sizes="100vw"
-          className="object-cover object-top"
+          className="object-cover object-[center_20%]"
         />
+        <div className="absolute inset-0 bg-pembuka-scrim" />
       </div>
       <div className="absolute inset-0 hidden lg:block">
-        <Image
-          src={openingPhotos.landscape}
-          alt="Alwi & Septy — busana adat Sunda"
-          fill
-          sizes="100vw"
-          className="object-cover object-top"
-        />
+        <div className="relative mx-auto h-full max-w-[1600px]">
+          <Image
+            src={openingPhotos.landscape}
+            alt="Alwi & Septy — busana adat Sunda"
+            fill
+            sizes="(min-width: 1600px) 1600px, 100vw"
+            className="object-cover object-[center_20%]"
+          />
+          <div className="absolute inset-0 bg-pembuka-scrim-lg" />
+        </div>
       </div>
-
-      <div className="absolute inset-0 bg-pembuka-scrim lg:hidden" />
-      <div className="absolute inset-0 hidden bg-pembuka-scrim-lg lg:block" />
 
       <svg
         className="absolute top-[-1px] left-0 block h-[66px] w-full -scale-y-100 lg:h-[110px]"
