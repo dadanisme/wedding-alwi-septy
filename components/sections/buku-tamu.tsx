@@ -53,7 +53,7 @@ export function BukuTamu({ guestName = "" }: BukuTamuProps) {
     >
       {/* Ornamen sulur pojok kiri bawah (khusus ponsel) */}
       <svg
-        className="pointer-events-none absolute -bottom-[12px] -left-[18px] h-[110px] w-[110px] -scale-y-100 opacity-40 lg:hidden"
+        className="pointer-events-none absolute bottom-[6px] -left-[10px] h-[110px] w-[110px] -scale-y-100 opacity-40 lg:hidden"
         aria-hidden="true"
       >
         <use href="#sulur" />
@@ -61,13 +61,13 @@ export function BukuTamu({ guestName = "" }: BukuTamuProps) {
 
       {/* Ornamen sulur kiri & kanan bawah (khusus desktop) */}
       <svg
-        className="pointer-events-none absolute -bottom-[16px] -left-[10px] hidden h-[170px] w-[170px] -scale-y-100 opacity-34 lg:block"
+        className="pointer-events-none absolute bottom-[6px] -left-[10px] hidden h-[170px] w-[170px] -scale-y-100 opacity-34 lg:block"
         aria-hidden="true"
       >
         <use href="#sulur" />
       </svg>
       <svg
-        className="pointer-events-none absolute -bottom-[16px] -right-[10px] hidden h-[170px] w-[170px] -scale-x-100 -scale-y-100 opacity-34 lg:block"
+        className="pointer-events-none absolute bottom-[6px] -right-[10px] hidden h-[170px] w-[170px] -scale-x-100 -scale-y-100 opacity-34 lg:block"
         aria-hidden="true"
       >
         <use href="#sulur" />
