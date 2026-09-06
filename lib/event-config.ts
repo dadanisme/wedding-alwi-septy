@@ -89,3 +89,71 @@ export const openingPhotos = {
   portrait: "/photos/adat-sunda-03.jpg",
   landscape: "/photos/adat-sunda-04.jpg",
 } as const;
+
+/**
+ * Foto untuk seksi Galeri — seluruh 21 foto dari klien, urut mengikuti
+ * penomoran file (modern-01..12 lalu adat-sunda-01..09). `orientation`
+ * diukur langsung dari dimensi asli tiap berkas (bukan ditebak): dipakai
+ * komponen untuk memilih rasio tile grid per foto, bukan memaksa semua
+ * foto ke satu rasio potret seperti wireframe mockup — mockup hanya
+ * menyediakan penampung, tanpa foto asli. Lihat docs/DECISIONS.md.
+ */
+export const galleryPhotos = [
+  { src: "/photos/modern-01.jpg", alt: "Alwi & Septy — foto modern 1", orientation: "portrait" },
+  { src: "/photos/modern-02.jpg", alt: "Alwi & Septy — foto modern 2", orientation: "portrait" },
+  { src: "/photos/modern-03.jpg", alt: "Alwi & Septy — foto modern 3", orientation: "portrait" },
+  { src: "/photos/modern-04.jpg", alt: "Alwi & Septy — foto modern 4", orientation: "portrait" },
+  { src: "/photos/modern-05.jpg", alt: "Alwi & Septy — foto modern 5", orientation: "landscape" },
+  { src: "/photos/modern-06.jpg", alt: "Alwi & Septy — foto modern 6", orientation: "landscape" },
+  { src: "/photos/modern-07.jpg", alt: "Alwi & Septy — foto modern 7", orientation: "landscape" },
+  { src: "/photos/modern-08.jpg", alt: "Alwi & Septy — foto modern 8", orientation: "landscape" },
+  { src: "/photos/modern-09.jpg", alt: "Alwi & Septy — foto modern 9", orientation: "landscape" },
+  { src: "/photos/modern-10.jpg", alt: "Alwi & Septy — foto modern 10", orientation: "landscape" },
+  { src: "/photos/modern-11.jpg", alt: "Alwi & Septy — foto modern 11", orientation: "landscape" },
+  { src: "/photos/modern-12.jpg", alt: "Alwi & Septy — foto modern 12", orientation: "landscape" },
+  {
+    src: "/photos/adat-sunda-01.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 1",
+    orientation: "portrait",
+  },
+  {
+    src: "/photos/adat-sunda-02.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 2",
+    orientation: "portrait",
+  },
+  {
+    src: "/photos/adat-sunda-03.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 3",
+    orientation: "portrait",
+  },
+  {
+    src: "/photos/adat-sunda-04.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 4",
+    orientation: "landscape",
+  },
+  {
+    src: "/photos/adat-sunda-05.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 5",
+    orientation: "landscape",
+  },
+  {
+    src: "/photos/adat-sunda-06.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 6",
+    orientation: "landscape",
+  },
+  {
+    src: "/photos/adat-sunda-07.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 7",
+    orientation: "landscape",
+  },
+  {
+    src: "/photos/adat-sunda-08.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 8",
+    orientation: "landscape",
+  },
+  {
+    src: "/photos/adat-sunda-09.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 9",
+    orientation: "landscape",
+  },
+] as const;

@@ -1,14 +1,12 @@
 # PROGRESS
 
-Diperbarui: 6 September 2026 (malam, lanjutan)
+Diperbarui: 6 September 2026 (malam, lanjutan lagi)
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Foto prewedding asli dari klien sudah masuk (`public/photos/`, 21 foto) — lihat "Selesai". Ini membuka blocker Sampul & Galeri, tapi **Mempelai** dan **Love Story** masih terkunci (lihat Terkunci) karena kebutuhannya beda: Mempelai butuh foto solo (semua 21 foto yang ada berdua), Love Story butuh naskah.
-
-Berkas config konten acara sudah ada (`lib/event-config.ts`, baru mencakup data mempelai/jadwal/venue/rekening/foto sampul — akan bertambah seiring seksi lain diimplementasikan).
+**Mempelai** dan **Love Story** masih terkunci (lihat Terkunci) karena kebutuhannya beda: Mempelai butuh foto solo (semua 21 foto yang ada berdua), Love Story butuh naskah. Seksi Galeri (lihat "Selesai") sengaja dikerjakan duluan sambil menunggu, dan untuk sementara dirender langsung setelah Pembuka di `app/page.tsx` — begitu Mempelai & Love Story selesai, `<Galeri />` perlu dipindah ke posisi yang benar (setelah keduanya, sesuai urutan PRD §4.2).
 
 Firebase/Firestore/Auth dan lapisan akses data **belum** dikerjakan — masih di daftar "Berikutnya".
 
@@ -34,12 +32,14 @@ Firebase/Firestore/Auth dan lapisan akses data **belum** dikerjakan — masih di
   Tiga putaran perbaikan pasca-implementasi awal (kronologi lengkap & alasan tiap fix ada di `docs/DECISIONS.md`, jangan diulang di sini): (1) `/code-review` menemukan risiko teks terpotong diam-diam → `h-` jadi `min-h-`; (2) fix itu sendiri regresi (teks salam nongol di atas, bukan di bawah) karena `h-full` tidak resolve terhadap parent `min-height` — ketahuan dari screenshot manusia, diperbaiki dengan pindahkan `justify-end` ke `<section>`; (3) di monitor lebar (>1920px) foto latar motong kepala pasangan karena kontainer jadi sangat pipih (tinggi nyaris tetap, lebar `100vw` tak terbatas) — diperbaiki dengan `max-w-[1600px]` khusus foto desktop + `object-position` custom (`object-[center_20%]`, dihitung dari posisi kepala asli di foto, bukan tebakan). **Pelajaran yang berulang di seksi ini: re-verifikasi visual wajib di setiap perubahan CSS/layout, jangan asumsi "aman" dari kode saja** (sudah disimpan ke memory).
   Diverifikasi ulang di 390px, ~1000px (kasus terburuk foto ponsel: tablet lanskap), 1280px (referensi mockup — tidak berubah), dan 2200px (monitor lebar) — kepala aman & framing wajar di semua titik itu. **Belum dikonfirmasi manusia di ponsel asli** untuk versi final ini.
   **Update:** `max-w-[1600px]` di atas dicabut lagi atas permintaan user sesi ini (dikonfirmasi dulu karena membalik keputusan sebelumnya — lihat `docs/DECISIONS.md`). Foto desktop kembali full-bleed 100vw tanpa batas lebar; `object-[center_20%]` tidak diubah. Diverifikasi ulang di 1280px/2200px/2560px/3440px — kepala masih aman di semua titik itu, tidak diuji di atas 3440px.
+- **Seksi Galeri** (`components/sections/galeri.tsx`, dirender di `/` setelah Pembuka — posisi sementara, lihat "Sedang Dikerjakan") — grid seluruh 21 foto klien (bukan subset kurasi, dikonfirmasi user) dengan lightbox custom (navigasi next/prev, keyboard, swipe ponsel, indikator posisi, tanpa dependency baru). Rasio tile mengikuti orientasi foto asli, bukan wireframe mockup yang mengasumsikan mayoritas potret — detail penyimpangan, 2 bug layout grid yang ditemukan+diperbaiki (sel kosong & tinggi baris tidak rata), dan 3 temuan `/code-review` (sizes per-tile-span, scope efek fokus, safety-net `assertNoGridGaps`) semua ada di `docs/DECISIONS.md`, jangan diulang di sini. Konten baru di `lib/event-config.ts` (`galleryPhotos`, 21 entri + orientasi terukur), utility tipografi baru (`text-section-label(-lg)`, dipakai lintas seksi masa depan yang punya pola label sama). Diverifikasi visual di 390px, 1280px, dan 2200px (termasuk titik yang sempat bug) lewat Chrome DevTools MCP, lolos `/code-review`. **Belum dikonfirmasi manusia di ponsel asli.**
 
 ## Berikutnya
 
 - Setup project Firebase — Firestore dan Auth
 - Lapisan akses data
-- Implementasi seksi berikutnya satu per satu — kandidat siap: **Galeri** (foto sudah ada). Detail Acara/RSVP/Buku Tamu/Hadiah/Penutup belum dicek blocker-nya secara spesifik.
+- Implementasi seksi berikutnya satu per satu — Detail Acara/RSVP/Buku Tamu/Hadiah/Penutup belum dicek blocker-nya secara spesifik.
+- Begitu Mempelai & Love Story unlock: pindahkan `<Galeri />` di `app/page.tsx` ke posisi setelah keduanya (urutan PRD §4.2), bukan langsung setelah Pembuka.
 
 ## Terkunci
 

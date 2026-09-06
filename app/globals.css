@@ -248,3 +248,25 @@ body {
   font-size: 18px;
   line-height: 1.95;
 }
+
+/*
+ * Label eyebrow kecil di atas judul tiap seksi (mis. "GALERI", "RSVP",
+ * "BUKU TAMU") — pola yang berulang di banyak seksi pada mockup (bukan
+ * spesifik satu seksi seperti utility text-ayat-title atau
+ * text-pembuka-greeting di atas). Ditemukan saat implementasi seksi
+ * Galeri. Warna & text-indent sengaja tidak dibakukan di sini — ikuti
+ * pola text-label-small: pakai token warna (mis. text-ink-soft) & indent-[]
+ * terpisah di komponen.
+ */
+@utility text-section-label {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+}
+@utility text-section-label-lg {
+  font-size: 14px;
+  letter-spacing: 0.48em;
+}
