@@ -212,6 +212,9 @@ export default function AdminDashboardClient({
           </div>
 
           <div className="flex items-center gap-3">
+            <div className="hidden text-right text-sm font-medium text-ink-soft sm:block">
+              <span>{adminEmail}</span>
+            </div>
             <a
               href="/"
               target="_blank"
@@ -220,9 +223,6 @@ export default function AdminDashboardClient({
             >
               Lihat Undangan Publik ↗
             </a>
-            <div className="hidden text-right text-sm font-medium text-ink-soft sm:block">
-              <span>{adminEmail}</span>
-            </div>
             <button
               onClick={handleLogout}
               className="cursor-pointer rounded-xl border border-rose-300 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-800 transition hover:bg-rose-100 hover:text-rose-900"

@@ -443,30 +443,53 @@ export default function GuestManagement({
                     {/* Status Buka Sampul */}
                     <td className="px-4 py-3.5">
                       {isOpened ? (
-                        <div className="space-y-1">
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold text-emerald-800">
+                        <div className="group relative inline-flex items-center gap-1.5">
+                          <span
+                            title={`Terakhir dibuka: ${formatDateTime(guest.lastOpenedAt || guest.openedAt)}${hasMultipleDevices ? ` · ${guest.uniqueDevices.length} Perangkat berbeda` : ''}`}
+                            className="cursor-help inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold text-emerald-800 whitespace-nowrap"
+                          >
                             <IconCheck size={12} className="stroke-[3]" />
                             <span>Dibuka ({guest.openCount}x)</span>
                           </span>
-                          <div className="text-[11px] text-ink-soft">
-                            {formatDateTime(guest.lastOpenedAt || guest.openedAt)}
-                          </div>
+
                           {hasMultipleDevices && (
-                            <div className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-900" title="Tautan dibuka dari beberapa perangkat berbeda">
+                            <span
+                              className="cursor-help inline-flex items-center gap-1 rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 whitespace-nowrap"
+                              title={`Tautan dibuka dari ${guest.uniqueDevices.length} perangkat berbeda (indikasi diteruskan)`}
+                            >
                               <IconAlertTriangle size={11} className="text-amber-800 shrink-0" />
                               <span>{guest.uniqueDevices.length} Perangkat</span>
-                            </div>
+                            </span>
                           )}
+
+                          {/* Tooltip on hover */}
+                          <div className="pointer-events-none absolute bottom-full left-0 mb-1.5 hidden group-hover:flex flex-col items-start z-30 whitespace-nowrap">
+                            <div className="rounded-lg bg-[#2C1E14] px-2.5 py-1 text-[11px] font-medium text-white shadow-lg">
+                              <div>Terakhir dibuka: {formatDateTime(guest.lastOpenedAt || guest.openedAt)}</div>
+                              {hasMultipleDevices && (
+                                <div className="text-amber-300 font-semibold text-[10px] mt-0.5">
+                                  ⚠️ Dibuka dari {guest.uniqueDevices.length} perangkat berbeda
+                                </div>
+                              )}
+                            </div>
+                            <div className="w-2 h-1 ml-4 -mt-px border-t-4 border-t-[#2C1E14] border-x-4 border-x-transparent" />
+                          </div>
                         </div>
                       ) : (
-                        <div className="space-y-1">
-                          <span className="inline-block rounded-full bg-gray-100 border border-gray-200 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
+                        <div className="group relative inline-flex items-center gap-1.5">
+                          <span
+                            title={guest.autoVisitCount > 0 ? `Pratinjau link WhatsApp bot: ${guest.autoVisitCount}x` : 'Belum pernah dibuka oleh tamu'}
+                            className="inline-block rounded-full bg-gray-100 border border-gray-200 px-2.5 py-0.5 text-xs font-semibold text-gray-600 whitespace-nowrap"
+                          >
                             Belum Buka
                           </span>
                           {guest.autoVisitCount > 0 && (
-                            <div className="text-[10px] text-ink-soft" title="Pratinjau link oleh bot WhatsApp">
+                            <span
+                              className="cursor-help inline-block rounded-md bg-gray-100 border border-gray-200 px-2 py-0.5 text-[11px] font-medium text-ink-soft whitespace-nowrap"
+                              title={`Pratinjau link oleh bot WhatsApp: ${guest.autoVisitCount}x`}
+                            >
                               WA Preview: {guest.autoVisitCount}x
-                            </div>
+                            </span>
                           )}
                         </div>
                       )}
@@ -475,22 +498,41 @@ export default function GuestManagement({
                     {/* Status RSVP */}
                     <td className="px-4 py-3.5">
                       {guest.rsvpStatus === 'attending' ? (
-                        <div className="space-y-1">
-                          <span className="inline-block rounded-full bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 text-xs font-bold text-emerald-900">
+                        <div className="group relative inline-flex items-center">
+                          <span
+                            title={
+                              guest.rsvp?.plusOne
+                                ? `Membawa 1 Pendamping: ${guest.rsvp.plusOneName || 'Tanpa nama'}`
+                                : 'Hadir sendiri (1 Orang)'
+                            }
+                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold whitespace-nowrap ${
+                              guest.rsvp?.plusOne
+                                ? 'cursor-help bg-emerald-100 border border-emerald-300 text-emerald-900'
+                                : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                            }`}
+                          >
                             Hadir {guest.rsvp?.plusOne ? '(2 Orang)' : '(1 Orang)'}
                           </span>
+
+                          {/* Tooltip info pendamping jika membawa +1 */}
                           {guest.rsvp?.plusOne && (
-                            <div className="text-xs text-ink-soft">
-                              +1 {guest.rsvp.plusOneName ? `(${guest.rsvp.plusOneName})` : 'Pendamping'}
+                            <div className="pointer-events-none absolute bottom-full left-0 mb-1.5 hidden group-hover:flex flex-col items-start z-30 whitespace-nowrap">
+                              <div className="rounded-lg bg-[#2C1E14] px-2.5 py-1 text-[11px] font-medium text-white shadow-lg">
+                                +1 Pendamping:{' '}
+                                <strong className="text-amber-200">
+                                  {guest.rsvp.plusOneName ? guest.rsvp.plusOneName : 'Tanpa nama'}
+                                </strong>
+                              </div>
+                              <div className="w-2 h-1 ml-4 -mt-px border-t-4 border-t-[#2C1E14] border-x-4 border-x-transparent" />
                             </div>
                           )}
                         </div>
                       ) : guest.rsvpStatus === 'not_attending' ? (
-                        <span className="inline-block rounded-full bg-rose-100 border border-rose-300 px-2.5 py-0.5 text-xs font-bold text-rose-900">
+                        <span className="inline-block rounded-full bg-rose-100 border border-rose-300 px-2.5 py-0.5 text-xs font-bold text-rose-900 whitespace-nowrap">
                           Tidak Hadir
                         </span>
                       ) : (
-                        <span className="inline-block rounded-full bg-amber-100 border border-amber-300 px-2.5 py-0.5 text-xs font-bold text-amber-900">
+                        <span className="inline-block rounded-full bg-amber-100 border border-amber-300 px-2.5 py-0.5 text-xs font-bold text-amber-900 whitespace-nowrap">
                           Belum Konfirmasi
                         </span>
                       )}
@@ -513,17 +555,17 @@ export default function GuestManagement({
                         {/* Tombol WhatsApp */}
                         <button
                           onClick={() => setSelectedWaGuest(guest)}
-                          className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-2.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#20bd5a] transition"
+                          className="cursor-pointer inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-[#25D366] px-3 text-xs font-bold text-white shadow-xs hover:bg-[#20bd5a] transition shrink-0"
                           title="Buka Generator WhatsApp"
                         >
                           <IconWhatsApp size={14} />
-                          <span className="hidden xl:inline">WhatsApp</span>
+                          <span>WhatsApp</span>
                         </button>
 
                         {/* Tombol Salin Link */}
                         <button
                           onClick={() => handleCopyLink(guest)}
-                          className="cursor-pointer rounded-lg border border-[#D5C6B1] bg-white p-2 text-xs font-semibold text-ink hover:bg-[#FAF6F0] transition"
+                          className="cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#D5C6B1] bg-white text-xs font-semibold text-ink hover:bg-[#FAF6F0] transition shrink-0"
                           title="Salin tautan personal"
                         >
                           {copiedGuestId === guest.id ? (
@@ -536,7 +578,7 @@ export default function GuestManagement({
                         {/* Tombol Edit */}
                         <button
                           onClick={() => setEditingGuest(guest)}
-                          className="cursor-pointer rounded-lg border border-[#D5C6B1] bg-white p-2 text-xs font-semibold text-ink hover:bg-[#FAF6F0] transition"
+                          className="cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#D5C6B1] bg-white text-xs font-semibold text-ink hover:bg-[#FAF6F0] transition shrink-0"
                           title="Edit tamu"
                         >
                           <IconEdit size={14} />
@@ -545,7 +587,7 @@ export default function GuestManagement({
                         {/* Tombol Hapus */}
                         <button
                           onClick={() => setDeletingGuest(guest)}
-                          className="cursor-pointer rounded-lg border border-rose-200 bg-rose-50 p-2 text-xs font-semibold text-rose-800 hover:bg-rose-100 transition"
+                          className="cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-lg border border-rose-200 bg-rose-50 text-xs font-semibold text-rose-800 hover:bg-rose-100 transition shrink-0"
                           title="Hapus tamu"
                         >
                           <IconTrash size={14} />

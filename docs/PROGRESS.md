@@ -15,7 +15,7 @@ Fokus berikutnya:
 
 ## Selesai
 
-- **Penyempurnaan UI Admin Panel — Ikon Vektor SVG, Dropdown Select Styling, & Segmented Tabs** (7 Sep 2026):
+- **Penyempurnaan UI Admin Panel — Ikon Vektor SVG, Dropdown Select Styling, Segmented Tabs, & Tooltips** (7 Sep 2026):
   - **Sistem Ikon Vektor Native (`components/admin/admin-icons.tsx`)**: Menggantikan seluruh emoji di admin panel dengan ikon SVG vektor konsisten (stroke 2px, fill currentColor, ukuran serasi): `IconUsers`, `IconUserPlus`, `IconUpload`, `IconDownload`, `IconWhatsApp`, `IconLink`, `IconEdit`, `IconTrash`, `IconCopy`, `IconCheck`, `IconSearch`, `IconX`, `IconChevronDown`, `IconMessageSquare`, `IconClock`, `IconAlertTriangle`, `IconFileText`, `IconMail`. Bebas dependensi pustaka ikon eksternal.
   - **Perbaikan Dropdown Select & Form Modal (`components/admin/guest-form-modal.tsx`, `components/admin/guest-management.tsx`)**:
     - Memperbaiki chevron dropdown native yang sebelumnya menempel/mepet di tepi kanan dengan menerapkan `appearance-none pr-10 pl-3.5 relative` dipadukan `IconChevronDown` positioned absolute di sisi kanan dengan padding elegan.
@@ -23,7 +23,11 @@ Fokus berikutnya:
   - **Tab Navigasi Segmented Top-Level (`components/admin/dashboard-client.tsx`)**:
     - Menghadirkan tab navigasi pill segmented elegan di bawah kartu metrik ringkasan untuk beralih antara modul **Manajemen Tamu** (`IconUsers`, badge counter tamu) dan **Buku Tamu & Moderasi** (`IconMessageSquare`, badge counter pesan).
     - Mencegah halaman menjadi terlalu panjang dan padat ketika jumlah tamu (150) dan pesan ucapan bertambah banyak.
-  - **Verifikasi**: Lolos 14/14 unit test (`bun test tests/guest-management.test.ts`), `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, serta verifikasi visual interaktif melalui Chrome DevTools MCP (pengujian desktop & modal).
+  - **Perbaikan Proporsi Tombol Aksi & Tooltip Detail Tamu**:
+    - Memperbaiki ukuran tombol WhatsApp agar seragam presisi `h-8` (32px) dengan tombol salin link, edit, dan hapus (`h-8 w-8`).
+    - Menukar posisi email admin dan tombol "Lihat Undangan Publik" di header navigasi sesuai hierarki konteks akun.
+    - Mengubah timestamp buka sampul dan detail `+1 Pendamping` menjadi floating tooltip elegan di atas chip (lengkap dengan panah pointer dan fallback aksesibilitas `title`), sehingga baris tabel tetap satu baris rapi dan bebas dari teks menggantung di bawah chip.
+  - **Verifikasi**: Lolos 14/14 unit test (`bun test tests/guest-management.test.ts`), `bun run lint` (0 error, 0 warning), `bun run build` sukses 100%, serta verifikasi visual interaktif melalui Chrome DevTools MCP (pengujian desktop, hover state tooltip, & modal).
 
 - **Admin Panel Bagian 2 — Manajemen Tamu Lengkap, Generator WhatsApp, Impor CSV & Ekspor** (7 Sep 2026):
   - **Tabel Tamu Responsif**: Menampilkan daftar tamu lengkap dengan nama, sapaan, kategori grup, status buka (frekuensi & waktu buka), deteksi penerusan link via hash perangkat unik (`uniqueDevices > 1`), status RSVP (Hadir + pendamping, Tidak Hadir, Belum Respons), serta catatan/kebutuhan khusus.
