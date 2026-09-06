@@ -71,11 +71,47 @@ export function InvitationExperience({
         });
     }
 
-    // Gulir halus (smooth scroll) ke seksi berikutnya (Ayat) setelah layout re-render
+    // Gulir halus sinematik (spring-like ease-in-out) ke seksi berikutnya (Ayat)
     setTimeout(() => {
       const ayatEl = document.getElementById("ayat");
       if (ayatEl) {
-        ayatEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        const targetY = ayatEl.getBoundingClientRect().top + window.scrollY;
+        const startY = window.scrollY || window.pageYOffset;
+        const diff = targetY - startY;
+        const duration = 1500; // 1,5 detik untuk transisi lembut, elegan, dan megah
+        const startTime = performance.now();
+        let animationFrameId: number;
+
+        // Kurva ease-in-out cubic: akselerasi lembut di awal, meluncur megah, lalu deselerasi panjang
+        const easeInOutCubic = (t: number): number => {
+          return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        };
+
+        const cancel = () => {
+          cancelAnimationFrame(animationFrameId);
+          window.removeEventListener("wheel", cancel);
+          window.removeEventListener("touchstart", cancel);
+        };
+
+        window.addEventListener("wheel", cancel, { passive: true });
+        window.addEventListener("touchstart", cancel, { passive: true });
+
+        const step = (currentTime: number) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const ease = easeInOutCubic(progress);
+
+          window.scrollTo(0, startY + diff * ease);
+
+          if (progress < 1) {
+            animationFrameId = requestAnimationFrame(step);
+          } else {
+            window.removeEventListener("wheel", cancel);
+            window.removeEventListener("touchstart", cancel);
+          }
+        };
+
+        animationFrameId = requestAnimationFrame(step);
       }
     }, 50);
   };
