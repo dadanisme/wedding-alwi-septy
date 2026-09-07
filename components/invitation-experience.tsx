@@ -203,7 +203,6 @@ export function InvitationExperience({
         <Pembuka />
         <Mempelai />
         <LoveStory />
-        <Galeri />
         <Acara />
         <Rsvp fullSlug={guest?.fullSlug} initialRsvp={guest?.rsvp ?? null} />
         <BukuTamu
@@ -214,6 +213,7 @@ export function InvitationExperience({
           initialLoadFailed={guestBookLoadFailed}
         />
         <Hadiah />
+        <Galeri />
         <Penutup />
       </main>
 
