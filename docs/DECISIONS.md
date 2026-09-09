@@ -285,6 +285,21 @@ Percobaan pertama pakai `object-top` (0%) — ini menghilangkan potongan kepala,
 
 ---
 
+## Seksi Galeri: Penyesuaian Foto Klien (Hapus 3 Foto & Relokasi Posisi Foto Adat Sunda 4 & 9)
+
+**Keputusan:** atas arahan pengguna/mempelai:
+1. Menghapus 3 foto dari `galleryPhotos` di `lib/event-config.ts`:
+   - `modern-10.jpg` ("Alwi & Septy — foto modern 10")
+   - `modern-12.jpg` ("Alwi & Septy — foto modern 12")
+   - `adat-sunda-05.jpg` ("Alwi & Septy — busana adat Sunda 5")
+2. Memindahkan `adat-sunda-04.jpg` dan `adat-sunda-09.jpg` ke posisi setelah `modern-11.jpg` (menggantikan posisi `modern-12.jpg`).
+3. Total foto galeri menjadi 18 foto.
+
+**Verifikasi layout grid:**
+- Grid ponsel (2 kolom) dan desktop (4 kolom) diverifikasi ulang terhadap fungsi `assertNoGridGaps()`. Susunan baru tidak menyisakan celah/gap baris kosong di tengah grid dan lolos assertion build Next.js.
+
+---
+
 ## Container system terpusat (max-w: 1440px) dan perlakuan ultrawide
 
 **Keputusan:** seluruh halaman undangan dibatasi lebar maksimum 1440px (`max-w-page`) di tengah layar (`mx-auto`) untuk viewport ultrawide (>1440px). Area luar (gutter) di ultrawide memakai warna matte linen hangat (`--color-matte: #e4ded2`, berasal dari acuan warna latar bundler mockup yang disetujui) dipadukan dengan tekstur motif damask botani melati yang diulang rapi (`public/patterns/botanical-damask.jpg`) dan elevasi multi-layer shadow (`shadow-page`).
@@ -652,6 +667,7 @@ Memenuhi seluruh baris PRD §4.4 (moderasi tidak ada, pembaruan real-time, kontr
 5. **Antarmuka Moderasi Buku Tamu Real-Time:**
    - Panel moderasi menyajikan daftar seluruh ucapan (termasuk yang disembunyikan), tab penyaring (*Semua*, *Tampil*, *Disembunyikan*), dan pencarian instan.
    - Tombol "Sembunyikan" / "Tampilkan Kembali" memperbarui state lokal secara optimistik dan memanggil Server Action `toggleMessageVisibilityAction` yang dilindungi verifikasi sesi admin. Status langsung tersinkronisasi ke Firestore dan daftar publik tamu.
+
 6. **Pembagian Scope Sesi (Sesuai Konfirmasi Pengguna):**
    - Sesi 1: Autentikasi Firebase Auth, Proteksi Sesi Server, Dashboard Kapasitas 250, dan Moderasi Buku Tamu.
    - Sesi 2: Manajemen Tamu Lengkap (Tabel 150 tamu, filter reminder belum respons, generator pesan WhatsApp personal, form tambah/edit tamu, impor CSV, dan ekspor data).
@@ -664,3 +680,16 @@ Memenuhi requirement fungsional PRD §4.4, §4.5, dan §4.7 dengan keamanan maks
 2. Password admin statis hardcoded di kode sumber tanpa Firebase Auth.
 3. Menghapus atau menggabungkan metrik bot WhatsApp dengan metrik buka nyata (merusak akurasi data kehadiran tamu).
 
+---
+
+## Seksi Pembuka: Menyeragamkan foto latar mobile & desktop menggunakan foto adat Sunda (adat-sunda-04.jpg)
+
+**Keputusan:** latar seksi Pembuka diseragamkan di seluruh breakpoint (mobile dan desktop) menggunakan foto adat Sunda yang sama dengan versi desktop (`/photos/adat-sunda-04.jpg`), menggantikan `adat-sunda-03.jpg` yang sebelumnya digunakan khusus pada ponsel.
+
+**Alasan:** permintaan langsung dari user agar foto di bagian pembuka konsisten antara ponsel dan komputer. Foto `adat-sunda-04.jpg` menampilkan Alwi & Septy mengenakan busana pernikahan adat Sunda lengkap (mahkota Siger Sunda dan blangkon) secara formal dan simetris.
+
+**Penyesuaian Teknis:**
+1. Di `lib/event-config.ts`, `openingPhotos.portrait` disamakan nilainya dengan `landscape` (`"/photos/adat-sunda-04.jpg"`).
+2. Di `components/sections/pembuka.tsx`, kontainer foto disederhanakan dari dua elemen terpisah (`lg:hidden` & `hidden lg:block`) menjadi satu elemen foto responsif dengan satu ref (`photoRef`).
+3. Styling `object-cover object-[center_20%]` membuktikan framing wajah dan mahkota mempelai tetap proporsional dan tidak terpotong wave divider di viewport 390px ponsel, tablet 768px, maupun desktop 1280px.
+4. Nilai ekspansi parallax `-top-[70px] -bottom-[70px] lg:-top-[90px] lg:-bottom-[90px]` dan scrim adaptif `bg-pembuka-scrim lg:bg-pembuka-scrim-lg` digabungkan secara responsif sehingga performa render browser lebih hemat (1 elemen Next/Image).

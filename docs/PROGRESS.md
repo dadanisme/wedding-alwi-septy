@@ -1,12 +1,12 @@
 # PROGRESS
 
-Diperbarui: 7 September 2026 (sesi Pembuatan Dynamic OpenGraph Image 1200×630 untuk Pratinjau WhatsApp & Media Sosial)
+Diperbarui: 9 September 2026 (sesi Penyeragaman Foto Seksi Pembuka Mobile & Desktop menggunakan adat-sunda-04.jpg)
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Implementasi Dynamic OpenGraph Banner 1200×630 piksel (PRD §4.6) untuk rute umum `/` dan rute personal `/[guestSlug]` telah selesai 100% dan lolos build & lint.
+Penyeragaman foto latar seksi Pembuka antara mobile dan desktop selesai 100% dan lolos build & lint.
 
 Fokus berikutnya:
 1. Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) setelah deploy / tunnel.
@@ -14,6 +14,19 @@ Fokus berikutnya:
 3. Persiapan input daftar 150 tamu resmi saat data final dari klien diserahkan.
 
 ## Selesai
+
+- **Penyeragaman Foto Latar Seksi Pembuka Mobile & Desktop** (9 Sep 2026):
+  - Menyamakan foto latar di `components/sections/pembuka.tsx` antara versi ponsel dan komputer: kedua versi kini menggunakan foto adat Sunda resmi `adat-sunda-04.jpg` (`openingPhotos.portrait` disamakan dengan `openingPhotos.landscape`).
+  - Menyederhanakan markup latar belakang dari dua container terpisah (`lg:hidden` & `hidden lg:block`) menjadi satu container foto responsif dengan satu ref (`photoRef`) dan nilai parallax responsif (`lg:-top-[90px] lg:-bottom-[90px]`).
+  - Mempertahankan scrim kontras adaptif (`bg-pembuka-scrim lg:bg-pembuka-scrim-lg`) dan framing `object-cover object-[center_20%]`, memastikan kepala dan mahkota Siger Sunda pasangan tetap utuh dan teks salam terbaca tajam di ponsel (390px), tablet (768px), maupun desktop (1280px).
+  - Lolos `bun test` 15/15, `bun run lint` (0 error, 0 warning), dan `bun run build` sukses 100%.
+
+- **Penyesuaian Foto Galeri Prewedding** (9 Sep 2026):
+  - Menghapus 3 foto dari konfigurasi `galleryPhotos`: `foto modern 10`, `foto modern 12`, dan `busana adat Sunda 5`.
+  - Memindahkan `busana adat Sunda 4` dan `busana adat Sunda 9` ke posisi setelah `foto modern 11` (menggantikan posisi `foto modern 12`).
+  - Total foto berkurang dari 21 foto menjadi 18 foto.
+  - Verifikasi integritas grid: perhitungan auto-placement `assertNoGridGaps` lolos 100% pada layout 2 kolom (ponsel) dan 4 kolom (desktop) tanpa sisa gap sel kosong.
+  - Lolos `bun run lint` dan `bun run build` sukses 100%.
 
 - **Sistem Dynamic OpenGraph Banner 1200×630 piksel (PRD §4.6)** (7 Sep 2026):
   - **Banner Standar 1200×630 Lanskap**: Memperbaiki masalah tampilan thumbnail vertikal dan thumbnail kotak kecil WhatsApp dengan menghasilkan kartu OpenGraph presisi 1200 × 630 piksel (rasio standar 1.91:1) menggunakan `next/og` (`ImageResponse`).

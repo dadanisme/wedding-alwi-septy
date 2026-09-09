@@ -176,17 +176,16 @@ export const openingGreeting = {
  * bukan satu foto yang dipaksa cocok ke dua rasio. Lihat docs/DECISIONS.md.
  */
 export const openingPhotos = {
-  portrait: "/photos/adat-sunda-03.jpg",
+  portrait: "/photos/adat-sunda-04.jpg",
   landscape: "/photos/adat-sunda-04.jpg",
 } as const;
 
 /**
- * Foto untuk seksi Galeri — seluruh 21 foto dari klien, urut mengikuti
- * penomoran file (modern-01..12 lalu adat-sunda-01..09). `orientation`
- * diukur langsung dari dimensi asli tiap berkas (bukan ditebak): dipakai
- * komponen untuk memilih rasio tile grid per foto, bukan memaksa semua
- * foto ke satu rasio potret seperti wireframe mockup — mockup hanya
- * menyediakan penampung, tanpa foto asli. Lihat docs/DECISIONS.md.
+ * Foto untuk seksi Galeri — 18 foto terpilih dari klien (3 foto dihapus dan
+ * urutan disesuaikan atas permintaan klien). `orientation` diukur langsung
+ * dari dimensi asli tiap berkas (bukan ditebak): dipakai komponen untuk
+ * memilih rasio tile grid per foto, bukan memaksa semua foto ke satu rasio
+ * potret seperti wireframe mockup. Lihat docs/DECISIONS.md.
  */
 export const galleryPhotos = [
   {
@@ -253,13 +252,6 @@ export const galleryPhotos = [
     height: 1333,
   },
   {
-    src: "/photos/modern-10.jpg",
-    alt: "Alwi & Septy — foto modern 10",
-    orientation: "landscape",
-    width: 2000,
-    height: 1333,
-  },
-  {
     src: "/photos/modern-11.jpg",
     alt: "Alwi & Septy — foto modern 11",
     orientation: "landscape",
@@ -267,8 +259,15 @@ export const galleryPhotos = [
     height: 1333,
   },
   {
-    src: "/photos/modern-12.jpg",
-    alt: "Alwi & Septy — foto modern 12",
+    src: "/photos/adat-sunda-04.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 4",
+    orientation: "landscape",
+    width: 2000,
+    height: 1333,
+  },
+  {
+    src: "/photos/adat-sunda-09.jpg",
+    alt: "Alwi & Septy — busana adat Sunda 9",
     orientation: "landscape",
     width: 2000,
     height: 1333,
@@ -295,20 +294,6 @@ export const galleryPhotos = [
     height: 2000,
   },
   {
-    src: "/photos/adat-sunda-04.jpg",
-    alt: "Alwi & Septy — busana adat Sunda 4",
-    orientation: "landscape",
-    width: 2000,
-    height: 1333,
-  },
-  {
-    src: "/photos/adat-sunda-05.jpg",
-    alt: "Alwi & Septy — busana adat Sunda 5",
-    orientation: "landscape",
-    width: 2000,
-    height: 1333,
-  },
-  {
     src: "/photos/adat-sunda-06.jpg",
     alt: "Alwi & Septy — busana adat Sunda 6",
     orientation: "landscape",
@@ -328,13 +313,6 @@ export const galleryPhotos = [
     orientation: "landscape",
     width: 2000,
     height: 1500,
-  },
-  {
-    src: "/photos/adat-sunda-09.jpg",
-    alt: "Alwi & Septy — busana adat Sunda 9",
-    orientation: "landscape",
-    width: 2000,
-    height: 1333,
   },
 ] as const;
 

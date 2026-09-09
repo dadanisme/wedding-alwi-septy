@@ -16,8 +16,7 @@ import { ScrollReveal } from "@/components/scroll-reveal";
  */
 export function Pembuka() {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const mobilePhotoRef = useRef<HTMLDivElement | null>(null);
-  const desktopPhotoRef = useRef<HTMLDivElement | null>(null);
+  const photoRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Hormati preferensi aksesibilitas jika pengguna memilih reduced-motion
@@ -49,11 +48,8 @@ export function Pembuka() {
       const offset = distanceFromCenter * 0.18;
       const transformValue = `translate3d(0, ${offset.toFixed(1)}px, 0)`;
 
-      if (mobilePhotoRef.current) {
-        mobilePhotoRef.current.style.transform = transformValue;
-      }
-      if (desktopPhotoRef.current) {
-        desktopPhotoRef.current.style.transform = transformValue;
+      if (photoRef.current) {
+        photoRef.current.style.transform = transformValue;
       }
     };
 
@@ -100,28 +96,11 @@ export function Pembuka() {
       id="pembuka"
       className="relative flex min-h-[620px] flex-col justify-end overflow-hidden bg-espresso lg:min-h-[660px]"
     >
-      {/* Latar Parallax Foto Ponsel (< lg) */}
-      <div className="absolute inset-0 overflow-hidden lg:hidden" aria-hidden="true">
+      {/* Latar Parallax Foto */}
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         <div
-          ref={mobilePhotoRef}
-          className="absolute -top-[70px] -bottom-[70px] inset-x-0 will-change-transform"
-        >
-          <Image
-            src={openingPhotos.portrait}
-            alt="Alwi & Septy — busana adat Sunda"
-            fill
-            sizes="100vw"
-            className="object-cover object-[center_20%] animate-ken-burns"
-          />
-        </div>
-        <div className="absolute inset-0 bg-pembuka-scrim pointer-events-none" />
-      </div>
-
-      {/* Latar Parallax Foto Desktop (>= lg) */}
-      <div className="absolute inset-0 hidden overflow-hidden lg:block" aria-hidden="true">
-        <div
-          ref={desktopPhotoRef}
-          className="absolute -top-[90px] -bottom-[90px] inset-x-0 will-change-transform"
+          ref={photoRef}
+          className="absolute -top-[70px] -bottom-[70px] inset-x-0 will-change-transform lg:-top-[90px] lg:-bottom-[90px]"
         >
           <Image
             src={openingPhotos.landscape}
@@ -131,7 +110,7 @@ export function Pembuka() {
             className="object-cover object-[center_20%] animate-ken-burns"
           />
         </div>
-        <div className="absolute inset-0 bg-pembuka-scrim-lg pointer-events-none" />
+        <div className="absolute inset-0 bg-pembuka-scrim pointer-events-none lg:bg-pembuka-scrim-lg" />
       </div>
 
       {/* Pembatas Wave Atas */}
