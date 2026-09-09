@@ -1,12 +1,12 @@
 # PROGRESS
 
-Diperbarui: 9 September 2026 (sesi Penyeragaman Foto Seksi Pembuka Mobile & Desktop menggunakan adat-sunda-04.jpg)
+Diperbarui: 9 September 2026 (sesi Penghapusan Foto Galeri Duplikat modern-06)
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Penyeragaman foto latar seksi Pembuka antara mobile dan desktop selesai 100% dan lolos build & lint.
+Penghapusan foto galeri duplikat (`modern-06.jpg`) selesai 100% dan lolos test, lint, & build.
 
 Fokus berikutnya:
 1. Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) setelah deploy / tunnel.
@@ -14,6 +14,12 @@ Fokus berikutnya:
 3. Persiapan input daftar 150 tamu resmi saat data final dari klien diserahkan.
 
 ## Selesai
+
+- **Penghapusan Foto Galeri Duplikat `modern-06.jpg`** (9 Sep 2026):
+  - User melapor lewat perbandingan visual bahwa satu foto galeri identik dengan "Alwi & Septy — foto modern 7" (pose, lokasi taman bunga ungu, dan framing sama persis — kemungkinan jepretan beruntun dari sesi foto yang sama).
+  - Verifikasi visual langsung terhadap kedua foto (`modern-06.jpg` vs `modern-07.jpg`) mengonfirmasi duplikasi; dikonfirmasi ke user sebelum menghapus.
+  - Menghapus entri `modern-06.jpg` dari `galleryPhotos` di `lib/event-config.ts`. Total foto galeri berkurang dari 18 menjadi 17 (berkas gambar `public/photos/modern-06.jpg` dibiarkan ada, tidak dipakai referensi apa pun lagi di kode).
+  - Lolos `bun test` 15/15 (termasuk asersi `assertNoGridGaps`), `bun run lint` (0 error, 0 warning), dan `bun run build` sukses 100%.
 
 - **Penyeragaman Foto Latar Seksi Pembuka Mobile & Desktop** (9 Sep 2026):
   - Menyamakan foto latar di `components/sections/pembuka.tsx` antara versi ponsel dan komputer: kedua versi kini menggunakan foto adat Sunda resmi `adat-sunda-04.jpg` (`openingPhotos.portrait` disamakan dengan `openingPhotos.landscape`).

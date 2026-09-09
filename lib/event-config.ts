@@ -224,13 +224,6 @@ export const galleryPhotos = [
     height: 1333,
   },
   {
-    src: "/photos/modern-06.jpg",
-    alt: "Alwi & Septy — foto modern 6",
-    orientation: "landscape",
-    width: 2000,
-    height: 1333,
-  },
-  {
     src: "/photos/modern-07.jpg",
     alt: "Alwi & Septy — foto modern 7",
     orientation: "landscape",
