@@ -181,8 +181,12 @@ export const openingPhotos = {
 } as const;
 
 /**
- * Foto untuk seksi Galeri — 18 foto terpilih dari klien (3 foto dihapus dan
- * urutan disesuaikan atas permintaan klien). `orientation` diukur langsung
+ * Foto untuk seksi Galeri — 17 foto terpilih dari klien (3 foto dihapus,
+ * urutan disesuaikan atas permintaan klien, 2 duplikat dihapus — modern-06
+ * & modern-09 — 2 foto baru ditambahkan, dan adat-sunda-03 dihapus untuk
+ * menghindari rangkaian potret ganjil yang memaksa satu foto jadi tile
+ * lebar sekaligus menyisakan sisa kolom kosong di baris terakhir grid).
+ * `orientation` diukur langsung
  * dari dimensi asli tiap berkas (bukan ditebak): dipakai komponen untuk
  * memilih rasio tile grid per foto, bukan memaksa semua foto ke satu rasio
  * potret seperti wireframe mockup. Lihat docs/DECISIONS.md.
@@ -238,15 +242,22 @@ export const galleryPhotos = [
     height: 1333,
   },
   {
-    src: "/photos/modern-09.jpg",
-    alt: "Alwi & Septy — foto modern 9",
+    src: "/photos/modern-11.jpg",
+    alt: "Alwi & Septy — foto modern 11",
     orientation: "landscape",
     width: 2000,
     height: 1333,
   },
   {
-    src: "/photos/modern-11.jpg",
-    alt: "Alwi & Septy — foto modern 11",
+    src: "/photos/modern-13.jpg",
+    alt: "Alwi & Septy — foto modern 13",
+    orientation: "landscape",
+    width: 2000,
+    height: 1333,
+  },
+  {
+    src: "/photos/modern-14.jpg",
+    alt: "Alwi & Septy — foto modern 14",
     orientation: "landscape",
     width: 2000,
     height: 1333,
@@ -275,13 +286,6 @@ export const galleryPhotos = [
   {
     src: "/photos/adat-sunda-02.jpg",
     alt: "Alwi & Septy — busana adat Sunda 2",
-    orientation: "portrait",
-    width: 1333,
-    height: 2000,
-  },
-  {
-    src: "/photos/adat-sunda-03.jpg",
-    alt: "Alwi & Septy — busana adat Sunda 3",
     orientation: "portrait",
     width: 1333,
     height: 2000,

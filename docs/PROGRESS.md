@@ -1,12 +1,12 @@
 # PROGRESS
 
-Diperbarui: 9 September 2026 (sesi Penghapusan Foto Galeri Duplikat modern-06)
+Diperbarui: 9 September 2026 (sesi Penambahan 2 Foto Galeri Baru & Perbaikan Tinggi Baris Grid)
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Penghapusan foto galeri duplikat (`modern-06.jpg`) selesai 100% dan lolos test, lint, & build.
+Penambahan 2 foto galeri baru, penghapusan 1 duplikat + 1 foto run-ganjil, dan perbaikan bug tinggi baris grid (ditemukan & diperbaiki di sesi yang sama) — semua selesai 100%, lolos test/lint/build. **Belum di-commit. Belum dikonfirmasi manusia di ponsel asli.**
 
 Fokus berikutnya:
 1. Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) setelah deploy / tunnel.
@@ -14,6 +14,14 @@ Fokus berikutnya:
 3. Persiapan input daftar 150 tamu resmi saat data final dari klien diserahkan.
 
 ## Selesai
+
+- **Penambahan 2 Foto Galeri Baru, Penghapusan Duplikat & Run-Ganjil, Perbaikan Tinggi Baris Grid** (9 Sep 2026) — kronologi lengkap & alasan tiap keputusan ada di `docs/DECISIONS.md`, jangan diulang di sini:
+  - User menyediakan 2 foto prewedding baru di Downloads (masing-masing 6000×4000) — diproses dengan pipeline identik intake 21 foto awal (`sips` resize 2000px + kompresi q78), disimpan sebagai `modern-13.jpg`/`modern-14.jpg`, ditambahkan ke `galleryPhotos` mengikuti urutan penomoran file yang sudah terkunci.
+  - `modern-09.jpg` dihapus — user mengidentifikasi ini duplikat/jepretan beruntun dari `modern-08.jpg` (pose & framing identik), sama seperti kasus `modern-06.jpg` di sesi sebelumnya.
+  - `adat-sunda-03.jpg` dihapus — BUKAN soal kualitas/duplikat, tapi karena posisinya (rangkaian 3 foto potret `adat-sunda-01/02/03`) memicu heuristik run-ganjil `buildGalleryTiles()` yang memaksanya jadi tile lebar SEKALIGUS (setelah net +1 foto dari 2 poin di atas) menyisakan sisa kosong di baris terakhir grid desktop. Dibuktikan lewat simulasi matematis bahwa menghapus satu dari ketiganya menyelesaikan kedua masalah sekaligus — opsi menambah foto (bukan menghapus) dicek dan ditolak, 3 kandidat spare (`modern-10`, `modern-12`, `adat-sunda-05`) semuanya kurang cocok kualitas/nada DAN semuanya lanskap (bukan potret seperti dugaan awal), jadi tidak bisa memperbaiki rangkaian ganjilnya sama sekali.
+  - **Bug baru ditemukan (sudah ada sebelum sesi ini juga, bukan disebabkan penghapusan di atas) — tinggi tile grid tidak rata sebaris:** kombinasi 1 tile lanskap sebaris dengan tile potret span-1 di grid 4-kolom (desktop) tidak pernah menghasilkan tinggi yang sama persis. Perbaikan berjalan 3 iterasi (rasio tetap → CSS stretch → akar masalah sesungguhnya: `<button>` galeri defaultnya `display: inline-block`, yang selalu menyisakan celah descender-font tak terlihat di bawah tile, seragam di semua baris makanya tidak pernah ketahuan sebelumnya). Fix final: tambah `block` ke className tombol + 2 fungsi assertion baru (`matchRowHeightsAtLg`, `assertRowHeightsMatch`) yang membuat build gagal keras kalau galeri diedit lagi nanti dan memunculkan gap tinggi yang tidak tertangani.
+  - Total foto galeri: 17 (awal sesi) + 2 baru − 1 duplikat − 1 (perbaikan run-ganjil) = **17 foto**.
+  - Verifikasi: 2 asersi baru `assertRowHeightsMatch` (efek samping saat modul dimuat) hanya benar-benar dieksekusi lewat `bun run build` (prerender `/`) — `bun test` (15/15) tidak menyentuhnya sama sekali, karena satu-satunya berkas test tidak meng-import `galeri.tsx`. `bun run lint` 0 error/warning. Verifikasi visual + pengukuran piksel langsung (`getBoundingClientRect`/`getComputedStyle`, bukan cuma screenshot) di 390px, 1280px, dan 2200px — tinggi seluruh tile satu baris PERSIS sama (461.25px di 1280px, 521.25px di 2200px), bukan mendekati. **Belum di-commit. Belum dikonfirmasi manusia di ponsel asli.**
 
 - **Penghapusan Foto Galeri Duplikat `modern-06.jpg`** (9 Sep 2026):
   - User melapor lewat perbandingan visual bahwa satu foto galeri identik dengan "Alwi & Septy — foto modern 7" (pose, lokasi taman bunga ungu, dan framing sama persis — kemungkinan jepretan beruntun dari sesi foto yang sama).

@@ -10,6 +10,16 @@ const TOTAL = galleryPhotos.length;
 type GalleryTile = (typeof galleryPhotos)[number] & {
   span: 1 | 2;
   aspect: string;
+  /**
+   * true = tile ini ikut stretch mengisi tinggi baris grid mulai breakpoint
+   * `lg`, bukan pakai `aspect` tetap — lihat `matchRowHeightsAtLg()`. JSX
+   * merender ini lewat ternary literal ("lg:aspect-auto lg:h-full"), bukan
+   * class yang dirakit dari potongan string, karena Tailwind men-scan teks
+   * sumber untuk nama class UTUH — potongan yang digabung saat runtime
+   * tidak akan terdeteksi, jadi CSS-nya tidak akan pernah ter-generate
+   * meski logikanya benar.
+   */
+  stretchAtLg?: boolean;
 };
 
 /**
@@ -72,8 +82,25 @@ function buildGalleryTiles(photos: typeof galleryPhotos): GalleryTile[] {
 
 /**
  * Simulasi penempatan grid CSS row-major (sparse, tanpa `dense`) — sama
- * seperti algoritma auto-placement asli — untuk memverifikasi tidak ada
- * baris yang menyisakan sel kosong sebelum baris berikutnya dimulai.
+ * seperti algoritma auto-placement asli. Dipakai baik untuk deteksi gap
+ * maupun deteksi baris yang mencampur tile span-1 dan span-2 (lihat
+ * `matchRowHeightsAtLg` dan `assertRowHeightsMatch` di bawah).
+ */
+function simulateRows(tiles: GalleryTile[], columns: number): GalleryTile[][] {
+  const rows: GalleryTile[][] = [[]];
+  let used = 0;
+  for (const tile of tiles) {
+    if (used + tile.span > columns) {
+      rows.push([]);
+      used = 0;
+    }
+    rows[rows.length - 1].push(tile);
+    used += tile.span;
+  }
+  return rows;
+}
+
+/**
  * Baris TERAKHIR boleh tidak penuh (itu wajar, bukan bug). Dipanggil untuk
  * 2 kolom (ponsel) dan 4 kolom (desktop) saat modul dimuat, supaya kalau
  * `galleryPhotos` diedit dan heuristik promosi run-ganjil di atas ternyata
@@ -82,23 +109,123 @@ function buildGalleryTiles(photos: typeof galleryPhotos): GalleryTile[] {
  * ditemukan sesi ini.
  */
 function assertNoGridGaps(tiles: GalleryTile[], columns: number) {
-  let used = 0;
-  for (const tile of tiles) {
-    if (used + tile.span > columns) {
-      if (used !== columns) {
-        throw new Error(
-          `Galeri: susunan galleryPhotos menyisakan gap ${columns - used} kolom pada grid ${columns}-kolom sebelum baris berikutnya dimulai — buildGalleryTiles() perlu disesuaikan. Lihat docs/DECISIONS.md.`,
-        );
-      }
-      used = 0;
+  const rows = simulateRows(tiles, columns);
+  rows.forEach((row, index) => {
+    const used = row.reduce((sum, tile) => sum + tile.span, 0);
+    const isLastRow = index === rows.length - 1;
+    if (used !== columns && !isLastRow) {
+      throw new Error(
+        `Galeri: susunan galleryPhotos menyisakan gap ${columns - used} kolom pada grid ${columns}-kolom sebelum baris berikutnya dimulai — buildGalleryTiles() perlu disesuaikan. Lihat docs/DECISIONS.md.`,
+      );
     }
-    used += tile.span;
+  });
+}
+
+/**
+ * Tile span-2 mana pun (baik lanskap murni aspect 3:2, maupun potret yang
+ * dipromosikan aspect 4:3 di atas) yang kebetulan mendarat sebaris dengan
+ * tile potret span-1 (aspect 2:3) di grid 4-kolom (desktop) TIDAK akan
+ * setinggi tile potret di sebelahnya kalau cuma mengandalkan rasio tetap:
+ * lebar sel span-2 sebenarnya `2×lebar-kolom + 1×gap` (bukan persis
+ * `2×lebar-kolom`), jadi rasio aspect manapun yang dipilih untuk
+ * mendekati "tinggi 1.5×lebar-kolom" akan selalu meleset beberapa piksel
+ * (lebih terlihat di layar lebar, karena gap makin kecil secara
+ * proporsional). Ditemukan dari screenshot manusia di dua breakpoint
+ * (1280px meleset ~7px, 2200px meleset ~8px) — percobaan pertama pakai
+ * `aspect-[4/3]` (rasio yang sama dipakai tile potret yang dipromosikan)
+ * MENGURANGI gap dari ~48px jadi ~7-8px tapi tidak menghilangkannya sama
+ * sekali, dan pengguna masih melihatnya sebagai "belum sama".
+ *
+ * Perbaikan yang benar-benar presisi piksel: BUKAN menebak rasio yang
+ * lebih cocok, tapi melepas aspect-ratio tetap tile itu sepenuhnya
+ * (`aspect-auto`) dan biarkan CSS Grid men-stretch tingginya (`h-full`)
+ * mengikuti baris — perilaku bawaan `align-items: stretch` pada grid item
+ * yang TIDAK punya ukuran intrinsik sendiri. Ini exact by construction,
+ * bukan pendekatan, karena tinggi baris itu sendiri ditentukan oleh tile
+ * potret (aspect tetap) di baris yang sama — lihat `matchRowHeightsAtLg`.
+ *
+ * Override ini HANYA dipasang mulai breakpoint `lg` karena di grid
+ * 2-kolom (ponsel) tile span-2 SELALU sendirian di barisnya (span 2 ==
+ * kolom 2, tidak ada tile potret sebaris untuk di-stretch-kan), jadi tidak
+ * pernah butuh koreksi — foto tetap tampil di rasio aslinya (3:2 atau 4:3)
+ * di ponsel, tidak berubah.
+ *
+ * PENYEBAB KEDUA yang baru ketahuan sesi ini juga (bukan cuma soal rasio
+ * di atas): `<button>` defaultnya `display: inline-block`. Sebuah elemen
+ * inline-block, WALAUPUN tingginya sudah dipatok tepat via aspect-ratio,
+ * tetap "memesan" beberapa piksel ekstra di bawah dirinya pada wrapper-nya
+ * (`ScrollReveal`, block biasa) — sisa ruang untuk descender font pada
+ * garis-teks tak terlihat yang otomatis dibuat elemen inline dalam
+ * konteks block (efek klasik "extra space below image/inline-block").
+ * Ini SERAGAM di semua baris (potret maupun lanskap) ±7px pada 1280px,
+ * makanya sebelumnya tidak pernah ketahuan — semua tile di baris yang
+ * sama diam-diam kehilangan tinggi yang identik, jadi tidak ada yang
+ * kelihatan "beda". Begitu `matchRowHeightsAtLg` membuat satu tile
+ * benar-benar stretch mengikuti TINGGI WRAPPER (yang masih termasuk
+ * ekstra ~7px itu), sementara tile potret di sebelahnya TETAP memesan
+ * ekstra ~7px yang sama tapi tidak pernah mengisinya (karena aspect-ratio
+ * tetap tidak stretch), selisihnya baru kelihatan sebagai baris yang
+ * "masih ga sama tingginya" — dilaporkan pengguna bahkan SETELAH fix
+ * stretch di atas dipasang. Diverifikasi lewat `getComputedStyle().height`
+ * langsung di browser (bukan tebakan): SEMUA baris kelebihan ~7px yang
+ * identik sebelum diperbaiki, nol setelah `<button>` diberi `block`
+ * (lihat className di JSX) alih-alih inline-block bawaan browser.
+ */
+function matchRowHeightsAtLg(tiles: GalleryTile[]) {
+  for (const row of simulateRows(tiles, 4)) {
+    const hasSpan1 = row.some((tile) => tile.span === 1);
+    if (!hasSpan1) continue;
+    for (const tile of row) {
+      if (tile.span === 2) {
+        tile.stretchAtLg = true;
+      }
+    }
+  }
+}
+
+function aspectHeightUnits(tile: GalleryTile): number {
+  const match = tile.aspect.match(/aspect-\[(\d+)\/(\d+)\]/);
+  if (!match) {
+    throw new Error(`Galeri: format aspect tidak dikenali: ${tile.aspect}`);
+  }
+  const widthOverHeight = Number(match[1]) / Number(match[2]);
+  return tile.span / widthOverHeight;
+}
+
+/**
+ * Verifikasi tambahan: setiap baris (hasil simulasi yang sama dengan
+ * `assertNoGridGaps`) tidak boleh berisi tile dengan tinggi relatif
+ * (dalam satuan lebar-kolom, dihitung dari `aspect` MASING-MASING tile)
+ * yang beda — kalau beda, tile yang lebih pendek akan menyisakan ruang
+ * kosong di bawahnya. Tile yang sudah ditandai `stretchAtLg` dilewati saat
+ * memeriksa breakpoint `lg` karena tingginya dijamin cocok oleh CSS
+ * stretch, bukan oleh kesamaan rasio — lihat `matchRowHeightsAtLg`.
+ * Dipanggil untuk kedua breakpoint supaya kombinasi baru yang tidak
+ * tertangani `matchRowHeightsAtLg` (misal dua tile span-2 dengan aspect
+ * berbeda mendarat sebaris TANPA tile potret span-1 di antaranya, jadi
+ * tidak ada yang di-stretch) gagal keras saat build, bukan diam-diam
+ * menampilkan gap visual.
+ */
+function assertRowHeightsMatch(tiles: GalleryTile[], columns: number, isLg: boolean) {
+  for (const row of simulateRows(tiles, columns)) {
+    const measured = row.filter((tile) => !(isLg && tile.stretchAtLg));
+    if (measured.length < 2) continue;
+    const heights = measured.map((tile) => aspectHeightUnits(tile));
+    const [first, ...rest] = heights;
+    if (rest.some((h) => Math.abs(h - first) > 0.01)) {
+      throw new Error(
+        `Galeri: baris grid ${columns}-kolom (${isLg ? "lg" : "dasar"}) punya tile dengan tinggi tidak sama (${row.map((t) => t.src).join(", ")}) — akan menyisakan ruang kosong di bawah tile yang lebih pendek. Lihat docs/DECISIONS.md.`,
+      );
+    }
   }
 }
 
 const galleryTiles = buildGalleryTiles(galleryPhotos);
+matchRowHeightsAtLg(galleryTiles);
 assertNoGridGaps(galleryTiles, 2);
 assertNoGridGaps(galleryTiles, 4);
+assertRowHeightsMatch(galleryTiles, 2, false);
+assertRowHeightsMatch(galleryTiles, 4, true);
 
 /**
  * Seksi Galeri — grid seluruh 21 foto klien dengan "tampilan perbesar"
@@ -195,6 +322,9 @@ export function Galeri() {
             duration={700}
             className={`${photo.span === 2 ? "col-span-2" : ""}`}
           >
+            {/* `block` (bukan inline-block bawaan browser untuk <button>) menghilangkan
+                celah descender-font tak terlihat di bawah tile — lihat komentar
+                matchRowHeightsAtLg() di atas. */}
             <button
               ref={(el) => {
                 triggerRefs.current[index] = el;
@@ -202,7 +332,7 @@ export function Galeri() {
               type="button"
               onClick={() => openLightbox(index)}
               aria-label={`Perbesar foto ${index + 1} dari ${TOTAL}`}
-              className={`group relative w-full overflow-hidden focus-visible:z-10 cursor-pointer ${photo.aspect}`}
+              className={`group relative block w-full overflow-hidden focus-visible:z-10 cursor-pointer ${photo.aspect} ${photo.stretchAtLg ? "lg:aspect-auto lg:h-full" : ""}`}
             >
               <Image
                 src={photo.src}
