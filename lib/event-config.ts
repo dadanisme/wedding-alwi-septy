@@ -442,61 +442,73 @@ export const closingConfig = {
 
 /**
  * Konfigurasi dan data seksi Love Story (Seksi 5, PRD §4.2 item 5).
- * Ditranskrip persis dari mockup yang diapprove (Undangan Alwi & Septy.html).
+ * Naskah "Roadmap to Our Wedding Day" dari klien (9 Sep 2026) — menggantikan
+ * naskah linimasa awal yang ditranskrip dari mockup. Judul & subjudul sengaja
+ * berbahasa Inggris (gaya klien), sedangkan body tetap Bahasa Indonesia —
+ * satu-satunya seksi dengan campuran bahasa ini, dikonfirmasi user. Langkah
+ * bernomor (1–4), bukan tahun — konten kini soal masa persiapan pasca-lamaran
+ * menuju hari-H, bukan linimasa hubungan sejak awal kenal. Lihat docs/DECISIONS.md.
  */
 export interface LoveStoryMoment {
-  year: string;
+  step: string;
   title: string;
-  mobileDescription: string;
-  desktopDescription: string;
+  subtitle: string;
+  mobileDescription?: string;
+  desktopDescription?: string;
   photo?: string | null;
   placeholderText?: string;
   placeholderDesktopText?: string;
 }
 
 export const loveStoryConfig = {
-  sectionLabel: "Love Story",
+  sectionLabel: "Roadmap to Our Wedding Day",
   temporaryNote:
     "* Linimasa dan narasi cerita bersifat sementara dan dapat disesuaikan kembali.",
   moments: [
     {
-      year: "2019",
-      title: "Awal Perkenalan",
-      mobileDescription: "Dipertemukan lewat kegiatan kampus di Bandung.",
+      step: "1",
+      title: "We Said Yes",
+      subtitle: "The Beginning of Our Big Adventure",
+      mobileDescription:
+        "Lamaran selesai, dua keluarga bertemu, dan sejak saat itu semuanya mulai terasa nyata.",
       desktopDescription:
-        "Dipertemukan lewat kegiatan kampus di Bandung, dari obrolan yang awalnya tidak diniatkan serius.",
+        "Lamaran selesai, dua keluarga bertemu, dan sejak saat itu semuanya mulai terasa nyata.",
       photo: null,
-      placeholderText: "2019 · 1:1",
-      placeholderDesktopText: "2019 · 4:3",
+      placeholderText: "1 · 1:1",
+      placeholderDesktopText: "1 · 4:3",
     },
     {
-      year: "2021",
-      title: "Menjalin Komitmen",
-      mobileDescription: "Sepakat menempuh jalan yang sama, sabar dan perlahan.",
+      step: "2",
+      title: "Planning Mode: ON",
+      subtitle: "Turning Ideas Into Our Day",
+      mobileDescription:
+        "Pergi ke sana-kemari, pilih ini-itu, revisi sana-sini. Pelan-pelan semua ide mulai berubah jadi hari yang benar-benar kami.",
       desktopDescription:
-        "Sepakat menempuh jalan yang sama, dijalani perlahan dan dengan sabar.",
+        "Pergi ke sana-kemari, pilih ini-itu, revisi sana-sini. Pelan-pelan semua ide mulai berubah jadi hari yang benar-benar kami.",
       photo: null,
-      placeholderText: "2021 · 1:1",
-      placeholderDesktopText: "2021 · 4:3",
+      placeholderText: "2 · 1:1",
+      placeholderDesktopText: "2 · 4:3",
     },
     {
-      year: "2025",
-      title: "Lamaran",
-      mobileDescription: "Kedua keluarga bertemu dan menetapkan tanggal.",
+      step: "3",
+      title: "The Wedding Hustle",
+      subtitle: "Meetings, Fittings & Endless Checklists",
+      mobileDescription:
+        "Meeting, fitting, urus dokumen, follow-up vendor, sampai checklist yang rasanya ga habis-habis, tapi somehow seru juga.",
       desktopDescription:
-        "Kedua keluarga bertemu di Bandung dan menetapkan tanggal.",
+        "Meeting, fitting, urus dokumen, follow-up vendor, sampai checklist yang rasanya ga habis-habis, tapi somehow seru juga.",
       photo: null,
-      placeholderText: "2025 · 1:1",
-      placeholderDesktopText: "2025 · 4:3",
+      placeholderText: "3 · 1:1",
+      placeholderDesktopText: "3 · 4:3",
     },
     {
-      year: "2026",
-      title: "Menuju Halal",
-      mobileDescription: "10 Oktober 2026, di Bandung.",
-      desktopDescription: "10 Oktober 2026, di hadapan keluarga dan sahabat.",
+      step: "4",
+      title: "And Finally We’re Almost There",
+      subtitle:
+        "After all the planning, calls, checklists, and little chaos. See you on 10.10.2026.",
       photo: null,
-      placeholderText: "2026 · 1:1",
-      placeholderDesktopText: "2026 · 4:3",
+      placeholderText: "4 · 1:1",
+      placeholderDesktopText: "4 · 4:3",
     },
   ] as readonly LoveStoryMoment[],
 } as const;

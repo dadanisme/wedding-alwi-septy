@@ -6,7 +6,7 @@ export function LoveStory() {
   return (
     <section
       id="love-story"
-      aria-label="Love Story"
+      aria-label="Roadmap to Our Wedding Day"
       className="relative overflow-hidden border-t border-gold-bright/35 bg-cream-secondary"
     >
       {/* Sulur sudut ponsel: kiri atas */}
@@ -52,7 +52,7 @@ export function LoveStory() {
         <div className="flex w-full flex-col gap-[26px] lg:hidden">
           {loveStoryConfig.moments.map((moment, index) => (
             <ScrollReveal
-              key={moment.year}
+              key={moment.step}
               animation="fade-up"
               delay={index * 120}
               className="flex items-start gap-4"
@@ -74,15 +74,17 @@ export function LoveStory() {
                   aria-label={`Placeholder foto ${moment.title}`}
                 >
                   <span className="text-story-placeholder text-ink-soft">
-                    {moment.placeholderText ?? `${moment.year} · 1:1`}
+                    {moment.placeholderText ?? `${moment.step} · 1:1`}
                   </span>
                 </div>
               )}
 
               <div className="flex flex-col gap-1.5">
-                <span className="text-story-year text-gold-deep">{moment.year}</span>
                 <h3 className="text-story-title text-ink">{moment.title}</h3>
-                <p className="text-story-desc text-ink-soft">{moment.mobileDescription}</p>
+                <p className="text-story-subtitle text-ink-soft/90">{moment.subtitle}</p>
+                {moment.mobileDescription && (
+                  <p className="text-story-desc text-ink-soft">{moment.mobileDescription}</p>
+                )}
               </div>
             </ScrollReveal>
           ))}
@@ -101,7 +103,7 @@ export function LoveStory() {
 
             return (
               <div
-                key={moment.year}
+                key={moment.step}
                 className="grid grid-cols-[1fr_96px_1fr] items-center"
               >
                 {isEven ? (
@@ -112,15 +114,17 @@ export function LoveStory() {
                       delay={index * 100}
                       className="flex flex-col items-end gap-2 text-right"
                     >
-                      <span className="text-story-year-lg text-gold-deep">
-                        {moment.year}
-                      </span>
                       <h3 className="text-story-title-lg text-ink">
                         {moment.title}
                       </h3>
-                      <p className="text-story-desc-lg text-ink-soft max-w-[400px]">
-                        {moment.desktopDescription}
+                      <p className="text-story-subtitle-lg text-ink-soft/90 max-w-[400px]">
+                        {moment.subtitle}
                       </p>
+                      {moment.desktopDescription && (
+                        <p className="text-story-desc-lg text-ink-soft max-w-[400px]">
+                          {moment.desktopDescription}
+                        </p>
+                      )}
                     </ScrollReveal>
 
                     {/* Kolom Tengah: Penanda diamond berdenyut lembut */}
@@ -160,7 +164,7 @@ export function LoveStory() {
                           aria-label={`Placeholder foto ${moment.title}`}
                         >
                           <span className="text-story-placeholder text-ink-soft">
-                            {moment.placeholderDesktopText ?? `${moment.year} · 4:3`}
+                            {moment.placeholderDesktopText ?? `${moment.step} · 4:3`}
                           </span>
                         </div>
                       )}
@@ -191,7 +195,7 @@ export function LoveStory() {
                           aria-label={`Placeholder foto ${moment.title}`}
                         >
                           <span className="text-story-placeholder text-ink-soft">
-                            {moment.placeholderDesktopText ?? `${moment.year} · 4:3`}
+                            {moment.placeholderDesktopText ?? `${moment.step} · 4:3`}
                           </span>
                         </div>
                       )}
@@ -217,15 +221,17 @@ export function LoveStory() {
                       delay={index * 100}
                       className="flex flex-col items-start gap-2 text-left"
                     >
-                      <span className="text-story-year-lg text-gold-deep">
-                        {moment.year}
-                      </span>
                       <h3 className="text-story-title-lg text-ink">
                         {moment.title}
                       </h3>
-                      <p className="text-story-desc-lg text-ink-soft max-w-[400px]">
-                        {moment.desktopDescription}
+                      <p className="text-story-subtitle-lg text-ink-soft/90 max-w-[400px]">
+                        {moment.subtitle}
                       </p>
+                      {moment.desktopDescription && (
+                        <p className="text-story-desc-lg text-ink-soft max-w-[400px]">
+                          {moment.desktopDescription}
+                        </p>
+                      )}
                     </ScrollReveal>
                   </>
                 )}

@@ -1,19 +1,26 @@
 # PROGRESS
 
-Diperbarui: 9 September 2026 (sesi Penambahan 2 Foto Galeri Baru & Perbaikan Tinggi Baris Grid)
+Diperbarui: 10 September 2026 (sesi Naskah Baru Love Story "Roadmap to Our Wedding Day")
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Penambahan 2 foto galeri baru, penghapusan 1 duplikat + 1 foto run-ganjil, dan perbaikan bug tinggi baris grid (ditemukan & diperbaiki di sesi yang sama) — semua selesai 100%, lolos test/lint/build. **Belum di-commit. Belum dikonfirmasi manusia di ponsel asli.**
+Naskah seksi Love Story diganti total jadi "Roadmap to Our Wedding Day" (naskah final dari klien) — selesai 100%, lolos test/lint/build, diverifikasi visual 390px & 1280px via Chrome DevTools MCP. Alasan tiap keputusan (bahasa campuran disengaja, badge angka dihapus, struktur item ke-4 asimetris, bug typografi `-lg` pre-existing yang ditemukan tapi sengaja tidak diperbaiki) ada di `docs/DECISIONS.md`. **Belum di-commit. Belum dikonfirmasi manusia di ponsel asli.**
 
 Fokus berikutnya:
 1. Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) setelah deploy / tunnel.
 2. Konfirmasi ke mempelai terkait placeholder catatan RSVP.
 3. Persiapan input daftar 150 tamu resmi saat data final dari klien diserahkan.
+4. Audit terpisah pola utility `text-story-*-lg` (dan kemungkinan section lain dengan pola serupa) — desktop title/desc Love Story jatuh ke font body salah karena `-lg` dipakai sendirian tanpa base class. Lihat `docs/DECISIONS.md`.
 
 ## Selesai
+
+- **Naskah Baru Love Story — "Roadmap to Our Wedding Day"** (10 Sep 2026) — kronologi lengkap & alasan tiap keputusan ada di `docs/DECISIONS.md`, jangan diulang di sini:
+  - Naskah final dari klien menggantikan linimasa 2019-2026 transkrip mockup: 4 langkah pasca-lamaran ("We Said Yes" → "Planning Mode: ON" → "The Wedding Hustle" → "And Finally We're Almost There"), title/subtitle Inggris + body Indonesia (satu-satunya seksi dengan campuran bahasa ini, dikonfirmasi user lewat pertanyaan klarifikasi).
+  - `sectionLabel` berubah dari "Love Story" ke "Roadmap to Our Wedding Day". Field data `year` diganti `step`, lalu badge angka dihapus total dari tampilan atas permintaan user di sesi yang sama. Field baru `subtitle` ditambahkan ke `LoveStoryMoment`; `mobileDescription`/`desktopDescription` dibuat opsional untuk mengakomodasi item ke-4 yang hanya punya title+subtitle.
+  - Ditemukan (bukan disebabkan sesi ini) bug typografi: `text-story-title-lg`/`text-story-desc-lg` di desktop kehilangan font-family/weight yang benar karena dipakai sendirian tanpa base class. Sengaja TIDAK diperbaiki (di luar scope), tapi `text-story-subtitle-lg` yang baru dibuat mandiri (properti lengkap) supaya tidak ikut kena bug yang sama.
+  - Lolos `bun test` 15/15, `bun run lint` 0 error/warning, `bun run build` sukses. Diverifikasi visual + a11y-tree di 390px & 1280px via Chrome DevTools MCP.
 
 - **Penambahan 2 Foto Galeri Baru, Penghapusan Duplikat & Run-Ganjil, Perbaikan Tinggi Baris Grid** (9 Sep 2026) — kronologi lengkap & alasan tiap keputusan ada di `docs/DECISIONS.md`, jangan diulang di sini:
   - User menyediakan 2 foto prewedding baru di Downloads (masing-masing 6000×4000) — diproses dengan pipeline identik intake 21 foto awal (`sips` resize 2000px + kompresi q78), disimpan sebagai `modern-13.jpg`/`modern-14.jpg`, ditambahkan ke `galleryPhotos` mengikuti urutan penomoran file yang sudah terkunci.

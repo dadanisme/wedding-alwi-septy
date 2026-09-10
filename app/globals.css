@@ -719,19 +719,6 @@ button:not(:disabled),
  * Seksi Love Story — ditranskrip persis dari mockup yang disetujui
  * (Undangan Alwi & Septy.html, seksi 5).
  */
-@utility text-story-year {
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 10px;
-  line-height: 1;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-}
-@utility text-story-year-lg {
-  font-size: 11px;
-  letter-spacing: 0.36em;
-}
-
 @utility text-story-title {
   font-family: var(--font-display);
   font-weight: 500;
@@ -740,6 +727,25 @@ button:not(:disabled),
 }
 @utility text-story-title-lg {
   font-size: 28px;
+}
+
+@utility text-story-subtitle {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+/* Standalone (bukan delta): dipakai sendiri tanpa text-story-subtitle di
+ * blok desktop terpisah, beda dari pola title/desc di seksi ini. */
+@utility text-story-subtitle-lg {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 }
 
 @utility text-story-desc {
