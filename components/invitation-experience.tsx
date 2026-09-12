@@ -7,7 +7,6 @@ import { Sampul } from "@/components/sections/sampul";
 import { Ayat } from "@/components/sections/ayat";
 import { Pembuka } from "@/components/sections/pembuka";
 import { Mempelai } from "@/components/sections/mempelai";
-import { LoveStory } from "@/components/sections/love-story";
 import { Galeri } from "@/components/sections/galeri";
 import { Acara } from "@/components/sections/acara";
 import { Rsvp } from "@/components/sections/rsvp";
@@ -202,7 +201,6 @@ export function InvitationExperience({
         <Ayat />
         <Pembuka />
         <Mempelai />
-        <LoveStory />
         <Acara />
         <Rsvp fullSlug={guest?.fullSlug} initialRsvp={guest?.rsvp ?? null} />
         <BukuTamu

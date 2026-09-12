@@ -1,20 +1,29 @@
 # PROGRESS
 
-Diperbarui: 10 September 2026 (sesi Naskah Baru Love Story "Roadmap to Our Wedding Day")
+Diperbarui: 12 September 2026 (sesi Empat Perubahan Klien: Love Story dihapus, foto Mempelai, carousel Buku Tamu, urutan Galeri)
 
 Berkas ini dibaca otomatis di awal setiap sesi. **Perbarui di akhir setiap sesi.** Tetap pendek — kalau melewati satu halaman, pindahkan riwayat lamanya ke bawah dan rangkum.
 
 ## Sedang Dikerjakan
 
-Naskah seksi Love Story diganti total jadi "Roadmap to Our Wedding Day" (naskah final dari klien) — selesai 100%, lolos test/lint/build, diverifikasi visual 390px & 1280px via Chrome DevTools MCP. Alasan tiap keputusan (bahasa campuran disengaja, badge angka dihapus, struktur item ke-4 asimetris, bug typografi `-lg` pre-existing yang ditemukan tapi sengaja tidak diperbaiki) ada di `docs/DECISIONS.md`. **Belum di-commit. Belum dikonfirmasi manusia di ponsel asli.**
+Empat perubahan klien (hasil diskusi dengan Alwi, diteruskan lewat WhatsApp) selesai 100% dalam satu sesi — **menembus aturan satu-seksi-per-sesi atas instruksi eksplisit user, bukan preseden baru** (lihat `docs/DECISIONS.md`). Lolos `bun test` 15/15, `bun run lint` bersih, `bun run build` sukses, `/code-review` level high (7 temuan, semuanya diperbaiki & diverifikasi ulang di browser). **Belum di-commit. Belum dikonfirmasi manusia di ponsel asli.**
 
 Fokus berikutnya:
 1. Pengujian pengiriman pratinjau pesan WhatsApp ke nomor nyata (Android, iOS, WhatsApp Web) setelah deploy / tunnel.
 2. Konfirmasi ke mempelai terkait placeholder catatan RSVP.
 3. Persiapan input daftar 150 tamu resmi saat data final dari klien diserahkan.
-4. Audit terpisah pola utility `text-story-*-lg` (dan kemungkinan section lain dengan pola serupa) — desktop title/desc Love Story jatuh ke font body salah karena `-lg` dipakai sendirian tanpa base class. Lihat `docs/DECISIONS.md`.
+4. Dress code, handle Instagram, dan jumlah pasti keluarga inti/panitia masih ditunggu dari klien.
 
 ## Selesai
+
+- **Empat Perubahan Klien dalam Satu Sesi** (12 Sep 2026) — kronologi lengkap & alasan tiap keputusan ada di `docs/DECISIONS.md`, jangan diulang di sini:
+  - **Seksi Love Story / "Roadmap to Our Wedding Day" dihapus total** — komponen, render, `loveStoryConfig` + `LoveStoryMoment`, dan seluruh utility `text-story-*` / `bg-story-placeholder*` dihapus bersih (bukan disembunyikan di balik flag). Naskahnya yang baru ditulis 10 Sep tetap ada di git history. **Efek: butir audit `text-story-*-lg` di daftar fokus sesi lalu jadi tidak relevan — utility-nya sudah tidak ada.**
+  - **Foto Mempelai diganti panel dekoratif** — kotak placeholder 3:4 diganti bingkai emas berisi ikon cincin `#ico-rings` + inisial nama panggilan (A / S) emas. Bingkai dipertahankan ukurannya supaya tata letak 3 kolom desktop & vertikal ponsel tidak berubah. Field `photo`/`photoPlaceholder*` dan utility `bg-mempelai-placeholder*`/`text-mempelai-note*` dihapus. **Efek: status "menunggu foto solo mempelai" berubah jadi "memang tidak ada foto" — baris Terkunci dicabut.**
+  - **Daftar ucapan Buku Tamu jadi carousel** — 1 kartu penuh di ponsel, tepat 2 kartu di desktop; swipe native + panah + titik posisi (berganti penghitung "3 / 27" di atas 10 ucapan). Kartu bergaya kutipan: tanda kutip emas, teks rata tengah, pembatas `#orn`, nama Cormorant Garamond. **Seluruh logika data tidak disentuh** (paginasi, jeda 30 detik, batas 3/tamu, kunci idempotensi, poll 20 detik). Dua iterasi desain ditolak user dulu ("wajib 1 pada satu waktu", lalu "jelek banget" karena panah menimpa teks ucapan) sebelum versi final yang memindahkan seluruh kendali ke bawah strip.
+  - **`modern-05.jpg` dipindah jadi foto pertama Galeri** — ditunjuk klien lewat panah di tangkapan layar + disebut alt-nya persis. Susunan disimulasikan manual dulu, lalu dibuktikan aman oleh tiga asersi build-time galeri (`assertNoGridGaps` 2 & 4 kolom, `assertRowHeightsMatch`) yang berjalan saat prerender.
+  - **`/code-review` level high menemukan 7 cacat pada carousel, semuanya diperbaiki:** titik posisi terakhir tak pernah menyala di desktop (indeks terakhir mustahil tercapai saat 2 kartu terlihat); poll 20 detik menggeser kartu yang sedang dibaca; `onScroll` tanpa throttle memaksa reflow tiap frame pada strip sampai 100 kartu; `prefers-reduced-motion` dilanggar; titik posisi 7×7px tak bisa ditekan jari; `items-stretch` menyeragamkan semua kartu ke ucapan terpanjang; `aria-live` mengumumkan ulang tiap frame gulir.
+  - **Perbaikan reduced-motion sempat no-op dan hanya ketahuan karena diuji di browser:** `behavior: "auto"` cuma mengembalikan keputusan ke properti CSS, dan kelas `scroll-smooth` menyetelnya ke `smooth`. Diganti `"instant"`, lalu dibuktikan: normal 0px pada 60ms (masih beranimasi) vs reduced-motion 331px (langsung mendarat).
+  - Verifikasi terukur, bukan dari screenshot: ponsel lebar kartu == lebar area terlihat (315 == 315) → tepat 1 kartu; desktop 2 × 350 + gap 20 == 720 → tepat 2 kartu; tinggi kartu ponsel kini mengikuti isinya (215 / 241 / 215px); baris pertama galeri 1280px sama persis 455.625px di ketiga tile. Nol error konsol.
 
 - **Naskah Baru Love Story — "Roadmap to Our Wedding Day"** (10 Sep 2026) — kronologi lengkap & alasan tiap keputusan ada di `docs/DECISIONS.md`, jangan diulang di sini:
   - Naskah final dari klien menggantikan linimasa 2019-2026 transkrip mockup: 4 langkah pasca-lamaran ("We Said Yes" → "Planning Mode: ON" → "The Wedding Hustle" → "And Finally We're Almost There"), title/subtitle Inggris + body Indonesia (satu-satunya seksi dengan campuran bahasa ini, dikonfirmasi user lewat pertanyaan klarifikasi).
@@ -214,16 +223,16 @@ Fokus berikutnya:
 
 | Item | Menunggu |
 |---|---|
-| Foto solo mempelai resmi | Menunggu kiriman foto solo Alwi & Septy (saat ini menggunakan placeholder visual 3:4 elegan) |
-| Naskah final Love Story | Naskah + tahun tiap momen final dari klien (PRD §11 poin 3) |
 | Akurasi proyeksi total di dashboard | Jumlah pasti keluarga inti dan panitia |
+
+~~Foto solo mempelai resmi~~ dan ~~naskah final Love Story~~ **tidak lagi ditunggu** (12 Sep): klien memutuskan seksi Mempelai tanpa foto sama sekali, dan seksi Love Story dihapus.
 
 ## Menunggu dari Klien
 
-1. ~~Foto prewedding~~ — **sudah masuk** (6 Sep), 21 foto di `public/photos/`. Tapi semuanya foto berdua — kalau seksi Mempelai butuh foto solo per orang, itu perlu diminta terpisah.
+1. ~~Foto prewedding~~ — **sudah masuk** (6 Sep), 21 foto di `public/photos/`. Foto solo per mempelai tidak lagi dibutuhkan — seksi Mempelai memang tanpa foto (12 Sep).
 2. ~~Foto berorientasi lanskap untuk sampul desktop~~ — tidak lagi relevan. Mockup yang diapprove memakai 2 foto **potret** (4:5) berdampingan untuk sampul desktop, foto yang sama dengan versi ponsel.
 3. Jumlah pasti keluarga inti dan panitia — dibutuhkan sebelum 3 Oktober 2026 (lihat Tanggal Penting)
-4. Naskah love story (termasuk berapa momen & tahunnya)
+4. ~~Naskah love story~~ — tidak lagi relevan, seksinya dihapus (12 Sep).
 5. Dress code
 6. ~~Pilihan musik latar~~ — **sudah masuk** (6 Sep), Sabilulungan (Sundanese Gamelan) di `public/audio/sabilulungan.mp3`.
 7. Handle Instagram

@@ -36,7 +36,8 @@ interface BukuTamuProps {
  * 1. Judul seksi "BUKU TAMU" dengan ornamen emas (#orn)
  * 2. Formulir ucapan: input nama (default ke guestName jika tersedia) & textarea pesan/doa
  * 3. Tombol submit "Kirim Ucapan"
- * 4. Daftar ucapan terbaru dengan atribusi nama, penanda waktu, dan isi doa
+ * 4. Daftar ucapan terbaru sebagai carousel kartu geser kanan-kiri (swipe
+ *    sentuh atau panah), dengan atribusi nama, penanda waktu, dan isi doa
  * 5. Ornamen sulur di sudut bawah (1 di ponsel, 2 di desktop)
  *
  * Integrasi Firestore (PRD §4.4): pengiriman lewat Server Action, paginasi
@@ -86,6 +87,12 @@ export function BukuTamu({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  // Posisi carousel ucapan: kartu terdepan yang sedang terlihat, plus status
+  // kedua ujung untuk menonaktifkan panah yang tidak bisa menggeser apa pun.
+  const [activeCard, setActiveCard] = useState(0);
+  const [atCarouselStart, setAtCarouselStart] = useState(true);
+  const [atCarouselEnd, setAtCarouselEnd] = useState(false);
+
   // Acuan waktu tunggal untuk seluruh baris daftar, disegarkan tiap penyegaran
   // berkala. Nilai awalnya dihitung juga saat render server, sehingga penanda
   // waktu bisa berbeda beberapa milidetik dari hasil hidrasi klien —
@@ -93,6 +100,8 @@ export function BukuTamu({
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   const sectionRef = useRef<HTMLElement | null>(null);
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+  const scrollSyncFrameRef = useRef<number | null>(null);
   const loadedCountRef = useRef(loadedCount);
   const entriesRef = useRef(entries);
   // Kegagalan render server perlu satu percobaan ulang. Dipicu saat seksi
@@ -213,6 +222,15 @@ export function BukuTamu({
         // mematikan penyegaran untuk tamu yang sebenarnya hanya melihat
         // sedikit baris.
         if (entriesRef.current.length > guestBookConfig.maxPollWindow) return;
+        // Penyegaran menyisipkan ucapan baru sebagai kartu PALING DEPAN, dan
+        // `scrollLeft` kontainer adalah angka, bukan jangkar: seluruh strip
+        // bergeser ke kanan sementara posisi gulir tidak ikut berubah, jadi
+        // kartu yang sedang dibaca tamu berganti sendiri di depan matanya.
+        // Selama tamu belum kembali ke kartu pertama, penyegaran DITUNDA (bukan
+        // dibatalkan) — siklus berikutnya mengambilnya begitu tamu menggeser
+        // balik ke awal.
+        const carousel = carouselRef.current;
+        if (carousel && carousel.scrollLeft > 1) return;
         void reload(loadedCountRef.current);
       }, guestBookConfig.pollIntervalMs);
     };
@@ -310,6 +328,10 @@ export function BukuTamu({
         setEntries((prev) => [result.entry, ...prev]);
         setLoadedCount((prev) => prev + 1);
         setNowMs(Date.now());
+        // Ucapan tamu masuk di kartu paling depan. Tanpa ini, tamu yang sudah
+        // menggeser carousel ke kanan mendapat konfirmasi "tersimpan" untuk
+        // kartu yang berada di luar layar.
+        carouselRef.current?.scrollTo({ left: 0, behavior: "smooth" });
         setMsg("");
         setNotice(guestBookConfig.successNotice);
         // Naskah ini selesai; naskah berikutnya berhak atas kuncinya sendiri.
@@ -352,6 +374,128 @@ export function BukuTamu({
     }
     setIsLoadingMore(false);
   };
+
+  // Jarak antar kartu diukur dari posisi SESUNGGUHNYA di DOM, bukan dari
+  // konstanta lebar+gap yang ditebak dari kelas Tailwind: lebar kartu berbeda
+  // per breakpoint (1 kartu penuh di ponsel, 2 kartu di desktop). Wajib
+  // presisi — `scroll-snap` CSS tidak konsisten ikut membetulkan posisi
+  // setelah `scrollBy` yang dipicu JS (beda dari scroll sentuh/wheel asli
+  // pengguna); diverifikasi langsung lewat Chrome DevTools, bukan diasumsikan:
+  // menggeser sejauh persentase lebar kontainer membuat strip berhenti di
+  // tengah-tengah kartu.
+  //
+  // Selisih `offsetLeft` antar kartu, bukan nilai mutlaknya: `offsetParent`
+  // kartu belum tentu kontainer scroll-nya, jadi nilai mutlak bisa membawa
+  // offset leluhur yang tidak relevan.
+  const measureCarousel = () => {
+    const el = carouselRef.current;
+    if (!el) return null;
+    const cards = Array.from(el.children) as HTMLElement[];
+    if (cards.length === 0) return null;
+    const origin = cards[0].offsetLeft;
+    const step = cards.length > 1 ? cards[1].offsetLeft - origin : el.clientWidth;
+    return { el, cards, origin, step: step > 0 ? step : el.clientWidth };
+  };
+
+  // `scroll-behavior: auto !important` di globals.css sudah menghormati
+  // prefers-reduced-motion, TAPI `behavior` yang ditulis eksplisit di
+  // ScrollToOptions mengalahkan properti CSS itu menurut spesifikasi — tanpa
+  // pengecekan ini, tamu yang mematikan animasi tetap mendapat gulir beranimasi
+  // dari tiap klik panah, klik titik, dan lompatan setelah kirim.
+  // "instant", bukan "auto": "auto" hanya mengembalikan keputusan ke properti
+  // CSS `scroll-behavior`, dan kelas `scroll-smooth` pada kontainer justru
+  // menyetel properti itu ke `smooth` — jadi "auto" tetap menghasilkan gulir
+  // beranimasi kecuali aturan reduced-motion di globals.css kebetulan menang.
+  // "instant" memaksa lompatan seketika tanpa bergantung pada urutan CSS.
+  const carouselScrollBehavior = (): ScrollBehavior =>
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+      ? "instant"
+      : "smooth";
+
+  const scrollCarousel = (direction: 1 | -1) => {
+    const measured = measureCarousel();
+    if (!measured) return;
+    measured.el.scrollBy({
+      left: direction * measured.step,
+      behavior: carouselScrollBehavior(),
+    });
+  };
+
+  const scrollToCard = (index: number) => {
+    const measured = measureCarousel();
+    if (!measured) return;
+    const target = measured.cards[index];
+    if (!target) return;
+    measured.el.scrollTo({
+      left: target.offsetLeft - measured.origin,
+      behavior: carouselScrollBehavior(),
+    });
+  };
+
+  /**
+   * Menyelaraskan penanda posisi (titik/penghitung) dan status aktif kedua
+   * tombol panah dengan posisi gulir nyata. Status ujung diambil dari
+   * `scrollLeft` terhadap lebar gulir — BUKAN dari `activeCard` — karena pada
+   * desktop dua kartu terlihat sekaligus, jadi gulir sudah mentok sebelum
+   * kartu terakhir pernah menjadi kartu terdepan; panah "berikutnya" akan
+   * tetap tampil aktif padahal tidak bisa menggeser apa pun lagi.
+   */
+  const syncCarouselState = useCallback(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const cards = Array.from(el.children) as HTMLElement[];
+    if (cards.length === 0) return;
+    const origin = cards[0].offsetLeft;
+    const rawStep = cards.length > 1 ? cards[1].offsetLeft - origin : el.clientWidth;
+    const step = rawStep > 0 ? rawStep : el.clientWidth;
+
+    const isAtStart = el.scrollLeft <= 1;
+    const isAtEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 1;
+
+    // Penjepitan di ujung kanan WAJIB, bukan kehati-hatian berlebih: di desktop
+    // dua kartu terlihat sekaligus, jadi gulir sudah mentok saat kartu terakhir
+    // baru menjadi kartu KEDUA — pembagian `scrollLeft / step` tidak pernah
+    // sampai ke indeks terakhir. Tanpa ini titik terakhir tidak pernah menyala
+    // padahal panah "berikutnya" sudah mati, dan mengklik titik terakhir malah
+    // menyalakan titik sebelumnya.
+    const leading = isAtEnd
+      ? cards.length - 1
+      : Math.min(cards.length - 1, Math.max(0, Math.round(el.scrollLeft / step)));
+
+    // Dijaga supaya tidak menyetel nilai yang sama: handler ini berjalan tiap
+    // frame gulir, dan strip bisa berisi sampai `maxPollWindow` kartu.
+    setActiveCard((prev) => (prev === leading ? prev : leading));
+    setAtCarouselStart((prev) => (prev === isAtStart ? prev : isAtStart));
+    setAtCarouselEnd((prev) => (prev === isAtEnd ? prev : isAtEnd));
+  }, []);
+
+  // Gulir sentuh membangkitkan event tiap frame, sementara `syncCarouselState`
+  // membaca offsetLeft/clientWidth/scrollWidth — pembacaan yang memaksa reflow
+  // sinkron. Dibatasi satu pengukuran per frame animasi.
+  const handleCarouselScroll = useCallback(() => {
+    if (scrollSyncFrameRef.current !== null) return;
+    scrollSyncFrameRef.current = requestAnimationFrame(() => {
+      scrollSyncFrameRef.current = null;
+      syncCarouselState();
+    });
+  }, [syncCarouselState]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollSyncFrameRef.current !== null) {
+        cancelAnimationFrame(scrollSyncFrameRef.current);
+      }
+    };
+  }, []);
+
+  // Daftar bisa berubah panjang tanpa ada gulir sama sekali (ucapan baru dari
+  // penyegaran berkala, paginasi, atau ucapan tamu sendiri), dan status ujung
+  // ikut berubah karenanya — tanpa ini panah "berikutnya" tetap mati padahal
+  // sudah ada kartu tambahan untuk dituju.
+  useEffect(() => {
+    syncCarouselState();
+  }, [entries.length, syncCarouselState]);
 
   return (
     <section
@@ -494,40 +638,125 @@ export function BukuTamu({
           </p>
         )}
 
-        {/* Daftar Ucapan */}
+        {/* Daftar Ucapan — carousel kartu doa yang digeser kanan-kiri: 1 kartu
+            penuh di ponsel, 2 kartu di desktop. Kendali (panah + titik posisi)
+            sengaja DI BAWAH strip, bukan melayang di atas kartu — versi
+            sebelumnya menaruh panah absolut di tepi kartu dan panahnya menutupi
+            baris pertama ucapan. Lihat docs/DECISIONS.md. */}
         {entries.length > 0 ? (
-          <div className="flex w-full flex-col gap-0 lg:max-w-[720px]">
-            {entries.map((entry, index) => (
-              <div
-                key={entry.id ?? `${entry.name}-${index}`}
-                className="border-t border-gold-bright/40 py-[18px] lg:py-[22px]"
-              >
-                <div className="flex items-baseline justify-between gap-[10px] lg:gap-[14px]">
-                  {/* min-w-0 + break-words: tanpa keduanya, nama panjang tanpa
-                      spasi memaksa lebar item flex melewati kontainer dan
-                      terpotong diam-diam oleh overflow-hidden seksi. */}
-                  <span className="text-buku-name lg:text-buku-name-lg min-w-0 text-ink break-words">
-                    {entry.name}
-                  </span>
+          <div className="w-full border-t border-gold-bright/40 pt-[20px] lg:max-w-[720px] lg:pt-[26px]">
+            <div
+              ref={carouselRef}
+              onScroll={handleCarouselScroll}
+              className="scrollbar-hidden flex w-full snap-x snap-mandatory items-start gap-4 overflow-x-auto scroll-smooth lg:items-stretch lg:gap-5"
+            >
+              {entries.map((entry, index) => (
+                <article
+                  key={entry.id ?? `${entry.name}-${index}`}
+                  className="flex w-full shrink-0 snap-start flex-col items-center border border-gold-bright/45 bg-white/55 px-[22px] py-[26px] text-center lg:w-[calc((100%-20px)/2)] lg:px-[26px] lg:py-[30px]"
+                >
                   <span
-                    suppressHydrationWarning
-                    className="text-buku-when lg:text-buku-when-lg text-ink-soft shrink-0"
+                    className="text-buku-quote lg:text-buku-quote-lg text-gold-bright/75"
+                    aria-hidden="true"
                   >
-                    {entry.when ??
-                      formatRelativeTimeId(
-                        entry.createdAt,
-                        nowMs,
-                        guestBookConfig.justNowLabel
-                      )}
+                    &ldquo;
                   </span>
-                </div>
-                {/* break-words menangani tempelan tautan panjang atau teks
-                    tanpa spasi; text-pretty saja tidak memecah kata tunggal. */}
-                <p className="mt-[6px] text-buku-msg text-ink-soft text-pretty break-words lg:mt-[7px] lg:max-w-[620px] lg:text-buku-msg-lg">
-                  {entry.msg}
-                </p>
+
+                  {/* flex-1 mendorong blok atribusi ke dasar kartu, supaya nama
+                      pengirim tetap sebaris rapi antar kartu yang panjang
+                      ucapannya berbeda-beda (tinggi kartu sendiri sudah seragam
+                      lewat items-stretch).
+                      break-words menangani tempelan tautan panjang atau teks
+                      tanpa spasi; text-pretty saja tidak memecah kata tunggal. */}
+                  <p className="text-buku-msg lg:text-buku-msg-lg mt-[6px] flex-1 text-ink-soft text-pretty break-words">
+                    {entry.msg}
+                  </p>
+
+                  <div className="mt-[18px] flex flex-col items-center gap-[6px] lg:mt-[22px]">
+                    <svg
+                      className="h-[13px] w-[104px] text-gold-bright lg:h-[15px] lg:w-[124px]"
+                      aria-hidden="true"
+                    >
+                      <use href="#orn" />
+                    </svg>
+                    <span className="text-buku-name lg:text-buku-name-lg min-w-0 text-ink break-words">
+                      {entry.name}
+                    </span>
+                    <span
+                      suppressHydrationWarning
+                      className="text-buku-when lg:text-buku-when-lg text-ink-soft"
+                    >
+                      {entry.when ??
+                        formatRelativeTimeId(
+                          entry.createdAt,
+                          nowMs,
+                          guestBookConfig.justNowLabel
+                        )}
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {entries.length > 1 && (
+              <div className="mt-[18px] flex items-center justify-center gap-[14px] lg:mt-[22px] lg:gap-[18px]">
+                <button
+                  type="button"
+                  onClick={() => scrollCarousel(-1)}
+                  disabled={atCarouselStart}
+                  aria-label="Ucapan sebelumnya"
+                  className="border-gold-bright/70 text-ink-soft hover:border-gold-deep hover:bg-gold-deep hover:text-on-photo flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border bg-transparent transition-colors disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-gold-bright/70 disabled:hover:bg-transparent disabled:hover:text-ink-soft lg:h-10 lg:w-10"
+                >
+                  <CarouselChevronIcon direction="left" />
+                </button>
+
+                {/* Titik posisi hanya sampai 10 ucapan; di atas itu barisnya
+                    lebih panjang dari lebar layar ponsel, jadi diganti penghitung. */}
+                {entries.length <= 10 ? (
+                  <div className="flex items-center">
+                    {entries.map((entry, index) => (
+                      <button
+                        key={entry.id ?? `dot-${entry.name}-${index}`}
+                        type="button"
+                        onClick={() => scrollToCard(index)}
+                        aria-label={`Ucapan ke-${index + 1} dari ${entries.length}`}
+                        aria-current={index === activeCard ? "true" : undefined}
+                        className="group flex h-6 w-4 cursor-pointer items-center justify-center"
+                      >
+                        {/* Titiknya sendiri tetap 7px demi tampilan, tapi area
+                            sentuhnya 16×24px: pada 7px murni, titik di ponsel
+                            praktis tidak bisa ditekan dengan jari. Lebarnya
+                            ditahan di 16px (bukan 24px penuh) supaya sepuluh
+                            titik + dua panah tetap muat dalam satu baris pada
+                            layar 390px; panah 36px dan swipe layar tetap
+                            tersedia sebagai kendali utama. */}
+                        <span
+                          className={`block h-[7px] rounded-full transition-all duration-300 ${
+                            index === activeCard
+                              ? "w-[20px] bg-gold-deep"
+                              : "w-[7px] bg-gold-bright/40 group-hover:bg-gold-bright/70"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-buku-when lg:text-buku-when-lg text-ink-soft tabular-nums">
+                    {activeCard + 1} / {entries.length}
+                  </span>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => scrollCarousel(1)}
+                  disabled={atCarouselEnd}
+                  aria-label="Ucapan berikutnya"
+                  className="border-gold-bright/70 text-ink-soft hover:border-gold-deep hover:bg-gold-deep hover:text-on-photo flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border bg-transparent transition-colors disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-gold-bright/70 disabled:hover:bg-transparent disabled:hover:text-ink-soft lg:h-10 lg:w-10"
+                >
+                  <CarouselChevronIcon direction="right" />
+                </button>
               </div>
-            ))}
+            )}
           </div>
         ) : loadFailed ? null : (
           /* Hanya ditampilkan bila daftar memang berhasil dibaca dan kosong.
@@ -565,5 +794,24 @@ export function BukuTamu({
         )}
       </div>
     </section>
+  );
+}
+
+function CarouselChevronIcon({ direction }: { direction: "left" | "right" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`h-4 w-4 lg:h-4.5 lg:w-4.5 ${direction === "right" ? "-scale-x-100" : ""}`}
+      aria-hidden="true"
+    >
+      <path
+        d="M15 5l-7 7 7 7"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
   );
 }

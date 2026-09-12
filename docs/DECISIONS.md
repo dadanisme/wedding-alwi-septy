@@ -742,3 +742,79 @@ Perbaikan berjalan 3 iterasi sebelum benar-benar presisi piksel:
 **Mitigasi untuk field baru sendiri:** `text-story-subtitle-lg` sengaja dibuat MANDIRI (properti lengkap: font-family, font-weight, font-style italic, line-height, letter-spacing — bukan cuma delta font-size) supaya tidak mewarisi bug yang sama, karena italic pada subtitle penting untuk hierarki visual dan item ke-4 mengandalkan subtitle sebagai satu-satunya teks deskriptif di desktop (tidak ada `desktopDescription` untuk item itu).
 
 **Verifikasi:** `bun test` 15/15, `bun run lint` 0 error/warning, `bun run build` sukses. Visual + a11y-tree via Chrome DevTools MCP di 390px dan 1280px — badge angka hilang, subtitle italic tampil benar (dikonfirmasi `getComputedStyle().fontStyle === "italic"`) di kedua breakpoint, item ke-4 tampil title+subtitle tanpa body kosong yang janggal. **Belum dikonfirmasi manusia di ponsel asli.**
+
+---
+
+## Empat perubahan klien dalam satu sesi (12 Sep 2026)
+
+**Keputusan:** mengerjakan empat perubahan lintas-seksi dalam satu sesi — Love Story dihapus, foto Mempelai diganti elemen dekoratif, daftar Buku Tamu jadi carousel, dan `modern-05` dipindah ke awal Galeri.
+
+**Alasan:** `CLAUDE.md` melarang mengerjakan lebih dari satu seksi per sesi. Larangan itu ditembus di sini **atas instruksi eksplisit user** ("semua aja langsung") setelah ditanya lebih dulu mana yang mau didahulukan. Dicatat supaya tidak dijadikan preseden diam-diam: aturan satu-seksi-per-sesi tetap berlaku untuk sesi berikutnya kecuali user kembali menyatakan sebaliknya.
+
+**Sumbernya:** keputusan klien hasil diskusi dengan Alwi, diteruskan lewat tangkapan layar WhatsApp berisi tiga poin ("Laman roadmap dihapus aja", "Nama mempelai ga usah ada foto aja", "Ucapan, slide kanan kiri") plus satu foto galeri yang ditunjuk untuk dinaikkan.
+
+---
+
+## Seksi Love Story / "Roadmap to Our Wedding Day" dihapus total
+
+**Keputusan:** seksi dihapus seluruhnya, bukan disembunyikan di balik flag. `components/sections/love-story.tsx` dihapus, render di `invitation-experience.tsx` dicabut, `loveStoryConfig` + interface `LoveStoryMoment` dihapus dari `lib/event-config.ts`, dan seluruh blok utility `text-story-*` / `bg-story-placeholder*` dihapus dari `app/globals.css`.
+
+**Alasan:** permintaan klien. Dihapus bersih karena konvensi proyek melarang meninggalkan kode mati / shim kompatibilitas; naskahnya tetap terekam di git history dan di entri DECISIONS sebelumnya kalau nanti dihidupkan lagi.
+
+**Efek samping yang diterima:** audit bug typografi `text-story-*-lg` yang dicatat di entri sesi 10 Sep jadi **tidak relevan lagi** — utility-nya sudah tidak ada. Butir "audit pola `text-story-*-lg`" di PROGRESS.md dicoret karenanya. Pola serupa di seksi lain (kalau ada) tetap belum diaudit.
+
+---
+
+## Foto Mempelai diganti panel dekoratif, bukan dihapus
+
+**Keputusan:** kotak placeholder foto 3:4 diganti panel berbingkai emas berisi ikon cincin kawin (`#ico-rings` dari sistem ornamen proyek) di atas inisial nama panggilan (A / S) berwarna emas. Field `photo`, `photoPlaceholderText`, `photoPlaceholderDesktopText` dihapus dari `couple`, begitu juga utility `bg-mempelai-placeholder*` dan `text-mempelai-note*`.
+
+**Alasan:** user memilih "ganti foto dengan elemen dekoratif lain" saat ditanya, bukan "hapus kotaknya". Mempertahankan bingkai 3:4 berukuran sama membuat tata letak tiga kolom desktop dan susunan vertikal ponsel tidak berubah sama sekali — risiko paling kecil. Isinya sengaja memakai ornamen yang SUDAH ada di sistem, bukan motif baru, karena arah desain proyek ini ditentukan klien lewat gambar referensi dan tidak ada referensi untuk elemen ini.
+
+**Konsekuensi:** kondisi "menunggu foto solo mempelai" berubah jadi "memang tidak ada foto". Baris Terkunci "Foto solo mempelai resmi" di PROGRESS.md dicabut, dan teks catatan bawah seksi diubah dari "* Foto dan detail profil bersifat sementara..." jadi hanya soal detail profil.
+
+**Ditolak:** menghapus bingkainya sama sekali dan menyisakan teks saja — tidak dipilih user, dan akan membuat kolom desktop tinggal teks mengambang tanpa jangkar visual.
+
+---
+
+## Daftar ucapan Buku Tamu jadi carousel, paginasinya tidak berubah
+
+**Keputusan:** daftar vertikal diganti carousel kartu horizontal — **1 kartu penuh di ponsel, tepat 2 kartu di desktop** — digeser lewat swipe native, tombol panah, atau titik posisi. Mekanisme paginasi (`Muat Ucapan Lainnya`), jeda 30 detik, batas 3 ucapan/tamu, kunci idempotensi, dan penyegaran berkala 20 detik **tidak disentuh sama sekali**; hanya lapisan tampilannya yang berubah.
+
+**Alasan:** permintaan klien ("Ucapan, slide kanan kiri"). Tidak ada gambar referensi, jadi desainnya diusulkan dan disetujui user untuk dirancang sendiri. Menjaga logika data tetap utuh disengaja: seluruh bagian itu punya sebelas cacat yang dulu ditemukan lewat pengujian (lihat entri Buku Tamu sebelumnya) dan tidak ada alasan mempertaruhkannya demi perubahan visual.
+
+**Dua iterasi desain, keduanya ditolak user sebelum versi final:**
+1. Kartu 240px dengan intipan kartu berikutnya di ponsel — ditolak ("wajib 1 pada satu waktu").
+2. Kartu lebar penuh tapi tombol panah melayang absolut di tepi kartu — ditolak ("jelek banget"). Penyebab konkretnya terlihat di tangkapan layar: **panah kiri menimpa baris pertama teks ucapan**.
+
+**Desain final:** kartu bergaya kutipan (tanda kutip emas dekoratif, teks rata tengah, pembatas ornamen `#orn`, nama pengirim Cormorant Garamond, waktu di bawahnya), dengan **seluruh kendali dipindah ke bawah strip** (panah · titik posisi · panah, rata tengah) sehingga tidak ada elemen yang menutupi teks tamu. Di atas 10 ucapan, titik posisi diganti penghitung "3 / 27" supaya barisnya tidak meluber di layar 390px.
+
+**Angka yang diverifikasi langsung di browser (bukan dari screenshot):** ponsel lebar kartu == lebar area terlihat (315px == 315px) → tepat 1 kartu, nol intipan. Desktop 2 × 350px + gap 20px == 720px → tepat 2 kartu, tidak ada kartu ketiga terpotong.
+
+---
+
+## Tujuh temuan `/code-review` pada carousel, semuanya diperbaiki
+
+**Keputusan:** seluruh tujuh temuan ditindak, bukan sebagian. Dicatat karena tiga di antaranya adalah kelas kesalahan yang berulang di proyek ini.
+
+1. **Titik posisi terakhir tidak pernah menyala di desktop.** `round(scrollLeft / step)` mengasumsikan satu kartu per layar; dengan dua kartu terlihat, gulir sudah mentok saat kartu terakhir baru jadi kartu kedua, jadi indeks terakhir **tidak pernah tercapai**. Akibatnya panah "berikutnya" mati sementara indikator masih menunjuk ada kartu di depan, dan mengklik titik terakhir malah menyalakan titik sebelumnya. Diperbaiki dengan menjepit indeks ke kartu terakhir saat gulir di ujung. Menariknya komentar di `syncCarouselState` sudah menyadari masalah "dua kartu terlihat" ini untuk tombol panah — perbaikannya waktu itu hanya dipasang di status panah, tidak di indeks aktif.
+2. **Penyegaran berkala menggeser kartu yang sedang dibaca.** `reload` menyisipkan ucapan baru di depan, dan `scrollLeft` adalah angka, bukan jangkar — strip bergeser sementara posisi gulir tetap. Jalur kirim sudah menangani kelas masalah ini (`scrollTo({left: 0})`), jalur poll 20 detik belum. Diperbaiki dengan menunda penyegaran selama tamu belum kembali ke kartu pertama.
+3. **`onScroll` tanpa throttle** memaksa reflow sinkron dan tiga `setState` tiap frame, pada strip yang bisa berisi sampai `maxPollWindow` (100) kartu. Dibatasi satu pengukuran per frame lewat `requestAnimationFrame` + penjagaan nilai-tidak-berubah.
+4. **`prefers-reduced-motion` dilanggar.** `behavior: "smooth"` yang ditulis eksplisit mengalahkan `scroll-behavior: auto !important` milik globals.css menurut spesifikasi. **Perbaikan pertama justru no-op dan ketahuan hanya karena diuji:** memakai `behavior: "auto"` cuma mengembalikan keputusan ke properti CSS — dan kelas `scroll-smooth` pada kontainer menyetel properti itu ke `smooth`, jadi gulir tetap beranimasi. Dibuktikan di browser (setelah 60ms masih 39px dari langkah 331px), lalu diganti `"instant"` dan diuji ulang: normal 0px pada 60ms (masih beranimasi) vs reduced-motion 331px (langsung mendarat).
+5. **Titik posisi 7×7px** praktis tidak bisa ditekan jari. Titiknya tetap 7px demi tampilan, area sentuhnya jadi 16×24px. Lebar ditahan 16px (bukan 24px penuh) supaya sepuluh titik + dua panah tetap muat satu baris di layar 390px; panah 36px dan swipe layar tetap jadi kendali utama.
+6. **`items-stretch` menyeragamkan tinggi seluruh kartu ke ucapan terpanjang.** Dengan batas 500 karakter dan sampai 100 entri, satu ucapan panjang membuat semua kartu jadi kotak tinggi nyaris kosong. Diubah jadi `items-start` di ponsel (hanya satu kartu terlihat, keseragaman tidak membeli apa pun) dan `lg:items-stretch` di desktop (dua kartu bersebelahan, keseragaman justru perlu). Terukur: tinggi kartu di ponsel kini 215 / 241 / 215px mengikuti isinya masing-masing.
+7. **`aria-live` pada penghitung** mengumumkan ulang tiap event gulir. Dicabut — tombol panah dan titik sudah punya nama aksesibel sendiri.
+
+**Pelajaran yang berulang (sudah ada di memory, terkonfirmasi lagi):** perbaikan aksesibilitas/gulir **wajib diuji di browser**, bukan dinilai dari kode. Butir 4 lolos pembacaan kode dengan mulus padahal tidak melakukan apa-apa.
+
+---
+
+## `modern-05` dipindah ke foto pertama Galeri
+
+**Keputusan:** `modern-05.jpg` (foto lanskap, pasangan di hamparan bunga ungu) dipindah dari urutan ke-5 menjadi foto pertama.
+
+**Alasan:** permintaan klien, ditunjuk lewat panah di tangkapan layar yang mengarah ke puncak grid tepat di bawah judul "GALERI", dan dikonfirmasi lewat teks dengan menyebut alt-nya persis ("Alwi & Septy — foto modern 5").
+
+**Kenapa aman:** susunan grid galeri rapuh — ada tiga asersi build-time (`assertNoGridGaps` 2 & 4 kolom, `assertRowHeightsMatch`) yang sengaja dipasang supaya build gagal keras kalau urutan foto diedit dan memunculkan sel kosong atau baris beda tinggi. Susunan baru disimulasikan manual dulu sebelum diedit, lalu dibuktikan oleh `bun run build` yang memang mengeksekusi asersi itu saat prerender `/`. Aman karena kebetulan: run potret `modern-01..04` (genap, 4 foto) tetap utuh di belakangnya, dan lanskap tidak pernah dikelompokkan per-run oleh `buildGalleryTiles` — tiap lanskap selalu span-2 sendiri.
+
+**Terukur:** di 1280px baris pertama (tile lanskap span-2 + dua tile potret) tingginya sama persis 455.625px di ketiganya — bukan mendekati.

@@ -1,6 +1,27 @@
-import Image from "next/image";
 import { couple, mempelaiConfig } from "@/lib/event-config";
 import { ScrollReveal } from "@/components/scroll-reveal";
+
+/**
+ * Pengganti foto profil (keputusan klien 12 Sep 2026, diteruskan dari
+ * diskusi dengan Alwi: "nama mempelai ga usah ada foto aja") — ikon cincin
+ * kawin dari sistem ornamen proyek (#ico-rings) di atas inisial nama
+ * panggilan, menggantikan kotak placeholder foto 3:4. Lihat docs/DECISIONS.md.
+ */
+function MempelaiPortraitPanel({ nickname }: { nickname: string }) {
+  return (
+    <div
+      className="bg-cream-secondary flex aspect-3/4 w-[196px] flex-col items-center justify-center gap-3 border border-gold-bright p-3.5 transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(201,162,39,0.35)] lg:w-[290px] lg:gap-4 lg:outline lg:outline-1 lg:outline-gold-bright/35 lg:outline-offset-8"
+      aria-hidden="true"
+    >
+      <svg className="h-10 w-10 opacity-90 lg:h-14 lg:w-14" aria-hidden="true">
+        <use href="#ico-rings" />
+      </svg>
+      <span className="text-mempelai-initial lg:text-mempelai-initial-lg text-gold-deep">
+        {nickname.charAt(0)}
+      </span>
+    </div>
+  );
+}
 
 export function Mempelai() {
   return (
@@ -65,30 +86,7 @@ export function Mempelai() {
             duration={1000}
             className="flex w-full flex-col items-center gap-3.5 lg:gap-5"
           >
-            {couple.groom.photo ? (
-              <div className="relative aspect-3/4 w-[196px] overflow-hidden border border-gold-bright transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(201,162,39,0.35)] lg:w-[290px] lg:outline lg:outline-1 lg:outline-gold-bright/35 lg:outline-offset-8">
-                <Image
-                  src={couple.groom.photo}
-                  alt={couple.groom.fullName}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 196px, 290px"
-                />
-              </div>
-            ) : (
-              <div
-                className="bg-mempelai-placeholder lg:bg-mempelai-placeholder-lg flex aspect-3/4 w-[196px] items-center justify-center border border-gold-bright p-3.5 transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(201,162,39,0.35)] lg:w-[290px] lg:outline lg:outline-1 lg:outline-gold-bright/35 lg:outline-offset-8"
-                role="img"
-                aria-label="Placeholder foto mempelai pria"
-              >
-                <span className="text-mempelai-note lg:text-mempelai-note-lg text-ink-soft text-center">
-                  <span className="lg:hidden">{couple.groom.photoPlaceholderText}</span>
-                  <span className="hidden lg:inline">{couple.groom.photoPlaceholderDesktopText}</span>
-                  <br />
-                  <span className="mt-1 inline-block opacity-75">(sementara)</span>
-                </span>
-              </div>
-            )}
+            <MempelaiPortraitPanel nickname={couple.groom.nickname} />
 
             <h3 className="text-full-name lg:text-full-name-lg text-ink text-center max-w-[290px] text-balance lg:max-w-[340px]">
               {couple.groom.firstNamePart}{" "}
@@ -133,30 +131,7 @@ export function Mempelai() {
             duration={1000}
             className="flex w-full flex-col items-center gap-3.5 lg:gap-5"
           >
-            {couple.bride.photo ? (
-              <div className="relative aspect-3/4 w-[196px] overflow-hidden border border-gold-bright transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(201,162,39,0.35)] lg:w-[290px] lg:outline lg:outline-1 lg:outline-gold-bright/35 lg:outline-offset-8">
-                <Image
-                  src={couple.bride.photo}
-                  alt={couple.bride.fullName}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 196px, 290px"
-                />
-              </div>
-            ) : (
-              <div
-                className="bg-mempelai-placeholder lg:bg-mempelai-placeholder-lg flex aspect-3/4 w-[196px] items-center justify-center border border-gold-bright p-3.5 transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(201,162,39,0.35)] lg:w-[290px] lg:outline lg:outline-1 lg:outline-gold-bright/35 lg:outline-offset-8"
-                role="img"
-                aria-label="Placeholder foto mempelai wanita"
-              >
-                <span className="text-mempelai-note lg:text-mempelai-note-lg text-ink-soft text-center">
-                  <span className="lg:hidden">{couple.bride.photoPlaceholderText}</span>
-                  <span className="hidden lg:inline">{couple.bride.photoPlaceholderDesktopText}</span>
-                  <br />
-                  <span className="mt-1 inline-block opacity-75">(sementara)</span>
-                </span>
-              </div>
-            )}
+            <MempelaiPortraitPanel nickname={couple.bride.nickname} />
 
             <h3 className="text-full-name lg:text-full-name-lg text-ink text-center max-w-[290px] text-balance lg:max-w-[340px]">
               {couple.bride.firstNamePart}{" "}
@@ -173,7 +148,7 @@ export function Mempelai() {
           </ScrollReveal>
         </div>
 
-        {/* Catatan bahwa foto dan data sementara */}
+        {/* Catatan bahwa detail profil masih bisa berubah */}
         <ScrollReveal animation="fade-up" delay={500}>
           <p className="text-caption-italic text-ink-soft/75 text-center max-w-reading text-xs lg:text-sm">
             {mempelaiConfig.temporaryNote}

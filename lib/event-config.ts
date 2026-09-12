@@ -13,9 +13,6 @@ export const couple = {
     father: "Dadang Sukandi",
     mother: "Tini Hernawati",
     parentLabel: "Putra dari Bapak Dadang Sukandi\n& Ibu Tini Hernawati",
-    photo: null as string | null,
-    photoPlaceholderText: "foto mempelai pria\n3:4",
-    photoPlaceholderDesktopText: "foto mempelai pria\n3:4 · 290 × 387",
     instagram: null as string | null,
   },
   bride: {
@@ -26,16 +23,16 @@ export const couple = {
     father: "Uun Syukur",
     mother: "Imas Yuliah",
     parentLabel: "Putri dari Bapak Uun Syukur\n& Ibu Imas Yuliah",
-    photo: null as string | null,
-    photoPlaceholderText: "foto mempelai wanita\n3:4",
-    photoPlaceholderDesktopText: "foto mempelai wanita\n3:4 · 290 × 387",
     instagram: null as string | null,
   },
 } as const;
 
 export const mempelaiConfig = {
   sectionLabel: "Mempelai",
-  temporaryNote: "* Foto dan detail profil bersifat sementara dan dapat disesuaikan kembali.",
+  // Keputusan klien (12 Sep 2026, diteruskan dari diskusi dengan Alwi): seksi
+  // ini tidak lagi menampilkan foto sama sekali — bukan "menunggu foto".
+  // Lihat docs/DECISIONS.md.
+  temporaryNote: "* Detail profil dapat disesuaikan kembali bila ada perubahan dari mempelai.",
 } as const;
 
 
@@ -190,8 +187,21 @@ export const openingPhotos = {
  * dari dimensi asli tiap berkas (bukan ditebak): dipakai komponen untuk
  * memilih rasio tile grid per foto, bukan memaksa semua foto ke satu rasio
  * potret seperti wireframe mockup. Lihat docs/DECISIONS.md.
+ *
+ * `modern-05` dipindah ke posisi pertama atas permintaan klien (12 Sep 2026,
+ * diteruskan dari diskusi dengan Alwi) — sebelumnya urutan ke-5. Dicek dulu
+ * lewat simulasi `buildGalleryTiles`/`assertNoGridGaps` di galeri.tsx sebelum
+ * dipindah: aman secara kebetulan karena run potret modern-01..04 (genap,
+ * 4 foto) tetap utuh di belakangnya. Lihat docs/DECISIONS.md.
  */
 export const galleryPhotos = [
+  {
+    src: "/photos/modern-05.jpg",
+    alt: "Alwi & Septy — foto modern 5",
+    orientation: "landscape",
+    width: 2000,
+    height: 1333,
+  },
   {
     src: "/photos/modern-01.jpg",
     alt: "Alwi & Septy — foto modern 1",
@@ -219,13 +229,6 @@ export const galleryPhotos = [
     orientation: "portrait",
     width: 1331,
     height: 2000,
-  },
-  {
-    src: "/photos/modern-05.jpg",
-    alt: "Alwi & Septy — foto modern 5",
-    orientation: "landscape",
-    width: 2000,
-    height: 1333,
   },
   {
     src: "/photos/modern-07.jpg",
@@ -438,79 +441,6 @@ export const closingConfig = {
   wassalam: "Wassalamu'alaikum Warahmatullahi Wabarakatuh",
   familySignature: `Kel. ${couple.groom.father} \u00A0·\u00A0 Kel. ${couple.bride.father}`,
   monogramAlt: `Monogram ${couple.groom.nickname} & ${couple.bride.nickname}`,
-} as const;
-
-/**
- * Konfigurasi dan data seksi Love Story (Seksi 5, PRD §4.2 item 5).
- * Naskah "Roadmap to Our Wedding Day" dari klien (9 Sep 2026) — menggantikan
- * naskah linimasa awal yang ditranskrip dari mockup. Judul & subjudul sengaja
- * berbahasa Inggris (gaya klien), sedangkan body tetap Bahasa Indonesia —
- * satu-satunya seksi dengan campuran bahasa ini, dikonfirmasi user. Langkah
- * bernomor (1–4), bukan tahun — konten kini soal masa persiapan pasca-lamaran
- * menuju hari-H, bukan linimasa hubungan sejak awal kenal. Lihat docs/DECISIONS.md.
- */
-export interface LoveStoryMoment {
-  step: string;
-  title: string;
-  subtitle: string;
-  mobileDescription?: string;
-  desktopDescription?: string;
-  photo?: string | null;
-  placeholderText?: string;
-  placeholderDesktopText?: string;
-}
-
-export const loveStoryConfig = {
-  sectionLabel: "Roadmap to Our Wedding Day",
-  temporaryNote:
-    "* Linimasa dan narasi cerita bersifat sementara dan dapat disesuaikan kembali.",
-  moments: [
-    {
-      step: "1",
-      title: "We Said Yes",
-      subtitle: "The Beginning of Our Big Adventure",
-      mobileDescription:
-        "Lamaran selesai, dua keluarga bertemu, dan sejak saat itu semuanya mulai terasa nyata.",
-      desktopDescription:
-        "Lamaran selesai, dua keluarga bertemu, dan sejak saat itu semuanya mulai terasa nyata.",
-      photo: null,
-      placeholderText: "1 · 1:1",
-      placeholderDesktopText: "1 · 4:3",
-    },
-    {
-      step: "2",
-      title: "Planning Mode: ON",
-      subtitle: "Turning Ideas Into Our Day",
-      mobileDescription:
-        "Pergi ke sana-kemari, pilih ini-itu, revisi sana-sini. Pelan-pelan semua ide mulai berubah jadi hari yang benar-benar kami.",
-      desktopDescription:
-        "Pergi ke sana-kemari, pilih ini-itu, revisi sana-sini. Pelan-pelan semua ide mulai berubah jadi hari yang benar-benar kami.",
-      photo: null,
-      placeholderText: "2 · 1:1",
-      placeholderDesktopText: "2 · 4:3",
-    },
-    {
-      step: "3",
-      title: "The Wedding Hustle",
-      subtitle: "Meetings, Fittings & Endless Checklists",
-      mobileDescription:
-        "Meeting, fitting, urus dokumen, follow-up vendor, sampai checklist yang rasanya ga habis-habis, tapi somehow seru juga.",
-      desktopDescription:
-        "Meeting, fitting, urus dokumen, follow-up vendor, sampai checklist yang rasanya ga habis-habis, tapi somehow seru juga.",
-      photo: null,
-      placeholderText: "3 · 1:1",
-      placeholderDesktopText: "3 · 4:3",
-    },
-    {
-      step: "4",
-      title: "And Finally We’re Almost There",
-      subtitle:
-        "After all the planning, calls, checklists, and little chaos. See you on 10.10.2026.",
-      photo: null,
-      placeholderText: "4 · 1:1",
-      placeholderDesktopText: "4 · 4:3",
-    },
-  ] as readonly LoveStoryMoment[],
 } as const;
 
 
